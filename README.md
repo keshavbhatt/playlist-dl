@@ -7,7 +7,7 @@ Powerful. feature rich GUI playlist downloader application for Linux Desktop.
 - In built YouTube Playlist Search
 - Allows custom selection of videos from playlist
 - Allows downloading Audio only in more than 10 formats including mp3, aac, m4a, vorbis, opus, flac, and wav
--  Allows separate selection of Audio and Video quality with intuitive UI controls.
+- Allows downloading Video in popular MP4 and MKV containers with ability to specify video and audio download quality with intuitive UI controls.
 - MultiThreaded download support
 - Resume your downloads anytime.
 - Included Powerful Online Video Player
