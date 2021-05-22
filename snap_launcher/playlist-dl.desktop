@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+GenericName=Playlist-Dl
+Name[en_US]=playlist-dl
+Comment=YouTube Playlist Downloader 
+Name=Playlist-Dl
+Type=Application
+Icon=${SNAP}/meta/gui/icon.png
+Keywords=YouTube;Playlist
+Exec=playlist-dl %F
+Categories=Utility;Qt;
+Terminal=false
+StartupNotify=false

@@ -1,0 +1,66 @@
+name: playlist-dl
+version: git
+summary: YouTube Playlist Downloader
+description: |
+  Playlist-Dl is a powerful GUI app for Searching, Browsing, Playing and Downloading YouTube Playlists on Linux Desktop.
+grade: stable
+confinement: strict
+icon: snap/gui/icon.png
+base: core18
+
+architectures:
+  - build-on: amd64
+    run-on: amd64
+
+apps:
+  playlist-dl:
+    command: desktop-launch playlist-dl
+    environment:
+       DISABLE_WAYLAND: 1
+    desktop: usr/share/applications/playlist-dl.desktop
+    plugs:
+        - avahi-observe
+        - browser-support
+        - camera
+        - desktop
+        - desktop-legacy
+        - gsettings
+        - home
+        - opengl
+        - audio-playback
+        - removable-media
+        - screen-inhibit-control
+        - unity7
+        - upower-observe
+        - x11
+        - mount-observe
+        - network
+        - wayland
+plugs:
+  gsettings:
+  gtk-3-themes:
+    interface: content
+    target: $SNAP/data-dir/themes
+    default-provider: gtk-common-themes
+  icon-themes:
+    interface: content
+    target: $SNAP/data-dir/icons
+    default-provider: gtk-common-themes
+  sound-themes:
+    interface: content
+    target: $SNAP/data-dir/sounds
+    default-provider: gtk-common-themes
+  qt513:
+    interface: content
+    target: $SNAP/qt513
+    default-provider: qt513
+
+parts:
+   snap-launcher:
+     plugin: dump
+     source: snap_launcher/
+     override-build: |
+            snapcraftctl build
+            sed -i 's|Icon=.*|Icon=${SNAP}/meta/gui/icon.png|g' ${SNAPCRAFT_PART_SRC}/playlist-dl.desktop
+            mkdir -p ${SNAPCRAFT_PART_INSTALL}/usr/share/applications/
+            cp -rf ${SNAPCRAFT_PART_SRC}/playlist-dl.desktop ${SNAPCRAFT_PART_INSTALL}/usr/share/applications/playlist-dl.desktop
