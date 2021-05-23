@@ -1,5 +1,5 @@
 name: playlist-dl
-version: git
+version: '1.0'
 summary: YouTube Playlist Downloader
 description: |
   Playlist-Dl is a powerful GUI app for Searching, Browsing, Playing and Downloading YouTube Playlists on Linux Desktop.
