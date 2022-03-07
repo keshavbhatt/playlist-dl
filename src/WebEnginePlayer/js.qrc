@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>js/ads.light</file>
+        <file>js/skip.js</file>
+        <file>js/qwebchannel.js</file>
+    </qresource>
+</RCC>
