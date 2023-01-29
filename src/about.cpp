@@ -19,8 +19,8 @@ About::About(QWidget *parent) :
     appAuthorName       = "Keshav Bhatt";
     appAuthorEmail      = "keshavnrj@gmail.com";
     appAuthorLink       = "http://ktechpit.com";
-    donateLink          = "https://paypal.me/keshavnrj/10";
-    moreAppsLink        = "https://snapcraft.io/search?q=keshavnrj";
+    donateLink          = "https://paypal.me/keshavnrj/5";
+    moreAppsLink        = "https://snapcraft.io/publisher/keshavnrj";
 
     appSourceCodeLink   = "https://github.com/keshavbhatt/playlist-dl";
     appRateLink         = "snap://playlist-dl";
