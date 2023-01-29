@@ -2,14 +2,6 @@
 <ui version="4.0">
  <class>account</class>
  <widget class="QWidget" name="account">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>553</width>
-    <height>422</height>
-   </rect>
-  </property>
   <property name="windowTitle">
    <string>Account</string>
   </property>
@@ -176,7 +168,7 @@
      <item>
       <widget class="QPushButton" name="buy_external">
        <property name="text">
-        <string>Purchase Licence in browser</string>
+        <string>Purchase Licence</string>
        </property>
        <property name="icon">
         <iconset resource="icons.qrc">

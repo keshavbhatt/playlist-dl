@@ -45,7 +45,7 @@ account::account(QWidget *parent) :
     //serverUID is unique identiifier which distinguish app on server
     serverUID = "PLDL";
 
-    ev_time = 518400;// 6 days trial //1728000; //1728000 20 days trial value in seconds
+    ev_time = 86400 * 30;// 30 days trial value in seconds
 
     // loader is the child of status
     _loader = new WaitingSpinnerWidget(ui->status,true,false);
@@ -92,7 +92,7 @@ account::account(QWidget *parent) :
     write_evaluation_val();
     check_evaluation_used();
 
-    init_claimOffer();
+    //init_claimOffer();
 }
 
 void account::init_claimOffer()
@@ -377,6 +377,9 @@ void account::showPurchaseMessage(QString message)
 
 void account::on_offer_claim_ins_clicked()
 {
+    if(claimOffer == nullptr)
+        return;
+
     if(!claimOffer->isVisible())
         claimOffer->show();
     else
