@@ -18,7 +18,7 @@ account::account(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    //ui->offer_groupBox->hide();
+    ui->offer_groupBox->hide();
 
     ui->email->setText(tr("In pro version only"));
     ipV6 = utils::randomIpV6();
