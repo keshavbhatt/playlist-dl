@@ -88,7 +88,7 @@ void PlaylistSearch::doSearch()
 
         QString term = ui->searchLineEdit->text();
 
-        QUrl url("http://ktechpit.com/USS/Olivia/youtube/api.php");
+        QUrl url("https://ktechpit.com/USS/Olivia/youtube/api.php");
         QUrlQuery query;
         query.addQueryItem("query",term);
         url.setQuery(query);
