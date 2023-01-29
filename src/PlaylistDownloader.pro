@@ -21,7 +21,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
 
 # Set program version
-VERSION = 1.0
+VERSION = 2.1
 DEFINES += VERSIONSTR=\\\"$${VERSION}\\\"
 
 
