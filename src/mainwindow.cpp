@@ -13,7 +13,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     setWindowTitle(QApplication::applicationName());
-    setWindowIcon(QIcon(":/icons/app/icon-128.png"));
+    setWindowIcon(QIcon(":/icons/app/icon-64.png"));
     setMinimumWidth(600);
     setMinimumHeight(400);
 
