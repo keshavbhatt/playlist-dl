@@ -7,6 +7,8 @@
 
 int main(int argc, char *argv[])
 {
+    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+
     /*
      * Add extra arguments on runtime
      */
@@ -29,7 +31,6 @@ int main(int argc, char *argv[])
     QApplication::setOrganizationName("org.keshavnrj.ubuntu");
     QApplication::setApplicationVersion(VERSIONSTR);
 
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
     //allow multiple instances in debug builds
     #ifndef QT_DEBUG
