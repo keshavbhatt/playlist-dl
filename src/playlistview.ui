@@ -206,9 +206,6 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
-       <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
-      </item>
-      <item>
        <widget class="ElidedLabel" name="status_label">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
