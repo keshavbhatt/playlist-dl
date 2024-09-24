@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>563</width>
-    <height>536</height>
+    <width>809</width>
+    <height>568</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -33,6 +33,20 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QPushButton" name="forceReload">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;ByPass cache and load resource from network&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>Force Reload</string>
+       </property>
+       <property name="icon">
+        <iconset resource="icons.qrc">
+         <normaloff>:/icons/others/primo/button_blue_repeat.png</normaloff>:/icons/others/primo/button_blue_repeat.png</iconset>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
@@ -41,10 +55,10 @@
       <string notr="true"/>
      </property>
      <property name="verticalScrollMode">
-      <enum>QAbstractItemView::ScrollPerPixel</enum>
+      <enum>QAbstractItemView::ScrollMode::ScrollPerPixel</enum>
      </property>
      <property name="horizontalScrollMode">
-      <enum>QAbstractItemView::ScrollPerPixel</enum>
+      <enum>QAbstractItemView::ScrollMode::ScrollPerPixel</enum>
      </property>
     </widget>
    </item>
