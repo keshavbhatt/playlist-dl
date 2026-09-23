@@ -25,7 +25,7 @@ void Request::get(const QUrl url)
     QNetworkDiskCache* diskCache = new QNetworkDiskCache(this);
     diskCache->setCacheDirectory(_cache_path);
     m_netwManager->setCache(diskCache);
-    connect(m_netwManager,&QNetworkAccessManager::finished,[=](QNetworkReply* rep){
+    connect(m_netwManager,&QNetworkAccessManager::finished,[=, this](QNetworkReply* rep){
         if(rep->error() == QNetworkReply::NoError){
             QString repStr = rep->readAll();
             emit requestFinished(repStr);

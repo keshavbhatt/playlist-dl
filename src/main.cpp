@@ -4,11 +4,10 @@
 #include <QDebug>
 
 #include "rungaurd.h"
+#include "version.h"
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-
     /*
      * Add extra arguments on runtime
      */
@@ -29,7 +28,7 @@ int main(int argc, char *argv[])
 
     QApplication::setApplicationName("Playlist DL");
     QApplication::setOrganizationName("org.keshavnrj.ubuntu");
-    QApplication::setApplicationVersion(VERSIONSTR);
+    QApplication::setApplicationVersion(PLDL_VERSION);
 
 
     //allow multiple instances in debug builds

@@ -16,7 +16,7 @@ RateApp::RateApp(QWidget *parent, QString app_rating_url, int app_launch_count, 
 
     showTimer = new QTimer(this);
     showTimer->setInterval(this->present_delay);
-    connect(showTimer,&QTimer::timeout,[=](){
+    connect(showTimer,&QTimer::timeout,[=, this](){
        qDebug()<<"Rate timer timeout";
        emit showRateDialog();
        if(this->isVisible())

@@ -76,7 +76,7 @@ void PlayListItem::on_menuButton_clicked()
     QAction *viewPlaylistAction = new QAction(QIcon(":/icons/folder-open-line.png"), tr("View Playlist"), &menu);
     QAction *bookmarkPlaylistAction = new QAction(QIcon(":/icons/bookmark-3-line.png"), tr("Bookmark Playlist"), &menu);
 
-    connect(viewPlaylistAction,&QAction::triggered,[=](){
+    connect(viewPlaylistAction,&QAction::triggered,[=, this](){
         emit viewPlaylist(this->playlistId);
     });
 

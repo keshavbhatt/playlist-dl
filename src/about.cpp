@@ -52,17 +52,17 @@ About::About(QWidget *parent) :
         ui->source_code->hide();
     }
 
-    connect(ui->donate,&QPushButton::clicked,[=](){
+    connect(ui->donate,&QPushButton::clicked,[=, this](){
         QDesktopServices::openUrl(QUrl(donateLink));
     });
 
-    connect(ui->rate,&QPushButton::clicked,[=](){
+    connect(ui->rate,&QPushButton::clicked,[=, this](){
         QDesktopServices::openUrl(QUrl(appRateLink));
     });
-    connect(ui->more_apps,&QPushButton::clicked,[=](){
+    connect(ui->more_apps,&QPushButton::clicked,[=, this](){
         QDesktopServices::openUrl(QUrl(moreAppsLink));
     });
-    connect(ui->source_code,&QPushButton::clicked,[=](){
+    connect(ui->source_code,&QPushButton::clicked,[=, this](){
         QDesktopServices::openUrl(QUrl(appSourceCodeLink));
     });
 

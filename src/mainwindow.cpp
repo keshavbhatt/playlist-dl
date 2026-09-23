@@ -38,7 +38,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //init webenginePlayerWidget
     webenginePlayerWidget = new WebEnginePlayer(this);
-    connect(webenginePlayerWidget,&WebEnginePlayer::playerWorking,[=](bool working){
+    connect(webenginePlayerWidget,&WebEnginePlayer::playerWorking,[=, this](bool working){
         if(working){
             playerAction->setIcon(QIcon(":/icons/others/primo/red/button_blue_play.png"));
             playerAction->setToolTip(webenginePlayerWidget->getTitle());
@@ -48,7 +48,7 @@ MainWindow::MainWindow(QWidget *parent) :
             playerAction->setToolTip("Player");
         }
     });
-    connect(webenginePlayerWidget,&WebEnginePlayer::blockedClosed,[=](){
+    connect(webenginePlayerWidget,&WebEnginePlayer::blockedClosed,[=, this](){
         if(settingWidget){
             settingWidget->showNormal();
         }
@@ -57,7 +57,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //init playlistSearchWidget
     playlistSearchWidget = new PlaylistSearch(this,this->n_manager);
     playlistSearchWidget->layout()->setContentsMargins(0,0,0,0);
-    connect(playlistSearchWidget,&PlaylistSearch::loadPlaylist,[=](QString playListId){
+    connect(playlistSearchWidget,&PlaylistSearch::loadPlaylist,[=, this](QString playListId){
        startSpinner();
        playlistViewWidget->loadPlaylist(playListId);
        this->switchStackWidget(playlistViewWidget);
@@ -67,30 +67,30 @@ MainWindow::MainWindow(QWidget *parent) :
     //init playlisViewWidget
     playlistViewWidget = new PlaylistView(this);
     playlistViewWidget->layout()->setContentsMargins(0,0,0,0);
-    connect(playlistViewWidget,&PlaylistView::downloadSelected,[=](const QString playlistId,const QStringList itemIdList){
+    connect(playlistViewWidget,&PlaylistView::downloadSelected,[=, this](const QString playlistId,const QStringList itemIdList){
         startSpinner();
         playlistDownloadOptionsWidget->loadSelected(playlistId,itemIdList);
         this->switchStackWidget(playlistDownloadOptionsWidget);
         stopSpinner();
     });
 
-    connect(playlistViewWidget,&PlaylistView::playPlaylist,[=](const QString playlistId){
+    connect(playlistViewWidget,&PlaylistView::playPlaylist,[=, this](const QString playlistId){
         playPlaylist(playlistId);
     });
 
-    connect(playlistViewWidget,&PlaylistView::playAuthorUploads,[=](const QString authorId){
+    connect(playlistViewWidget,&PlaylistView::playAuthorUploads,[=, this](const QString authorId){
         playAuthorUploads(authorId);
     });
 
     //init playlisViewWidget
     playlistDownloadOptionsWidget = new PlaylistDownloadOptions(this,this->n_manager,nullptr);
     playlistDownloadOptionsWidget->layout()->setContentsMargins(0,0,0,0);
-    connect(playlistDownloadOptionsWidget,&PlaylistDownloadOptions::addToDownload,[=](QString download_record_filename)
+    connect(playlistDownloadOptionsWidget,&PlaylistDownloadOptions::addToDownload,[=, this](QString download_record_filename)
     {
        //add after a delay so the animation could be seen by user
        QTimer *timer = new QTimer(this);
        timer->setSingleShot(true);
-       connect(timer,&QTimer::timeout,[=](){
+       connect(timer,&QTimer::timeout,[=, this](){
            downloadWidget->addToDownload(download_record_filename,true);
            this->stopSpinner();
            timer->deleteLater();
@@ -109,7 +109,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //init stackWidget
     ui->stackedWidget->setAnimation(QEasingCurve::Type::OutQuart);
     ui->stackedWidget->setSpeed(650);
-    connect(ui->stackedWidget,&QStackedWidget::currentChanged,[=](int arg1)
+    connect(ui->stackedWidget,&QStackedWidget::currentChanged,[=, this](int arg1)
     {
         Q_UNUSED(arg1);
         if(stackVector.isEmpty() && ui->stackedWidget->currentWidget() != playlistSearchWidget){
@@ -151,7 +151,7 @@ MainWindow::MainWindow(QWidget *parent) :
     rateApp->setWindowFlags(Qt::Dialog);
     rateApp->setAttribute(Qt::WA_DeleteOnClose,true);
     QPoint centerPos = this->geometry().center()-rateApp->geometry().center();
-    connect(rateApp,&RateApp::showRateDialog,[=]()
+    connect(rateApp,&RateApp::showRateDialog,[=, this]()
     {
         if(this->windowState() != Qt::WindowMinimized && this->isVisible() && isActiveWindow()){
             rateApp->move(centerPos);
@@ -263,29 +263,29 @@ void MainWindow::createActions()
     accountAction   = new QAction(QIcon(":/icons/others/primo/lock.png"),tr("&Account"), this);
 
     //connect
-    connect(homeAction,&QAction::triggered,[=](){
+    connect(homeAction,&QAction::triggered,[=, this](){
        stackVector.clear();
        switchStackWidget(playlistSearchWidget,false);
     });
 
-    connect(searchAction,&QAction::triggered,[=]()
+    connect(searchAction,&QAction::triggered,[=, this]()
     {
         if(stackVector.isEmpty())
             return;
         switchStackWidget(stackVector.takeLast(),false);
     });
 
-    connect(downloadsAction,&QAction::triggered,[=]()
+    connect(downloadsAction,&QAction::triggered,[=, this]()
     {
         switchStackWidget(downloadWidget);
     });
 
-    connect(playerAction,&QAction::triggered,[=]()
+    connect(playerAction,&QAction::triggered,[=, this]()
     {
         switchStackWidget(webenginePlayerWidget);
     });
 
-    connect(accountAction,&QAction::triggered,[=]()
+    connect(accountAction,&QAction::triggered,[=, this]()
     {
          accountWidget->adjustSize();
          accountWidget->show();
@@ -336,19 +336,19 @@ void MainWindow::init_settings()
     settingWidget->restoreGeometry(settings.value("settingsGeo").toByteArray());
 
     connect(settingWidget,SIGNAL(updateWindowTheme()),this,SLOT(updateWindowTheme()));
-    connect(settingWidget,&SettingWidget::clearWebengineCache,[=](){
+    connect(settingWidget,&SettingWidget::clearWebengineCache,[=, this](){
         if(webenginePlayerWidget)
             webenginePlayerWidget->clearCache();
     });
 
-    connect(settingWidget,&SettingWidget::updatePlayerWebsite,[=](){
+    connect(settingWidget,&SettingWidget::updatePlayerWebsite,[=, this](){
         if(webenginePlayerWidget)
             webenginePlayerWidget->updatePlayerWebsite();
     });
 
 
 
-    connect(settingWidget,&SettingWidget::blockerSettingChanged,[=](const bool blockerDisabled){
+    connect(settingWidget,&SettingWidget::blockerSettingChanged,[=, this](const bool blockerDisabled){
        webenginePlayerWidget->blockerSettingChanged (blockerDisabled);
     });
 
@@ -449,9 +449,9 @@ void MainWindow::init_account()
     QPushButton *pb = new QPushButton("pop",this);
     pb->setObjectName("push");
     pb->hide();
-    connect(pb,&QPushButton::clicked,[=](){
+    connect(pb,&QPushButton::clicked,[=, this](){
        qDebug()<<"PUSH BUTTON clicked";
-       QTimer::singleShot(2000,[=](){
+       QTimer::singleShot(2000,[=, this](){
            if(accountWidget!=nullptr){
                if(!accountWidget->isVisible()){
                    accountWidget->adjustSize();
@@ -466,16 +466,16 @@ void MainWindow::init_account()
         accountWidget->setObjectName("accountWidget");
         accountWidget->setWindowFlags(Qt::Dialog);
         accountWidget->adjustSize();
-        connect(accountWidget,&account::showAccountWidget,[=](){
+        connect(accountWidget,&account::showAccountWidget,[=, this](){
             accountWidget->adjustSize();
             accountWidget->show();
             accountWidget->flashPurchaseButton();
         });
         //signal based check to enable pro on live check
-        connect(accountWidget,&account::disablePro,[=](){
+        connect(accountWidget,&account::disablePro,[=, this](){
            disablePro();
         });
-        connect(accountWidget,&account::enablePro,[=](){
+        connect(accountWidget,&account::enablePro,[=, this](){
            enablePro();
         });
         //manual check to enable pro if not conencted

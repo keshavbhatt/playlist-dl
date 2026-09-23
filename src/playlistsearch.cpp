@@ -3,6 +3,7 @@
 #include "ui_playlistsearch.h"
 
 #include <QMessageBox>
+#include <QRegularExpression>
 #include <QScrollBar>
 
 PlaylistSearch::PlaylistSearch(QWidget *parent, QNetworkAccessManager *manager)
@@ -182,13 +183,13 @@ void PlaylistSearch::parseResult(const QJsonDocument jsonResponse) {
     // init itemwidget & add to resultList
     PlayListItem *playlistItem =
         new PlayListItem(ui->resultsListWidget, n_manager);
-    connect(playlistItem, &PlayListItem::selectItem, [=](QPoint itemPos) {
+    connect(playlistItem, &PlayListItem::selectItem, [=, this](QPoint itemPos) {
       ui->resultsListWidget->setCurrentItem(
           ui->resultsListWidget->itemAt(itemPos));
     });
 
     connect(playlistItem, &PlayListItem::viewPlaylist,
-            [=](QString playlistId) { emit loadPlaylist(playlistId); });
+            [=, this](QString playlistId) { emit loadPlaylist(playlistId); });
 
     playlistItem->setObjectName("item_" + id);
     playlistItem->init(id, title, playlistThumbnail, author, authorId,
@@ -242,10 +243,11 @@ QString PlaylistSearch::getPlaylistId(QString arg1) {
   // QRegExp
   // reg("(?:http|https:\\/\\/|)www\\.youtube\\.com\\/playlist\\?list=([a-zA-Z0-9_-]{1,})");
   // QRegExp reg("(?:http|https:\\/\\/|)list=([a-zA-Z0-9_-]{1,})");
-  QRegExp reg(".*(youtu.be\\/|list=)([^#\\&\\?]*)");
-  if (reg.indexIn(arg1) > -1) {
-    qWarning() << reg.capturedTexts();
-    id = reg.cap(2);
+  static const QRegularExpression reg(".*(youtu.be\\/|list=)([^#\\&\\?]*)");
+  const QRegularExpressionMatch match = reg.match(arg1);
+  if (match.hasMatch()) {
+    qWarning() << match.capturedTexts();
+    id = match.captured(2);
   }
   return id;
 }
@@ -254,8 +256,9 @@ bool PlaylistSearch::isPlaylistUrl(QString arg1) {
   bool positive = false;
   // QRegExp
   // reg("(?:http|https:\\/\\/|)www\\.youtube\\.com\\/playlist\\?list=([a-zA-Z0-9_-]{1,})");
-  QRegExp reg(".*(youtu.be\\/|list=)([^#\\&\\?]*)");
-  if (reg.indexIn(arg1) == 0) {
+  static const QRegularExpression reg(".*(youtu.be\\/|list=)([^#\\&\\?]*)");
+  const QRegularExpressionMatch match = reg.match(arg1);
+  if (match.hasMatch() && match.capturedStart(0) == 0) {
     positive = true;
   }
   return positive;

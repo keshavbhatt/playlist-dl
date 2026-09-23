@@ -197,7 +197,7 @@ void PlaylistEntryItem::on_menuButton_clicked()
     QAction *showPlaylistDetailsAction = new QAction(QIcon(":/icons/bookmark-3-line.png"), tr("Show Playlist Info"), &menu);
     QAction *openDownloadFolderAction = new QAction(QIcon(":/icons/folder-open-line.png"), tr("Open Download Location"), &menu);
 
-    connect(openDownloadFolderAction,&QAction::triggered,[=]
+    connect(openDownloadFolderAction,&QAction::triggered,[=, this]
     {
         QString link = getPlaylistDownloadLocation();
         QFileInfo info(link);
@@ -217,11 +217,11 @@ void PlaylistEntryItem::on_menuButton_clicked()
         }
     });
 
-    connect(viewPlaylistAction,&QAction::triggered,[=](){
+    connect(viewPlaylistAction,&QAction::triggered,[=, this](){
         emit viewPlaylist(this->playlistId);
     });
 
-    connect(showPlaylistDetailsAction,&QAction::triggered,[=](){
+    connect(showPlaylistDetailsAction,&QAction::triggered,[=, this](){
         emit viewPlaylistInfo();
     });
 

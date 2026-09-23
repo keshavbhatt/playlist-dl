@@ -109,7 +109,7 @@ void RemotePixmapLabel2::showRetry(const QString urlStr)
     QPushButton *retryBtn = new QPushButton(tr(""),this);
     retryBtn->setIcon(QIcon(QPixmap::fromImage(img)));
     retryBtn->setObjectName("retry");
-    connect(retryBtn,&QPushButton::clicked,[=](){
+    connect(retryBtn,&QPushButton::clicked,[=, this](){
        setRemotePixmap(urlStr);
     });
     retryBtn->show();

@@ -1,6 +1,7 @@
 #include "downloadprocess.h"
 
 #include <QDir>
+#include <QRegularExpression>
 #include <QSettings>
 #include "utils.h"
 #include "helper.h"
@@ -365,7 +366,7 @@ void DownloadProcess::startDownloadProcess()
 
     connect(downloadProcess,SIGNAL(readyRead()),this,SLOT(downloadProcessReadyRead()));
     connect(downloadProcess,SIGNAL(finished(int)),this,SLOT(downloadProcessFinished(int)));
-    connect(downloadProcess,&QProcess::stateChanged,[=](QProcess::ProcessState state)
+    connect(downloadProcess,&QProcess::stateChanged,[=, this](QProcess::ProcessState state)
     {
         switch (state) {
         case QProcess::Starting:
@@ -407,27 +408,27 @@ void DownloadProcess::downloadProcessReadyRead()
     if ((output.contains(QString("[download]")))&&(!output.contains("[download] Destination:"))&&
                 (!output.contains("Merging formats into"))&&(!output.contains("Resuming download"))&&
                 (!output.contains("[ffmpeg]"))&&!output.contains("fragments")){
-        QRegExp rx("(\\d+\\.\\d+%)");
-        rx.indexIn(output);
-        if(!rx.cap(0).isEmpty()) {
-            progressVal = rx.cap(0);
+        static const QRegularExpression rx("(\\d+\\.\\d+%)");
+        const QRegularExpressionMatch rxMatch = rx.match(output);
+        if(rxMatch.hasMatch()) {
+            progressVal = rxMatch.captured(0);
             progressVal.chop(3);
         }
         //exact percent value
-        QRegExp rxe("(\\d.+%)");
-        rxe.indexIn(output);
-        if(!rxe.cap(0).isEmpty()) {
-            progressValExact = rxe.cap(0).remove("%");
+        static const QRegularExpression rxe("(\\d.+%)");
+        const QRegularExpressionMatch rxeMatch = rxe.match(output);
+        if(rxeMatch.hasMatch()) {
+            progressValExact = rxeMatch.captured(0).remove("%");
         }
         QString downspeed   = QString(QString(output.split(" at ").last()).split(" ETA").first()).remove("[download]");
         QString eta         = QString(output.split("ETA ").last()).remove("[download]");
         QString size        = QString(QString(output.split("% of ").last()).split(" at ").first()).remove("[download]");
 
-        QRegExp rxp("([A-Za-z]+)");
+        static const QRegularExpression rxp("([A-Za-z]+)");
         QString match;
-        rxp.indexIn(size);
-        if(!rxp.cap(0).isEmpty()){
-            match = rxp.cap(0);
+        const QRegularExpressionMatch rxpMatch = rxp.match(size);
+        if(rxpMatch.hasMatch()){
+            match = rxpMatch.captured(0);
         }
         double tot_size           = QString(size.split(match).first()).toDouble();
         double downloadedSize     = (progressValExact.toDouble()/100)*tot_size;

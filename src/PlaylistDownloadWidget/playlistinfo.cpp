@@ -28,7 +28,7 @@ PLaylistInfo::PLaylistInfo(QWidget *parent, QString download_record_filename) :
         label->setTextInteractionFlags(Qt::TextSelectableByMouse
                                        | Qt::LinksAccessibleByMouse
                                        | Qt::LinksAccessibleByKeyboard);
-        connect(label,&QLabel::linkActivated,[=](QString link)
+        connect(label,&QLabel::linkActivated,[=, this](QString link)
         {
             QFileInfo info(link);
             if(info.exists() == false){

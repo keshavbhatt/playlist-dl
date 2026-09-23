@@ -14,11 +14,11 @@ SettingWidget::SettingWidget(QWidget *parent) :
 
     init_engine();
 
-    connect(ui->download_engine,&QPushButton::clicked,[=]()
+    connect(ui->download_engine,&QPushButton::clicked,[=, this]()
     {
         emit engine->openSettingsAndClickDownload();
     });
-    connect(ui->clearn_engine_cache,&QPushButton::clicked,[=]()
+    connect(ui->clearn_engine_cache,&QPushButton::clicked,[=, this]()
     {
         engine->clearEngineCache();
         QMovie *movie=new QMovie(":/icons/others/load.gif");
@@ -72,12 +72,12 @@ void SettingWidget::init_engine()
 {
     engine = new Engine(this);
 
-    connect(engine,&Engine::errorMessage,[=](QString errorMessage)
+    connect(engine,&Engine::errorMessage,[=, this](QString errorMessage)
     {
          QMessageBox::critical(this,"Engine error",errorMessage);
     });
 
-    connect(engine,&Engine::engineCacheCleared,[=]()
+    connect(engine,&Engine::engineCacheCleared,[=, this]()
     {
         if(ui->loading_movie->movie()!=nullptr){
             ui->loading_movie->movie()->stop();
@@ -85,12 +85,12 @@ void SettingWidget::init_engine()
         ui->loading_movie->setVisible(false);
     });
 
-    connect(engine,&Engine::engineDownloadFailed,[=](QString errorMessage)
+    connect(engine,&Engine::engineDownloadFailed,[=, this](QString errorMessage)
     {
         QMessageBox::critical(this,"Engine error",errorMessage);
     });
 
-    connect(engine,&Engine::engineDownloadSucceeded,[=]()
+    connect(engine,&Engine::engineDownloadSucceeded,[=, this]()
     {
         if(ui->loading_movie->movie()!=nullptr){
             ui->loading_movie->movie()->stop();
@@ -99,12 +99,12 @@ void SettingWidget::init_engine()
         ui->download_engine->setEnabled(true);
     });
 
-    connect(engine,&Engine::engineStatus,[=](QString status)
+    connect(engine,&Engine::engineStatus,[=, this](QString status)
     {
         ui->engine_status->setText(status);
     });
 
-    connect(engine,&Engine::openSettingsAndClickDownload,[=]()
+    connect(engine,&Engine::openSettingsAndClickDownload,[=, this]()
     {
            this->show();
            engine->download_engine_clicked();

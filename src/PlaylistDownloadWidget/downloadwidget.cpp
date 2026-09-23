@@ -47,12 +47,12 @@ void DownloadWidget::init_downloadManager()
 {
     downloadManager = new DownloadManager(this,Engine::enginePath());
 
-    connect(downloadManager,&DownloadManager::downloadProcessListChanged,[=]()
+    connect(downloadManager,&DownloadManager::downloadProcessListChanged,[=, this]()
     {
         QTimer::singleShot(500,this,SLOT(updateButtons()));
     });
 
-    connect(downloadManager,&DownloadManager::processStatusChanged,[=](DownloadProcess::Status status,DownloadProcess *downloadProcess){
+    connect(downloadManager,&DownloadManager::processStatusChanged,[=, this](DownloadProcess::Status status,DownloadProcess *downloadProcess){
         if( downloadProcess != nullptr)
         {
             auto pUUID = downloadProcess->getPlaylistId();
@@ -73,7 +73,7 @@ void DownloadWidget::init_downloadManager()
         }
     });
 
-    connect(downloadManager,&DownloadManager::addedNewDownloadProcess,[=](DownloadProcess *dp)
+    connect(downloadManager,&DownloadManager::addedNewDownloadProcess,[=, this](DownloadProcess *dp)
     {
         if(ui->stackedWidget->currentWidget() != ui->playlistViewWidget)
             return;
@@ -309,19 +309,19 @@ void DownloadWidget::addToDownload(QString download_record_filename, bool animat
     item->setSizeHint(playlistItem->sizeHint());
     ui->playlistWidget->addItem(item);
 
-    connect(playlistItem,&PlaylistEntryItem::selectItem,[=](QPoint itemPos)
+    connect(playlistItem,&PlaylistEntryItem::selectItem,[=, this](QPoint itemPos)
     {
        ui->playlistWidget->setCurrentItem(ui->playlistWidget->itemAt(itemPos));
     });
 
-    connect(playlistItem,&PlaylistEntryItem::viewPlaylist,[=](QString playlistId)
+    connect(playlistItem,&PlaylistEntryItem::viewPlaylist,[=, this](QString playlistId)
     {
         Q_UNUSED(playlistId)
         updatePlaylisInfoButton(playlistItem);
         loadPlaylist(download_record_filename);
     });
 
-    connect(playlistItem,&PlaylistEntryItem::viewPlaylistInfo,[=]()
+    connect(playlistItem,&PlaylistEntryItem::viewPlaylistInfo,[=, this]()
     {
         showPlaylistInfo(download_record_filename);
     });
@@ -474,7 +474,7 @@ void DownloadWidget::updatePlaylisInfoButton(PlaylistEntryItem *playlistItem)
 
     if(playlistItem != nullptr)
     {
-        connect(ui->playlistInfoButton,&QPushButton::clicked,[=](){
+        connect(ui->playlistInfoButton,&QPushButton::clicked,[=, this](){
            showPlaylistInfo(playlistItem->getPlaylistRecordFileName());
         });
     }

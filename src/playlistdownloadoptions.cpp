@@ -121,7 +121,7 @@ void PlaylistDownloadOptions::resetUi()
     ui->mkv->setChecked(true);
 
     foreach (QRadioButton *btn, this->findChildren<QRadioButton*>()) {
-        connect(btn,&QRadioButton::toggled,[=](){
+        connect(btn,&QRadioButton::toggled,[=, this](){
             this->updateStatus();
         });
     }
@@ -139,7 +139,7 @@ void PlaylistDownloadOptions::resetUi()
         slider->setOptimalHint(40,70);
         slider->setBestHint(70,100);
 
-        connect(slider,&QAdvancedSlider::valueChanged,[=](int value)
+        connect(slider,&QAdvancedSlider::valueChanged,[=, this](int value)
         {
             QString valString;
             switch (value) {

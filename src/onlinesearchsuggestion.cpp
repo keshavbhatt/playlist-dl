@@ -1,4 +1,5 @@
 #include "onlinesearchsuggestion.h"
+#include <QSet>
 #include <QSettings>
 
 const QString suggestUrl(QStringLiteral("http://suggestqueries.google.com/complete/search?ds=yt&client=youtube&hjson=t&cp=1&format=5&alt=json&q=%1"));
@@ -27,10 +28,10 @@ onlineSearchSuggestion::onlineSearchSuggestion(QLineEdit *parent): QObject(paren
 
     connect(popup, SIGNAL(itemClicked(QTreeWidgetItem*,int)),
             SLOT(doneCompletion()));
-    connect(editor,&QLineEdit::returnPressed,[=](){
+    connect(editor,&QLineEdit::returnPressed,[=, this](){
         preventSuggest();
     });
-    connect(popup,&QTreeWidget::itemSelectionChanged ,[=](){
+    connect(popup,&QTreeWidget::itemSelectionChanged ,[=, this](){
         QTreeWidgetItem *item = popup->currentItem();
         editor->setText(item->text(0));
     });
@@ -38,7 +39,7 @@ onlineSearchSuggestion::onlineSearchSuggestion(QLineEdit *parent): QObject(paren
     timer.setSingleShot(true);
     timer.setInterval(500);
     connect(&timer, SIGNAL(timeout()), SLOT(autoSuggest()));
-    connect(editor,&QLineEdit::textEdited,[=](QString str){
+    connect(editor,&QLineEdit::textEdited,[=, this](QString str){
         if(str.trimmed().simplified().isEmpty()==false){
             timer.start();
         }
@@ -189,7 +190,8 @@ void onlineSearchSuggestion::handleNetworkData(QNetworkReply *networkReply)
                 }
             }
             if(editor->hasFocus()||!editor->text().isEmpty()){
-                choices = choices.toList().toSet().toList().toVector();
+                const QSet<QString> unique(choices.begin(), choices.end());
+                choices = QVector<QString>(unique.begin(), unique.end());
                 choices.prepend(editor->text()); // add first choice from user input
                 showCompletion(choices);
             }

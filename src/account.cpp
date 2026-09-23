@@ -5,7 +5,6 @@ Last Edited: Fri Mar 26 18:53:35 IST 2021
 #include "account.h"
 #include "ui_account.h"
 #include "utils.h"
-#include <QTextCodec>
 #include <QFile>
 #include <QStandardPaths>
 #include <QMessageBox>
@@ -26,7 +25,7 @@ account::account(QWidget *parent) :
     QGraphicsOpacityEffect *eff = new QGraphicsOpacityEffect(this);
     eff->setOpacity(1);
     ui->buy_external->setGraphicsEffect(eff);
-    connect(blinkTimer,&QTimer::timeout,[=](){
+    connect(blinkTimer,&QTimer::timeout,[=, this](){
         if(blinkCounter == 0){
             blinkTimer->stop();
             return;
@@ -59,7 +58,7 @@ account::account(QWidget *parent) :
     _loader->setRevolutionsPerSecond(3);
     _loader->setColor(QColor("#1e90ff"));
 
-    setting_path =  QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+    setting_path =  QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
 
     //retrive old accountId
     if(settings.value("accountId").isValid()){
@@ -148,7 +147,7 @@ void account::check_purchase_request_done()
     QByteArray ans= reply->readAll();
 
 
-    QString s_data = QTextCodec::codecForMib(106)->toUnicode(ans);  //106 is textcode for UTF-8 here --- http://www.iana.org/assignments/character-sets/character-sets.xml
+    QString s_data = QString::fromUtf8(ans);
     if(reply->error() == QNetworkReply::NoError){
         checkedOnline = true;
         purchase_checked(username+" - "+s_data);
@@ -278,7 +277,7 @@ void account::write_evaluation_val()
         qDebug()<<"write ev file";
         QTextStream out(&file);
         QString val = QByteArray::fromBase64(settings.value(QApplication::applicationName()+"_emit").toByteArray());
-        out<<val<<endl;
+        out<<val<<Qt::endl;
         file.close();
         //save time to .appname.id file too
         QFile file2(QStandardPaths::writableLocation(QStandardPaths::DownloadLocation)+"/."+QApplication::applicationName()+".id");
@@ -286,7 +285,7 @@ void account::write_evaluation_val()
             return;
         }else{
             QTextStream out(&file2);
-            out<<endl<<QByteArray(QString::number(QDateTime::currentMSecsSinceEpoch()/1000).toUtf8()).toBase64();
+            out<<Qt::endl<<QByteArray(QString::number(QDateTime::currentMSecsSinceEpoch()/1000).toUtf8()).toBase64();
             file2.close();
         }
     }else{

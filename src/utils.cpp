@@ -3,8 +3,10 @@
 #include <QDateTime>
 #include <QMessageBox>
 #include <QProcessEnvironment>
+#include <QRandomGenerator>
 #include <QRegularExpression>
 #include <time.h>
+#include "version.h"
 
 utils::utils(QObject *parent) : QObject(parent)
 {
@@ -77,7 +79,7 @@ bool utils::delete_cache(const QString cache_dir)
 //returns string with first letter capitalized
 QString utils::toCamelCase(const QString& s)
 {
-    QStringList parts = s.split(' ', QString::SkipEmptyParts);
+    QStringList parts = s.split(' ', Qt::SkipEmptyParts);
     for (int i = 0; i < parts.size(); ++i)
         parts[i].replace(0, 1, parts[i][0].toUpper());
     return parts.join(" ");
@@ -104,14 +106,13 @@ QString utils::generateRandomId(int length){
 QString utils::genRand(int length)
 {
     QDateTime cd = QDateTime::currentDateTime();
-    const QString possibleCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"+QString::number(cd.currentMSecsSinceEpoch()).remove(QRegExp("[^a-zA-Z\\d\\s]")));
+    const QString possibleCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"+QString::number(cd.currentMSecsSinceEpoch()).remove(QRegularExpression("[^a-zA-Z\\d\\s]")));
 
     const int randomStringLength = length;
     QString randomString;
-    qsrand(cd.toTime_t());
     for(int i=0; i<randomStringLength; ++i)
     {
-        int index = qrand() % possibleCharacters.length();
+        int index = QRandomGenerator::global()->bounded(possibleCharacters.length());
         QChar nextChar = possibleCharacters.at(index);
         randomString.append(nextChar);
     }
@@ -142,13 +143,13 @@ QString utils::convertSectoDay(qint64 secs)
 //static on demand path maker
 QString utils::returnPath(QString pathname)
 {
-    QString _data_path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+    QString _data_path = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
     if(!QDir(_data_path+QDir::separator()+pathname).exists()){
         QDir d(_data_path+QDir::separator()+pathname);
         d.mkpath(_data_path+QDir::separator()+pathname);
     }
     if(pathname.endsWith(QDir::separator()))
-        pathname.remove(pathname.count()-1,1);
+        pathname.remove(pathname.size()-1,1);
     return _data_path+QDir::separator()+pathname+QDir::separator();
 }
 
@@ -160,7 +161,7 @@ QString utils::returnExactPath(QString pathname)
         d.mkpath(pathname);
     }
     if(pathname.endsWith(QDir::separator()))
-        pathname.remove(pathname.count()-1,1);
+        pathname.remove(pathname.size()-1,1);
     return pathname+QDir::separator();
 }
 
@@ -232,7 +233,7 @@ QString utils::appDebugInfo()
     QStringList debugInfo;
     debugInfo     << "<h3>"+QApplication::applicationName()+"</h3>"
                   << "<ul>"
-                  << "<li><b>" + QObject::tr("Version") + ":</b>             " + QString(VERSIONSTR) + "</li>"
+                  << "<li><b>" + QObject::tr("Version") + ":</b>             " + QString(PLDL_VERSION) + "</li>"
                   << "<li><b>" + QObject::tr("Build Date") + ":</b>          " + QString::fromLatin1(__DATE__) + "</li>"
                   << "<li><b>" + QObject::tr("Build Time") + ":</b>          " + QString::fromLatin1(__TIME__) + "</li>"
                   << "<li><b>" + QObject::tr("Qt Runtime Version")+ ":</b>   " + QString(qVersion()) + "</li>"
@@ -258,7 +259,7 @@ void utils::DisplayExceptionErrorDialog(const QString &error_info)
     message_box.setStandardButtons(QMessageBox::Close);
     QStringList detailed_text;
     detailed_text << "Error info: " + error_info
-                  << "\nApp version: " + QString(VERSIONSTR)
+                  << "\nApp version: " + QString(PLDL_VERSION)
                   << "\nQt Runtime Version: " + QString(qVersion())
                   << "\nQt Compiled Version: " + QString(QT_VERSION_STR)
                   << "\nSystem: " + QSysInfo::prettyProductName()
@@ -292,7 +293,10 @@ QString utils::GetEnvironmentVar(const QString &variable_name)
 void utils::saveJson(QJsonDocument document, QString fileName)
 {
     QFile jsonFile(fileName);
-    jsonFile.open(QFile::WriteOnly);
+    if(!jsonFile.open(QFile::WriteOnly)){
+        qWarning()<<"saveJson: cannot open"<<fileName<<jsonFile.errorString();
+        return;
+    }
     jsonFile.write(document.toJson());
     jsonFile.close();
 }
@@ -311,7 +315,7 @@ QJsonDocument utils::loadJson(QString fileName)
 
 QString utils::formatSeconds(int seconds)
 {
-    return QDateTime::fromTime_t(seconds).toUTC().toString("hh:mm:ss");
+    return QDateTime::fromSecsSinceEpoch(seconds).toUTC().toString("hh:mm:ss");
 }
 
 QObject* utils::getMainWindow(QObject *self)
@@ -332,13 +336,12 @@ bool utils::is_number( std::string token )
 QString utils::randomIpV6()
 {
     QDateTime cd = QDateTime::currentDateTime();
-    const QString possibleCharacters("abcdef0123456789"+QString::number(cd.currentMSecsSinceEpoch()).remove(QRegExp("[^a-zA-Z\\d\\s]")));
+    const QString possibleCharacters("abcdef0123456789"+QString::number(cd.currentMSecsSinceEpoch()).remove(QRegularExpression("[^a-zA-Z\\d\\s]")));
     const int randomStringLength = 28;
     QString randomString;
-    qsrand(cd.toTime_t());
     for(int i=0; i<randomStringLength; ++i)
     {
-        int index = qrand() % possibleCharacters.length();
+        int index = QRandomGenerator::global()->bounded(possibleCharacters.length());
         QChar nextChar = possibleCharacters.at(index);
         if(i==4||i==8||i==12||i==16||i==20||i==24){
             randomString.append(":");

@@ -30,7 +30,7 @@ WebEnginePlayer::WebEnginePlayer(QWidget *parent)
 
     bridge = new QJsBridge();
 
-    QObject::connect(bridge, &QJsBridge::hovered, [=](QVariant var)
+    QObject::connect(bridge, &QJsBridge::hovered, [=, this](QVariant var)
     {
         if(var.toDouble() == 1.0){
             showLoginPrompt();
@@ -39,7 +39,7 @@ WebEnginePlayer::WebEnginePlayer(QWidget *parent)
 
     //init webview
     m_view = new QWebEngineView(this);
-    connect(m_view,&QWebEngineView::loadFinished,[=](bool loaded)
+    connect(m_view,&QWebEngineView::loadFinished,[=, this](bool loaded)
     {
         if(loaded){
             emit playerWorking(m_view->title() != "about:blank");
@@ -48,7 +48,7 @@ WebEnginePlayer::WebEnginePlayer(QWidget *parent)
         mainWindow->stopSpinner();
         this->updateNavigationButtons(true);
     });
-    connect(m_view,&QWebEngineView::loadStarted,[=]()
+    connect(m_view,&QWebEngineView::loadStarted,[=, this]()
     {
         mainWindow->startSpinner();
         m_view->page()->profile()->settings()->setAttribute(QWebEngineSettings::ShowScrollBars,false);
@@ -56,7 +56,7 @@ WebEnginePlayer::WebEnginePlayer(QWidget *parent)
         this->updateNavigationButtons(false);
     });
 
-    connect(m_view,&QWebEngineView::loadProgress,[=](int progress)
+    connect(m_view,&QWebEngineView::loadProgress,[=, this](int progress)
     {
 
         toolbarWidget->setEnableCloseButton(m_view->title() != "about:blank");
@@ -163,23 +163,24 @@ WebEnginePlayer::WebEnginePlayer(QWidget *parent)
 
 void WebEnginePlayer::blockerSettingChanged(bool blockerDisabled)
 {
-    QWebEngineScript skipper = m_view->page()->scripts().findScript("skipper");
-    QWebEngineScript core    = m_view->page()->scripts().findScript("core");
+    QWebEngineScriptCollection &scripts = m_view->page()->scripts();
+    const QList<QWebEngineScript> skipper = scripts.find(QStringLiteral("skipper"));
+    const QList<QWebEngineScript> core    = scripts.find(QStringLiteral("core"));
 
-    if(blockerDisabled && m_view->page()->scripts().remove(skipper))
+    if(blockerDisabled)
     {
-        m_view->page()->scripts().remove(core);
-        this->reload(true);
+        if(!skipper.isEmpty() || !core.isEmpty())
+        {
+            for(const QWebEngineScript &script : skipper) scripts.remove(script);
+            for(const QWebEngineScript &script : core) scripts.remove(script);
+            this->reload(true);
+        }
     }else{
-        QWebEngineScript skipper = m_view->page()->scripts().findScript("skipper");
-        QWebEngineScript core    = m_view->page()->scripts().findScript("core");
-
-        if(skipper.isNull() || core.isNull() ){
-
+        if(skipper.isEmpty() || core.isEmpty())
+        {
             insertJavascript("skipper",getSourceCode(QStringLiteral(":/js/skip.js")),false);
             insertStyleSheet("core",getSourceCode(QStringLiteral(":/css/core.css")),false);
             this->reload(true);
-
         }
     }
 }
@@ -210,7 +211,7 @@ void WebEnginePlayer::init_blocked()
     blockedWidget->setWindowTitle(QApplication::applicationName()+" | Blocked requests");
     blockedWidget->setWindowFlag(Qt::Dialog);
     blockedWidget->setWindowModality(Qt::NonModal);
-    connect(blockedWidget,&Blocked::closed,[=](){
+    connect(blockedWidget,&Blocked::closed,[=, this](){
        emit blockedClosed();
     });
 }
@@ -249,11 +250,11 @@ void WebEnginePlayer::createToolBar()
     connect(toolbarWidget,&ToolBar::navigateWebviewFoward,m_view,&QWebEngineView::forward);
     connect(toolbarWidget,&ToolBar::reload,m_view,&QWebEngineView::reload);
     connect(toolbarWidget,&ToolBar::stop,m_view,&QWebEngineView::stop);
-    connect(toolbarWidget,&ToolBar::goHome,[=](){
+    connect(toolbarWidget,&ToolBar::goHome,[=, this](){
         m_view->page()->load(QUrl(homePaegUrl));
     });
 
-    connect(toolbarWidget,&ToolBar::history,[=](){
+    connect(toolbarWidget,&ToolBar::history,[=, this](){
 
         //load history of page
         QByteArray ba = history->value("history").toByteArray();

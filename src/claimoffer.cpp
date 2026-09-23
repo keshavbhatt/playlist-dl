@@ -28,7 +28,7 @@ ClaimOffer::ClaimOffer(QString accountId, QWidget *parent) :
     QLabel *label              = new QLabel(overlay);
     QProgressBar *progressbar  = new QProgressBar(overlay);
     QPushButton *cancel_button = new QPushButton("Cancel");
-    connect(cancel_button,&QPushButton::clicked,[=](){
+    connect(cancel_button,&QPushButton::clicked,[=, this](){
        auto *req = this->findChild<Request*>();
        if(req != nullptr){
            req->blockSignals(true);
@@ -97,12 +97,12 @@ void ClaimOffer::on_claimButton_clicked()
     auto *progressbar = overlay->findChild<QProgressBar*>();
 
     Request *req = new Request(this);
-    connect(req,&Request::requestStarted,[=](){
+    connect(req,&Request::requestStarted,[=, this](){
         overlay->show();
         if(progressbar!=nullptr)
             progressbar->setRange(0,0);
     });
-    connect(req,&Request::requestFinished,[=](QString rep){
+    connect(req,&Request::requestFinished,[=, this](QString rep){
         overlay->hide();
         if(progressbar!=nullptr)
             progressbar->setRange(0,100);
@@ -116,7 +116,7 @@ void ClaimOffer::on_claimButton_clicked()
         QMessageBox::information(this,this->windowTitle()+"- Information",
                                  rep,QMessageBox::Ok);
     });
-    connect(req,&Request::downloadError,[=](QString errorString){
+    connect(req,&Request::downloadError,[=, this](QString errorString){
         overlay->hide();
         if(progressbar!=nullptr)
             progressbar->setRange(0,100);
