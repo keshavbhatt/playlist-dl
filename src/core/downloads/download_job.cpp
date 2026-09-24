@@ -4,6 +4,8 @@
 
 #include <QJsonArray>
 
+#include <algorithm>
+
 using namespace Qt::StringLiterals;
 
 namespace pldl::core {
@@ -109,6 +111,33 @@ QString DownloadJob::statusLine() const
 QString DownloadJob::primaryFile() const
 {
     return outputFiles.isEmpty() ? QString() : outputFiles.first();
+}
+
+QString DownloadJob::detailLine() const
+{
+    if (isPlaylist() && itemCount > 0) {
+        if (isFinished()) {
+            return u"%1 videos"_s.arg(itemCount);
+        }
+        const QString place = u"%1 of %2"_s.arg(std::max(1, itemIndex)).arg(itemCount);
+        return currentItemTitle.isEmpty() ? place : currentItemTitle + u", "_s + place;
+    }
+    return uploader;
+}
+
+QString DownloadJob::formatLine() const
+{
+    switch (options.kind) {
+    case DownloadOptions::Kind::Video:
+        return qualityLabel(options.quality) + u", "_s + containerExtension(options.container).toUpper();
+    case DownloadOptions::Kind::Audio: {
+        const QString ext = audioFormatExtension(options.audioFormat);
+        return u"Audio, "_s + (ext.isEmpty() ? u"best"_s : ext.toUpper());
+    }
+    case DownloadOptions::Kind::Custom:
+        return u"Custom format"_s;
+    }
+    return {};
 }
 
 QJsonObject DownloadJob::toJson() const

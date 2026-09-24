@@ -60,6 +60,10 @@ QVariant DownloadQueue::data(const QModelIndex& index, int role) const
         return j.isPlaylist();
     case ErrorRole:
         return j.error;
+    case DetailLineRole:
+        return j.detailLine();
+    case FormatLineRole:
+        return j.formatLine();
     default:
         return {};
     }
@@ -78,6 +82,8 @@ QHash<int, QByteArray> DownloadQueue::roleNames() const
         {FilePathRole, "filePath"},
         {IsPlaylistRole, "isPlaylist"},
         {ErrorRole, "error"},
+        {DetailLineRole, "detailLine"},
+        {FormatLineRole, "formatLine"},
     };
 }
 
@@ -322,11 +328,10 @@ void DownloadQueue::notifyActive()
 
 void DownloadQueue::schedule()
 {
-    if (!hasEngine()) {
-        return;
-    }
-    // Oldest queued first (the list is newest-first).
-    for (int i = static_cast<int>(m_jobs.size()) - 1; i >= 0 && runningCount() < m_maxConcurrent; --i) {
+    // Oldest queued first (the list is newest-first). Without an engine the
+    // jobs wait in Queued, but they still count as active for the badge.
+    for (int i = static_cast<int>(m_jobs.size()) - 1; hasEngine() && i >= 0 && runningCount() < m_maxConcurrent;
+         --i) {
         DownloadJob& j = m_jobs[i];
         if (j.state == DownloadState::Queued && !m_runners.contains(j.id)) {
             startJob(j);
@@ -556,14 +561,27 @@ bool DownloadQueue::load(const QString& filePath)
             j.state = DownloadState::Paused;
         }
         loaded << j;
-        m_nextId = std::max(m_nextId, j.id + 1);
+    }
+    setJobs(loaded);
+    qCInfo(lcDownloads) << "loaded" << m_jobs.size() << "downloads from" << filePath;
+    return true;
+}
+
+void DownloadQueue::setJobs(QList<DownloadJob> jobs)
+{
+    const QList<quint64> running = m_runners.keys();
+    for (const quint64 id : running) {
+        stopRunner(id);
     }
     beginResetModel();
-    m_jobs = loaded;
+    m_jobs = std::move(jobs);
     endResetModel();
-    qCInfo(lcDownloads) << "loaded" << m_jobs.size() << "downloads from" << filePath;
+    for (const DownloadJob& j : std::as_const(m_jobs)) {
+        m_nextId = std::max(m_nextId, j.id + 1);
+    }
+    Q_EMIT changed();
     notifyActive();
-    return true;
+    schedule();
 }
 
 bool DownloadQueue::save(const QString& filePath) const

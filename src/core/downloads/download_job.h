@@ -62,6 +62,11 @@ struct DownloadJob
     [[nodiscard]] QString statusLine() const;
     /// The primary output file (first), or empty.
     [[nodiscard]] QString primaryFile() const;
+    /// The card's second line: the current entry and its place for a playlist
+    /// in progress ("Some video, 3 of 12"), else the uploader.
+    [[nodiscard]] QString detailLine() const;
+    /// The quality and format the options ask for ("1080p, MP4", "Audio, MP3").
+    [[nodiscard]] QString formatLine() const;
 
     [[nodiscard]] QJsonObject toJson() const;
     [[nodiscard]] static DownloadJob fromJson(const QJsonObject& object);

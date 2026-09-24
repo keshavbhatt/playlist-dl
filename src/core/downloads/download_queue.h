@@ -38,6 +38,8 @@ public:
         FilePathRole,
         IsPlaylistRole,
         ErrorRole,
+        DetailLineRole, ///< DownloadJob::detailLine()
+        FormatLineRole, ///< DownloadJob::formatLine()
     };
 
     /// Produces a fresh Netscape cookies file for a run, or nullptr for none.
@@ -83,6 +85,10 @@ public:
 
     bool load(const QString& filePath);
     bool save(const QString& filePath) const;
+    /// Replaces the list with `jobs` exactly as given (ids and states kept):
+    /// what load() does once it has read a file, and the seam the demo screen
+    /// and the page tests use to show every state without an engine.
+    void setJobs(QList<DownloadJob> jobs);
     [[nodiscard]] static QString defaultFilePath();
 
     static constexpr int kMaxEntries = 300;
