@@ -52,6 +52,9 @@
   delegate and filters. Verified live headless: `PLDL_DEBUG_DOWNLOAD` provisioned the
   engine and downloaded "Me at the zoo" (av1+aac, thumbnail embedded) in 151 s, exit 0.
   39 tests pass. Grabs of the demo queue in dark and light looked at.
+- Settings merged: six pages writing straight to settings, the engine card, Sign out and
+  clear session through a relaunch. 39 tests pass (`tst_browser_page` needs the network and
+  now allows 30 s).
 - Verified: grabs of the Search placeholder, the Browser page and the About sheet, looked
   at; `PLDL_DEBUG_OPEN`, `PLDL_DEBUG_GRAB`, `PLDL_DEBUG_WINDOW_SIZE` work offscreen with
   isolated XDG directories.

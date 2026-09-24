@@ -108,9 +108,9 @@ Target 30 options at most. Restart required: interface scale, hardware accelerat
 
 | # | Feature | 2.x | Decision | Status / class |
 |---|---|---|---|---|
-| G1 | Sidebar and stacked pages writing straight to settings; Reset settings | one dialog with group boxes | KEEP | todo |
+| G1 | Sidebar and stacked pages writing straight to settings; Reset settings | one dialog with group boxes | KEEP | done (`ui::SettingsDialog`, `ui::settings_form`; tst_settings_dialog) |
 | G2 | 2.x download folder and account id read once on first start | n/a | KEEP | done (`Application` reads the 2.x folder once; `LicenseService` the id) |
-| G3 | Cache size and Delete cache that agree with each other | measured one cache, cleared another | KEEP | todo |
+| G3 | Cache size and Delete cache that agree with each other | measured one cache, cleared another | KEEP | done (Advanced page: Clear cache clears the profile's HTTP cache) |
 
 ## H. Accounts and licensing (never in user-facing release text)
 
