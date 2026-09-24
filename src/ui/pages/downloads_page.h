@@ -97,6 +97,7 @@ private:
     BadgeLabel* m_allowanceChip = nullptr;
     QPushButton* m_pauseAll = nullptr;
     QPushButton* m_resumeAll = nullptr;
+    QPushButton* m_retryFailed = nullptr;
     QToolButton* m_clear = nullptr;
     QMenu* m_clearMenu = nullptr;
     QAction* m_clearFinished = nullptr;

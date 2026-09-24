@@ -88,6 +88,8 @@ public:
     void cancelRequests();
     void openDownloadFolder();
     void handleCardAction(quint64 id, Action action);
+    /// Retries every failed download in the list.
+    void retryFailed();
     /// Removes the job from the list; with `deleteFiles` its files, playlist
     /// file and (when left empty) its own folder go too.
     void removeJob(quint64 id, bool deleteFiles);

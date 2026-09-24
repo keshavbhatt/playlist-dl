@@ -333,9 +333,16 @@ void DownloadCardDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
     }
     painter->setPen(statusColor);
     const QRect statusRow(textLeft, card.top() + 56, textWidth, 16);
+    QString statusText = index.data(core::DownloadQueue::StatusLineRole).toString();
+    if (state == core::DownloadState::Failed) {
+        // The reason on the card itself, not only in the tooltip (review 2026-09-24).
+        const QString error = index.data(core::DownloadQueue::ErrorRole).toString().simplified();
+        if (!error.isEmpty() && !statusText.contains(error)) {
+            statusText += u": "_s + error;
+        }
+    }
     painter->drawText(statusRow, Qt::AlignLeft | Qt::AlignVCenter,
-                      smallMetrics.elidedText(index.data(core::DownloadQueue::StatusLineRole).toString(),
-                                              Qt::ElideRight, statusRow.width()));
+                      smallMetrics.elidedText(statusText, Qt::ElideRight, statusRow.width()));
 
     if (hovered) {
         paintButtons(painter, buttons, t, dpr);

@@ -388,6 +388,23 @@ void DownloadsController::cancelRequests()
     }
 }
 
+void DownloadsController::retryFailed()
+{
+    QList<quint64> failed;
+    for (int row = 0; row < m_queue->rowCount(); ++row) {
+        const QModelIndex index = m_queue->index(row, 0);
+        if (index.data(core::DownloadQueue::StateRole).toInt() == static_cast<int>(core::DownloadState::Failed)) {
+            failed << index.data(core::DownloadQueue::IdRole).toULongLong();
+        }
+    }
+    for (const quint64 id : failed) {
+        m_queue->retry(id);
+    }
+    if (!failed.isEmpty()) {
+        Q_EMIT toast(failed.size() == 1 ? tr("Retrying 1 download") : tr("Retrying %1 downloads").arg(failed.size()));
+    }
+}
+
 void DownloadsController::openDownloadFolder()
 {
     const QString dir = m_settings.downloadDirectory();

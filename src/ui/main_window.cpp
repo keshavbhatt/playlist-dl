@@ -129,6 +129,7 @@ void MainWindow::setupUi()
             });
         }
         m_engineSetupAuto = false;
+        m_engineQuiet = false;
         const QList<std::function<void()>> waiting = std::exchange(m_awaitingEngine, {});
         for (const auto& then : waiting) {
             then();
@@ -137,6 +138,10 @@ void MainWindow::setupUi()
     connect(m_engine, &services::EngineManager::installFailed, this, [this](const QString& error) {
         qCWarning(lcUi) << "engine setup failed:" << error;
         m_awaitingEngine.clear();
+        if (m_engineQuiet) {
+            m_engineQuiet = false;
+            showEngineSetup(); // the page waited in place; the reason and Retry are on the sheet
+        }
         if (m_search != nullptr) {
             m_search->retryPending(); // a search waiting for the engine fails with a message
         }
@@ -155,23 +160,30 @@ void MainWindow::setupUi()
     connect(m_search, &SearchPage::playlistChosen, this,
             [this](const services::SearchResult& result) { m_knownPlaylist = result; });
     connect(m_search, &SearchPage::playlistRequested, this, &MainWindow::openPlaylist);
+    // One gesture, one outcome (review 2026-09-24): a pasted single item opens
+    // the options sheet, as Download this and a link on any other site do.
     connect(m_search, &SearchPage::videoRequested, this,
-            [this](const QUrl& url) { openUrl(url.toString()); });
+            [this](const QUrl& url) { ensureEngine([this, url] { openVideoOptions(url); }); });
     connect(m_search, &SearchPage::linkRequested, this,
             [this](const QUrl& url) { ensureEngine([this, url] { openAnyLink(url); }); });
     connect(m_search, &SearchPage::engineNeeded, this, [this] {
-        ensureEngine([this] {
-            m_search->setEnginePaths(m_engine->paths());
-            m_search->retryPending();
-        });
+        ensureEngine(
+            [this] {
+                m_search->setEnginePaths(m_engine->paths());
+                m_search->retryPending();
+            },
+            true);
     });
     connect(m_engine, &services::EngineManager::ready, m_search, &SearchPage::setEnginePaths);
+    connect(m_engine, &services::EngineManager::statusChanged, m_search, &SearchPage::setEngineStatus);
     m_playlist = new PlaylistPage(m_settings, m_theme, *m_probe, m_downloadsController->thumbnails(), this);
     connect(m_playlist, &PlaylistPage::backRequested, this, [this] { showPage(PageId::Search); });
     connect(m_playlist, &PlaylistPage::playRequested, this, [this](const QUrl& url) { openUrl(url.toString()); });
     connect(m_playlist, &PlaylistPage::toast, this, &MainWindow::toast);
     connect(m_playlist, &PlaylistPage::hasPlaylistChanged, m_actions->playlist, &QAction::setEnabled);
-    connect(m_playlist, &PlaylistPage::engineNeeded, this, [this] { ensureEngine([this] { m_playlist->reload(); }); });
+    connect(m_playlist, &PlaylistPage::engineNeeded, this,
+            [this] { ensureEngine([this] { m_playlist->reload(); }, true); });
+    connect(m_engine, &services::EngineManager::statusChanged, m_playlist, &PlaylistPage::setEngineStatus);
     connect(m_playlist, &PlaylistPage::downloadRequested, this, &MainWindow::openPlaylistOptions);
     connect(m_playlist, &PlaylistPage::videoDownloadRequested, this,
             [this](const core::MediaEntry& entry) { openVideoOptions(QUrl(entry.url)); });
@@ -236,14 +248,7 @@ void MainWindow::connectActions()
     connect(a.playlist, &QAction::triggered, this, [this] { showPage(PageId::Playlist); });
     connect(a.browser, &QAction::triggered, this, [this] { showPage(PageId::Browser); });
     connect(a.downloads, &QAction::triggered, this, [this] { showPage(PageId::Downloads); });
-    connect(a.showHide, &QAction::triggered, this, [this] {
-        // Ctrl+W on the Browser page closes the tab, as in every browser.
-        if (isVisible() && m_pages->currentWidget() == m_browser) {
-            m_browser->closeCurrentTab();
-            return;
-        }
-        toggleVisibility();
-    });
+    connect(a.showHide, &QAction::triggered, this, &MainWindow::toggleVisibility);
     connect(a.settings, &QAction::triggered, this, &MainWindow::showSettings);
     connect(a.shortcuts, &QAction::triggered, this, &MainWindow::showShortcuts);
     connect(a.onlineGuide, &QAction::triggered, this, [] { platform::openUrl(links::kGuide); });
@@ -306,7 +311,7 @@ void MainWindow::connectActions()
             &MainWindow::showPlaylistItems);
     connect(m_downloads, &DownloadsPage::engineSetupRequested, this, &MainWindow::showEngineSetup);
     // Browser shortcuts act while the Browser page is showing; New tab brings
-    // it up. Ctrl+W is showHide's: it closes a tab there.
+    // it up. Ctrl+W closes a tab there and does nothing elsewhere.
     auto onBrowser = [this](auto member) {
         return [this, member] {
             if (m_pages->currentWidget() == m_browser) {
@@ -343,15 +348,19 @@ void MainWindow::start()
 
 // ---- engine ----------------------------------------------------------------
 
-void MainWindow::ensureEngine(std::function<void()> then)
+void MainWindow::ensureEngine(std::function<void()> then, bool quiet)
 {
     if (m_engine->isReady()) {
         then();
         return;
     }
     m_awaitingEngine.append(std::move(then));
-    m_engineSetupAuto = true;
-    showEngineSetup();
+    if (quiet && m_engineSetup == nullptr) {
+        m_engineQuiet = true; // the page shows the progress; no sheet unless it fails
+    } else {
+        m_engineSetupAuto = true;
+        showEngineSetup();
+    }
     if (!m_engine->status().isBusy()) {
         m_engine->install();
     }

@@ -78,7 +78,10 @@ public:
     /// Runs `then` once the engine is ready: at once when it is, otherwise
     /// after the setup sheet has provisioned it (nothing runs when the user
     /// closes the sheet or the install fails; the sheet shows the error).
-    void ensureEngine(std::function<void()> then);
+    /// Runs `then` once the engine is there, setting it up if needed. `quiet`
+    /// keeps the setup sheet away while a page shows the progress in place;
+    /// the sheet still comes up if the setup fails.
+    void ensureEngine(std::function<void()> then, bool quiet = false);
     void showEngineSetup();
     /// Headless verification: prints the queue's outcome to stdout and quits
     /// with 0 on Completed, 1 otherwise (PLDL_DEBUG_AUTODOWNLOAD).
@@ -189,6 +192,7 @@ private:
     services::MediaProbe* m_probe = nullptr;
     QPointer<EngineSetupDialog> m_engineSetup;
     bool m_engineSetupAuto = false;
+    bool m_engineQuiet = false; ///< a page waits inline; the sheet only on failure
     bool m_debugWatching = false; ///< the sheet was opened by ensureEngine: it closes itself once ready
     QList<std::function<void()>> m_awaitingEngine;
     QPointer<AccountDialog> m_accountDialog;

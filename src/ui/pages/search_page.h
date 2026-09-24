@@ -1,5 +1,6 @@
 #pragma once
 
+#include "services/engine_manager.h"
 #include "core/downloads/download_options.h"
 #include "services/playlist_search.h"
 #include "services/search_service.h"
@@ -53,6 +54,7 @@ public:
         Results,
         Error,
         NoResults,
+        SettingUp, ///< the engine is being set up for the first search (inline, no dialog)
     };
     Q_ENUM(State)
 
@@ -80,6 +82,8 @@ public:
     void cancelSearch();
     /// The window's answer to engineNeeded once the engine is provisioned.
     void setEnginePaths(const core::EnginePaths& paths);
+    /// The engine's progress while the page waits for it (State::SettingUp).
+    void setEngineStatus(const services::EngineManager::Status& status);
     void retryPending();
     /// Forces the engine for every search of this run (the debug hook).
     /// Shows `results` as if a search had answered (the tests, the demo hook).
@@ -111,7 +115,7 @@ public:
 Q_SIGNALS:
     /// A playlist link was pasted or a card chosen: the Playlist page opens it.
     void playlistRequested(const QUrl& url);
-    /// A video link was pasted: the Browser page opens it.
+    /// A video link was pasted: the window opens the Download options sheet.
     void videoRequested(const QUrl& url);
     /// A link on any other site was pasted: the window probes it (a playlist
     /// opens the Playlist page, a single item the options sheet).

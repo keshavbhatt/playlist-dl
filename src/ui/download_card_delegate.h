@@ -74,7 +74,9 @@ Q_SIGNALS:
     /// An indeterminate bar is on screen: the view repaints on this.
     void repaintNeeded();
 
-private:
+public:
+    /// The card's action buttons for a state: the delegate paints them on
+    /// hover and the page lists the same set in its context menu.
     struct HitButton
     {
         QRect rect;
@@ -83,6 +85,8 @@ private:
         QString tooltip;
     };
     [[nodiscard]] QList<HitButton> buttonsFor(const QRect& card, core::DownloadState state, bool hasFile) const;
+
+private:
     [[nodiscard]] static QRect cardRect(const QRect& rect);
     void paintProgress(QPainter* painter, const QRect& track, core::DownloadState state, double progress,
                        const QColor& chunk, const QColor& trackColor) const;

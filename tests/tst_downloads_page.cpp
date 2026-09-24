@@ -172,8 +172,13 @@ private Q_SLOTS:
         Status status;
         status.state = State::NotInstalled;
         m_page->setEngineStatus(status);
-        QCOMPARE(chip->text(), u"Engine missing"_s);
+        QCOMPARE(chip->text(), u"Set up the download engine"_s); // day one: an invitation
+        QCOMPARE(chip->tone(), pldl::ui::BadgeLabel::Tone::Accent);
+        status.error = u"no network"_s;
+        m_page->setEngineStatus(status);
+        QCOMPARE(chip->text(), u"Engine missing"_s); // after a failed setup: a warning
         QCOMPARE(chip->tone(), pldl::ui::BadgeLabel::Tone::Warning);
+        status.error.clear();
         status.state = State::Installing;
         status.progress = 0.5;
         m_page->setEngineStatus(status);

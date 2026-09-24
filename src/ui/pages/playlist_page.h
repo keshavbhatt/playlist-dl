@@ -1,5 +1,6 @@
 #pragma once
 
+#include "services/engine_manager.h"
 #include "core/downloads/media_info.h"
 #include "services/search_service.h"
 #include "ui/pages/page.h"
@@ -152,6 +153,12 @@ private:
     void buildStatus();
     void applyIcons();
     void setState(State state);
+
+public:
+    /// The engine's progress while the page waits for it (State::Loading).
+    void setEngineStatus(const services::EngineManager::Status& status);
+
+private:
     /// "video" on a YouTube playlist, "item" anywhere else (playlists come from any site).
     [[nodiscard]] QString itemWord(int count) const;
     void fillHeader(const QString& title, const QString& channel, const QString& thumbnail, int count,

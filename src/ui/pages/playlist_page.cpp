@@ -23,6 +23,7 @@
 #include <QHBoxLayout>
 #include <QKeyEvent>
 #include <QLabel>
+#include <QMenu>
 #include <QLineEdit>
 #include <QListView>
 #include <QPainter>
@@ -289,6 +290,30 @@ void PlaylistPage::buildList()
             [this](const QModelIndex& index, PlaylistEntryDelegate::Action action) {
                 handleRowAction(index, static_cast<int>(action));
             });
+    // The hover buttons as a menu too, plus Copy link (review 2026-09-24).
+    m_list->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(m_list, &QListView::customContextMenuRequested, this, [this](const QPoint& pos) {
+        const QModelIndex index = m_list->indexAt(pos).isValid() ? m_list->indexAt(pos) : m_list->currentIndex();
+        if (!index.isValid()) {
+            return;
+        }
+        const core::MediaEntry entry = m_model->entryAt(m_proxy->mapToSource(index).row());
+        if (entry.url.isEmpty()) {
+            return;
+        }
+        QMenu menu(this);
+        const QColor tint = palette().color(QPalette::Text);
+        menu.addAction(icons::themed(u"play"_s, tint), PlaylistEntryDelegate::actionLabel(PlaylistEntryDelegate::Action::Play),
+                       this, [this, index] { handleRowAction(index, static_cast<int>(PlaylistEntryDelegate::Action::Play)); });
+        menu.addAction(icons::themed(u"download"_s, tint),
+                       PlaylistEntryDelegate::actionLabel(PlaylistEntryDelegate::Action::Download), this,
+                       [this, index] { handleRowAction(index, static_cast<int>(PlaylistEntryDelegate::Action::Download)); });
+        menu.addAction(icons::themed(u"copy"_s, tint), tr("Copy link"), this, [this, entry] {
+            QGuiApplication::clipboard()->setText(entry.url);
+            Q_EMIT toast(tr("Link copied"));
+        });
+        menu.exec(m_list->viewport()->mapToGlobal(pos));
+    });
     layout->addWidget(m_list, 1);
 
     m_footer = new QLabel(m_listPane);
@@ -726,6 +751,22 @@ void PlaylistPage::handleRowAction(const QModelIndex& index, int action)
     } else {
         Q_EMIT videoDownloadRequested(entry);
     }
+}
+
+void PlaylistPage::setEngineStatus(const services::EngineManager::Status& status)
+{
+    using EngineState = services::EngineManager::State;
+    if (m_state != State::Loading || (status.state != EngineState::Installing && status.state != EngineState::Updating)) {
+        return;
+    }
+    QString text = tr("Setting up the download engine, a one-time step");
+    if (!status.stepLabel.isEmpty()) {
+        text += u"\n"_s + status.stepLabel;
+        if (status.progress >= 0) {
+            text += u" %1%"_s.arg(static_cast<int>(status.progress * 100));
+        }
+    }
+    m_status->setText(text);
 }
 
 QString PlaylistPage::itemWord(int count) const

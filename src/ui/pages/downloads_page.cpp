@@ -138,6 +138,14 @@ void DownloadsPage::setupHeader()
     connect(m_resumeAll, &QPushButton::clicked, &m_queue, &core::DownloadQueue::resumeAll);
     headerLayout()->addWidget(m_resumeAll);
 
+    m_retryFailed = new QPushButton(tr("Retry failed"), this);
+    m_retryFailed->setObjectName(u"retryFailedButton"_s);
+    m_retryFailed->setProperty("pldlFlat", true);
+    m_retryFailed->setCursor(Qt::PointingHandCursor);
+    m_retryFailed->setToolTip(tr("Start every failed download again"));
+    connect(m_retryFailed, &QPushButton::clicked, &m_controller, &DownloadsController::retryFailed);
+    headerLayout()->addWidget(m_retryFailed);
+
     m_clear = new QToolButton(this);
     m_clear->setObjectName(u"clearButton"_s);
     m_clear->setProperty("pldlFlat", true);
@@ -216,6 +224,27 @@ void DownloadsPage::setupList()
     m_list->setStyleSheet(u"QListView { background: transparent; }"_s);
     m_list->installEventFilter(this);
     connect(m_delegate, &DownloadCardDelegate::actionTriggered, &m_controller, &DownloadsController::handleCardAction);
+    // The hover buttons, as a menu too: right click, the Menu key, or a touchpad
+    // that never hovers (review 2026-09-24).
+    m_list->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(m_list, &QListView::customContextMenuRequested, this, [this](const QPoint& pos) {
+        const QModelIndex index = m_list->indexAt(pos).isValid() ? m_list->indexAt(pos) : m_list->currentIndex();
+        if (!index.isValid()) {
+            return;
+        }
+        const quint64 id = index.data(core::DownloadQueue::IdRole).toULongLong();
+        const auto state = static_cast<core::DownloadState>(index.data(core::DownloadQueue::StateRole).toInt());
+        const bool hasFile = !index.data(core::DownloadQueue::FilePathRole).toString().isEmpty();
+        QMenu menu(this);
+        for (const auto& button : m_delegate->buttonsFor(m_list->visualRect(index), state, hasFile)) {
+            const auto action = button.action;
+            menu.addAction(icons::themed(button.icon, palette().color(QPalette::Text)), button.tooltip, this,
+                           [this, id, action] { m_controller.handleCardAction(id, action); });
+        }
+        if (!menu.isEmpty()) {
+            menu.exec(m_list->viewport()->mapToGlobal(pos));
+        }
+    });
     connect(m_delegate, &DownloadCardDelegate::repaintNeeded, m_list->viewport(), qOverload<>(&QWidget::update));
     connect(m_list, &QListView::doubleClicked, this, [this](const QModelIndex& index) {
         if (!index.data(core::DownloadQueue::FilePathRole).toString().isEmpty()) {
@@ -282,9 +311,15 @@ void DownloadsPage::setEngineStatus(const services::EngineManager::Status& statu
         text = tr("Download engine");
         break;
     case State::NotInstalled:
-        text = tr("Engine missing");
-        glyph = u"warning"_s;
-        tone = BadgeLabel::Tone::Warning;
+        // A fresh install is the normal state on day one: a call to action,
+        // not an alarm. It turns into a warning once a setup has failed.
+        if (status.error.isEmpty()) {
+            text = tr("Set up the download engine");
+        } else {
+            text = tr("Engine missing");
+            glyph = u"warning"_s;
+            tone = BadgeLabel::Tone::Warning;
+        }
         break;
     case State::Installing:
     case State::Updating:
@@ -363,6 +398,7 @@ void DownloadsPage::updateCounts()
 
     m_pauseAll->setEnabled(active > 0);
     m_resumeAll->setEnabled(paused > 0);
+    m_retryFailed->setVisible(failed > 0);
     m_clearFinished->setEnabled(finished > 0);
     m_clearFailed->setEnabled(failed > 0);
     m_clearAll->setEnabled(finished + failed > 0);

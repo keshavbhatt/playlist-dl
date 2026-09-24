@@ -260,15 +260,23 @@ private Q_SLOTS:
     {
         QSignalSpy needed(m_page.get(), &SearchPage::engineNeeded);
         m_page->search(u"lofi hip hop"_s);
-        QCOMPARE(m_page->state(), SearchPage::State::Loading);
+        // No engine yet: the page says it is being set up, in place (no sheet).
+        QCOMPARE(m_page->state(), SearchPage::State::SettingUp);
         QVERIFY(busy::isBusy(m_page->searchButton()));
         QVERIFY(m_page->statusLabel()->isVisible());
+        QVERIFY(m_page->statusLabel()->text().contains(u"Setting up"_s));
+        pldl::services::EngineManager::Status progress;
+        progress.state = pldl::services::EngineManager::State::Installing;
+        progress.stepLabel = u"Fetching"_s;
+        progress.progress = 0.5;
+        m_page->setEngineStatus(progress);
+        QVERIFY(m_page->statusLabel()->text().contains(u"Fetching 50%"_s));
         QCOMPARE(m_settings->recentQueries(), QStringList{u"lofi hip hop"_s});
         QVERIFY(m_page->recentRow()->isVisible());
         // The service is a dead end: the engine is asked for and the search waits.
         QTRY_COMPARE_WITH_TIMEOUT(needed.size(), 1, 5000);
         QVERIFY(m_page->playlistSearch().hasPending());
-        QCOMPARE(m_page->state(), SearchPage::State::Loading);
+        QCOMPARE(m_page->state(), SearchPage::State::SettingUp);
         // Still no engine: the search fails and offers Retry.
         m_page->retryPending();
         QCOMPARE(m_page->state(), SearchPage::State::Error);
@@ -277,7 +285,7 @@ private Q_SLOTS:
 
         // Escape while searching cancels; the page goes back to empty.
         m_page->search(u"second"_s);
-        QCOMPARE(m_page->state(), SearchPage::State::Loading);
+        QCOMPARE(m_page->state(), SearchPage::State::SettingUp);
         m_page->queryField()->setFocus();
         QTest::keyClick(m_page->queryField(), Qt::Key_Escape);
         QCOMPARE(m_page->state(), SearchPage::State::Empty);
@@ -301,7 +309,7 @@ private Q_SLOTS:
         // A chip searches again for its query.
         chips.first()->click();
         QCOMPARE(m_page->queryField()->text(), u"two"_s);
-        QCOMPARE(m_page->state(), SearchPage::State::Loading);
+        QCOMPARE(m_page->state(), SearchPage::State::SettingUp); // no engine in the test
         m_page->cancelSearch();
         // Clear forgets them; the row goes.
         auto* clear = m_page->recentRow()->findChild<QToolButton*>(u"clearRecentButton"_s);

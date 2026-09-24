@@ -72,7 +72,10 @@ SearchPage::SearchPage(core::Settings& settings, core::ThemeService& theme, Thum
 
     connect(m_search, &services::PlaylistSearch::finished, this, &SearchPage::handleFinished);
     connect(m_search, &services::PlaylistSearch::failed, this, &SearchPage::handleFailed);
-    connect(m_search, &services::PlaylistSearch::engineNeeded, this, &SearchPage::engineNeeded);
+    connect(m_search, &services::PlaylistSearch::engineNeeded, this, [this] {
+        setState(State::SettingUp); // the window sets the engine up; the page says so in place
+        Q_EMIT engineNeeded();
+    });
     connect(&m_search->engine(), &services::SearchService::playlistCounted, this, &SearchPage::setPlaylistCount);
     connect(m_suggestions, &services::SearchSuggestions::suggestions, this, &SearchPage::showSuggestions);
     connect(&m_thumbnails, &ThumbnailCache::ready, this,
@@ -349,6 +352,11 @@ void SearchPage::setState(State state)
         m_retry->hide();
         m_stage->setCurrentWidget(m_statusPane);
         break;
+    case State::SettingUp:
+        m_status->setText(tr("Setting up the download engine, a one-time step"));
+        m_retry->hide();
+        m_stage->setCurrentWidget(m_statusPane);
+        break;
     }
     m_loadMore->setVisible(state == State::Results && m_hasMore);
 }
@@ -480,7 +488,7 @@ void SearchPage::cancelSearch()
     m_searchId = 0;
     busy::set(m_button, false);
     busy::set(m_loadMore, false);
-    if (m_state == State::Loading) {
+    if (m_state == State::Loading || m_state == State::SettingUp) {
         setState(m_results.isEmpty() ? State::Empty : State::Results);
     }
 }
@@ -635,6 +643,21 @@ QList<services::SearchResult> SearchPage::demoResults()
 void SearchPage::setEnginePaths(const core::EnginePaths& paths)
 {
     m_search->setEnginePaths(paths);
+}
+
+void SearchPage::setEngineStatus(const services::EngineManager::Status& status)
+{
+    if (m_state != State::SettingUp) {
+        return;
+    }
+    QString text = tr("Setting up the download engine, a one-time step");
+    if (!status.stepLabel.isEmpty()) {
+        text += u"\n"_s + status.stepLabel;
+        if (status.progress >= 0) {
+            text += u" %1%"_s.arg(static_cast<int>(status.progress * 100));
+        }
+    }
+    m_status->setText(text);
 }
 
 void SearchPage::retryPending()
