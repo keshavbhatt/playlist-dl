@@ -32,6 +32,7 @@ class EngineSetupDialog;
 class Page;
 class PlansDialog;
 class SearchPage;
+class SettingsDialog;
 class SideRail;
 class ThemeApplier;
 class ThumbnailCache;
@@ -111,6 +112,11 @@ public Q_SLOTS:
     void debugOpen(const QString& what);
     void quit();
 
+Q_SIGNALS:
+    /// Settings, "Sign out and clear session", confirmed: the application
+    /// writes the clear-session marker and relaunches.
+    void clearSessionRequested();
+
 protected:
     void closeEvent(QCloseEvent* event) override;
     void showEvent(QShowEvent* event) override;
@@ -123,6 +129,8 @@ private:
     void restoreWindowState();
     void saveWindowState();
     void maybeShowWhatsNew(bool force = false);
+    void connectSettingsDialog(SettingsDialog* dialog);
+    void confirmClearSession();
     void maybeShowGpuFallbackNotice();
     void promptUpgrade(const QString& feature);
     void handlePermissionPrompt(const QWebEnginePermission& permission);
@@ -153,6 +161,7 @@ private:
     QPointer<EngineSetupDialog> m_engineSetup;
     QList<std::function<void()>> m_awaitingEngine;
     QPointer<AccountDialog> m_accountDialog;
+    QPointer<SettingsDialog> m_settingsDialog;
     bool m_quitting = false;
     Qt::WindowStates m_stateBeforeFullScreen = Qt::WindowNoState;
 };

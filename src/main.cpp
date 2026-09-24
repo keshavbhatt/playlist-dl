@@ -14,7 +14,6 @@
 #include <QCoreApplication>
 #include <QGuiApplication>
 #include <QMenu>
-#include <QProcess>
 #include <QSettings>
 #include <QStandardPaths>
 #include <QTimer>
@@ -98,13 +97,7 @@ void relaunch(pldl::app::Application& app, const char* envKey)
     if (envKey != nullptr) {
         qputenv(envKey, "1");
     }
-    const QStringList args = QCoreApplication::arguments().mid(1);
-    app.singleInstance().release();
-    if (QProcess::startDetached(QCoreApplication::applicationFilePath(), args)) {
-        QCoreApplication::quit();
-    } else {
-        qWarning("relaunch failed to start; staying on the current configuration");
-    }
+    app.relaunch();
 }
 
 } // namespace
@@ -154,6 +147,8 @@ int main(int argc, char* argv[])
     QObject::connect(&app, &pldl::app::Application::settingsRequested, &window,
                      &pldl::ui::MainWindow::showSettings);
     QObject::connect(&app, &pldl::app::Application::quitRequested, &window, &pldl::ui::MainWindow::quit);
+    QObject::connect(&window, &pldl::ui::MainWindow::clearSessionRequested, &app,
+                     &pldl::app::Application::clearSessionAndRelaunch);
 
     const pldl::app::CliOptions& cli = app.cliOptions();
     window.start();

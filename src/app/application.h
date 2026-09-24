@@ -40,6 +40,14 @@ public:
     void dispatchCommand(const QJsonObject& command);
     /// Called once the window has stayed up long enough to deem the GPU stable.
     void markGpuStable();
+    /// Starts a fresh copy with the same arguments and quits this one (a
+    /// graphics fallback, the session clear). The single-instance lock is
+    /// released first so the new copy becomes primary.
+    void relaunch();
+    /// Settings, "Sign out and clear session": leaves the marker the next
+    /// start honours (the profile directories go before the web engine
+    /// touches them) and relaunches.
+    void clearSessionAndRelaunch();
 
 Q_SIGNALS:
     void raiseRequested();

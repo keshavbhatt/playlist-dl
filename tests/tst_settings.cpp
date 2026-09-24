@@ -60,6 +60,54 @@ private Q_SLOTS:
         QCOMPARE(m_settings->filenamePattern(), FilenamePattern::Title);
         QVERIFY(m_settings->engineAutoUpdate());
         QVERIFY(!m_settings->engineUseSystem());
+        QCOMPARE(m_settings->startPage(), StartPage::Search);
+        QVERIFY(m_settings->showWhatsNew());
+        QVERIFY(m_settings->numberPlaylistFiles());
+        QCOMPARE(m_settings->defaultAudioBitrate(), 0);
+        QVERIFY(m_settings->skipExisting());
+    }
+
+    void settingsPageKeys()
+    {
+        QSignalSpy general(m_settings.get(), &Settings::generalChanged);
+        m_settings->setStartPage(StartPage::LastPage);
+        m_settings->setStartPage(StartPage::LastPage);
+        QCOMPARE(m_settings->startPage(), StartPage::LastPage);
+        QCOMPARE(general.count(), 1);
+        m_settings->setShowWhatsNew(false);
+        QVERIFY(!m_settings->showWhatsNew());
+        QCOMPARE(general.count(), 2);
+
+        QSignalSpy defaults(m_settings.get(), &Settings::downloadDefaultsChanged);
+        m_settings->setNumberPlaylistFiles(false);
+        QVERIFY(!m_settings->numberPlaylistFiles());
+        m_settings->setSkipExisting(false);
+        QVERIFY(!m_settings->skipExisting());
+        m_settings->setDefaultAudioBitrate(192);
+        QCOMPARE(m_settings->defaultAudioBitrate(), 192);
+        m_settings->setDefaultAudioBitrate(999); // not offered: back to best
+        QCOMPARE(m_settings->defaultAudioBitrate(), 0);
+        m_settings->setDefaultAudioBitrate(128);
+        QCOMPARE(m_settings->defaultAudioBitrate(), 128);
+        m_settings->setLastDownloadKind(DownloadKind::Audio);
+        QCOMPARE(m_settings->lastDownloadKind(), DownloadKind::Audio);
+        QCOMPARE(defaults.count(), 6);
+
+        m_settings->sync();
+        Settings again(m_dir->filePath(u"pldl.ini"_s));
+        QCOMPARE(again.startPage(), StartPage::LastPage);
+        QVERIFY(!again.showWhatsNew());
+        QVERIFY(!again.numberPlaylistFiles());
+        QVERIFY(!again.skipExisting());
+        QCOMPARE(again.defaultAudioBitrate(), 128);
+
+        m_settings->resetToDefaults();
+        QCOMPARE(m_settings->startPage(), StartPage::Search);
+        QVERIFY(m_settings->showWhatsNew());
+        QVERIFY(m_settings->numberPlaylistFiles());
+        QVERIFY(m_settings->skipExisting());
+        QCOMPARE(m_settings->defaultAudioBitrate(), 0);
+        QVERIFY(general.count() >= 3);
     }
 
     void signalsAndClamping()

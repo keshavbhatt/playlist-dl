@@ -213,7 +213,7 @@ private Q_SLOTS:
         QCOMPARE(spy.count(), 0);
         page.open(QUrl(u"https://example.com/watch?v=1"_s));
         // The URL is known to the view as soon as the load is requested.
-        QTRY_VERIFY_WITH_TIMEOUT(page.currentUrl().host() == u"example.com"_s, 15000);
+        QTRY_VERIFY_WITH_TIMEOUT(page.currentUrl().host() == u"example.com"_s, 30000); // a real network load; generous under a busy CI or a parallel build
         page.downloadCurrent();
         QCOMPARE(spy.count(), 1);
         QCOMPARE(spy.at(0).at(0).toUrl(), QUrl(u"https://example.com/watch?v=1"_s));

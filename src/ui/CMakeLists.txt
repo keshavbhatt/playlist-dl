@@ -61,6 +61,10 @@ qt_add_library(pldl_ui STATIC
     range_slider.h
     search_card_delegate.cpp
     search_card_delegate.h
+    settings_dialog.cpp
+    settings_dialog.h
+    settings_form.cpp
+    settings_form.h
     shortcuts_dialog.cpp
     shortcuts_dialog.h
     side_rail.cpp
