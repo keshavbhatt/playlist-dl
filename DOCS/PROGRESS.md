@@ -28,6 +28,9 @@
 
 ### 2026-09-24, M6
 
+- UMD change ported (owner request): the page-load progress is a hairline inside the
+  address field (`ui::AddressField`), no bar in the layout, so the page never moves; the
+  tab's loader glyph turns while the page loads. Both back-ported to the rewrite kit.
 - Owner request: Settings, Search, Suggest as I type (on by default) gates the suggestions;
   the Playlist items sheet shows a banner when the folder already has a playlist file, with
   Play as is and Folder (`playlist-items-demo-file` hook).

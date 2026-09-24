@@ -10,6 +10,7 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPainterPath>
+#include <QTimer>
 #include <QToolButton>
 
 #include <algorithm>
@@ -83,10 +84,28 @@ void BrowserTabButton::setGlyph(const QString& glyph)
 
 void BrowserTabButton::setLoading(bool loading)
 {
-    if (m_loading != loading) {
-        m_loading = loading;
-        update();
+    if (m_loading == loading) {
+        return;
     }
+    m_loading = loading;
+    if (m_spin == nullptr) {
+        m_spin = new QTimer(this);
+        m_spin->setInterval(33);
+        connect(m_spin, &QTimer::timeout, this, &BrowserTabButton::tick);
+    }
+    if (loading) {
+        m_spin->start();
+    } else {
+        m_spin->stop();
+        m_spinAngle = 0;
+    }
+    update();
+}
+
+void BrowserTabButton::tick()
+{
+    m_spinAngle = (m_spinAngle + 12) % 360; // a turn a second, like the busy button
+    update();
 }
 
 QSize BrowserTabButton::sizeHint() const
@@ -147,7 +166,14 @@ void BrowserTabButton::paintEvent(QPaintEvent* /*event*/)
     const bool compact = width() < kMinWidth;
     const QRect glyphRect(compact ? (width() - kGlyph) / 2 : kPad, (height() - kGlyph) / 2, kGlyph, kGlyph);
     if (m_loading) {
-        p.drawPixmap(glyphRect, icons::pixmap(u"loader"_s, t.accent, kGlyph, devicePixelRatioF()));
+        // The loader turns while the page loads; a still glyph read as a freeze.
+        p.save();
+        p.setRenderHint(QPainter::SmoothPixmapTransform);
+        p.translate(glyphRect.center());
+        p.rotate(m_spinAngle);
+        p.drawPixmap(QRect(-kGlyph / 2, -kGlyph / 2, kGlyph, kGlyph),
+                     icons::pixmap(u"loader"_s, t.accent, kGlyph, devicePixelRatioF()));
+        p.restore();
     } else if (!m_siteIcon.isNull()) {
         m_siteIcon.paint(&p, glyphRect);
     } else {

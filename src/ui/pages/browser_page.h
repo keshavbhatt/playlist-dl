@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ui/badge_label.h"
+#include "ui/address_field.h"
 #include "ui/pages/page.h"
 
 #include <QJsonObject>
@@ -14,7 +15,6 @@ class QFrame;
 class QHBoxLayout;
 class QLabel;
 class QLineEdit;
-class QProgressBar;
 class QPushButton;
 class QShortcut;
 class QStackedWidget;
@@ -192,11 +192,10 @@ private:
     QToolButton* m_back = nullptr;
     QToolButton* m_forward = nullptr;
     QToolButton* m_reload = nullptr;
-    QLineEdit* m_address = nullptr;
+    AddressField* m_address = nullptr;
     BadgeLabel* m_adsBadge = nullptr;
     BadgeLabel* m_signedInBadge = nullptr;
     QPushButton* m_download = nullptr;
-    QProgressBar* m_progress = nullptr;
     QFrame* m_findBar = nullptr;
     QLineEdit* m_findField = nullptr;
     QLabel* m_findCount = nullptr;

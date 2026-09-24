@@ -5,6 +5,7 @@
 
 #include "core/settings/settings.h"
 #include "core/theme/theme_service.h"
+#include "ui/address_field.h"
 #include "ui/browser_tab.h"
 #include "ui/pages/browser_page.h"
 #include "web/error_page.h"
@@ -23,6 +24,7 @@
 #include <QSignalSpy>
 #include <QStandardPaths>
 #include <QTemporaryDir>
+#include <QProgressBar>
 #include <QTest>
 #include <QTcpServer>
 #include <QTcpSocket>
@@ -416,6 +418,22 @@ private Q_SLOTS:
         QVERIFY(html.contains(u"href=\"https://vimeo.com/a?b=1&amp;c=2\""_s));
         QVERIFY(html.contains(u"&lt;offline&gt;"_s));
         QVERIFY(!html.contains(u"youtube.com"_s));
+    }
+
+    void loadProgressLivesInTheAddressFieldSoThePageNeverMoves()
+    {
+        pldl::ui::BrowserPage page(*m_settings, *m_theme, u"7.0.0-test"_s);
+        page.resize(1000, 640);
+        page.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&page));
+        QVERIFY(page.findChild<QProgressBar*>(u"loadProgress"_s) == nullptr);
+        auto* field = qobject_cast<pldl::ui::AddressField*>(page.addressField());
+        QVERIFY(field != nullptr);
+        const int topBefore = page.currentView()->mapTo(&page, QPoint(0, 0)).y();
+        page.open(QUrl(u"data:text/html,<p>steady</p>"_s));
+        QTRY_VERIFY_WITH_TIMEOUT(field->progress() >= 0 || page.currentUrl().scheme() == u"data"_s, 5000);
+        QTRY_VERIFY_WITH_TIMEOUT(field->progress() < 0, 5000); // the load ended
+        QCOMPARE(page.currentView()->mapTo(&page, QPoint(0, 0)).y(), topBefore);
     }
 
     void anEmptyStartPageIsANewTab()

@@ -32,5 +32,8 @@ are not repeated. Below: what 2.x adds, from `reference/analysis-playlist-dl-v2.
 - Script the screenshots; verify headlessly before asking the owner to look.
 - A word-wrapped `QLabel` gives a layout a width-dependent height Qt leaves out of a
   window's minimum size: give it a full-width row and pin its minimum height.
+- A bar shown and hidden in the layout above a page moves the page by its height at every
+  load: draw progress inside a widget that is already there (the address field's hairline).
+- A still loader glyph reads as a freeze: turn it on a timer while the page loads.
 - Five pill buttons fit one row at about 680 px; a sixth does not. Secondary entries go
   as a flat link beside the line they belong to (What's new beside the version in About).

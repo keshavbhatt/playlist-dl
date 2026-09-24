@@ -27,7 +27,6 @@
 #include <QHBoxLayout>
 #include <QKeyEvent>
 #include <QLineEdit>
-#include <QProgressBar>
 #include <QPushButton>
 #include <QResizeEvent>
 #include <QShortcut>
@@ -247,7 +246,7 @@ void BrowserPage::buildToolbar()
         }
     });
 
-    m_address = new QLineEdit(this);
+    m_address = new AddressField(theme(), this);
     m_address->setObjectName(u"addressField"_s);
     m_address->setPlaceholderText(tr("Search or enter a web address"));
     m_address->setAccessibleName(tr("Address"));
@@ -431,14 +430,8 @@ void BrowserPage::buildStage()
     // button floats over its bottom right corner (mocks/browser.html).
     content()->setContentsMargins(0, 0, 0, 0);
     content()->setSpacing(0);
-    m_progress = new QProgressBar(this);
-    m_progress->setObjectName(u"loadProgress"_s);
-    m_progress->setProperty("pldlThin", true);
-    m_progress->setRange(0, 100);
-    m_progress->setTextVisible(false);
-    m_progress->setAccessibleName(tr("Page loading"));
-    m_progress->hide();
-    content()->addWidget(m_progress);
+    // The load progress lives inside the address field (AddressField): a bar
+    // in this layout moved the page by its height at every load (UMD owner).
 
     auto* stage = new QWidget(this);
     stage->setObjectName(u"browserStage"_s);
@@ -617,14 +610,13 @@ void BrowserPage::connectTab(const Tab& tab)
         if (view == currentView()) {
             m_loading = true;
             m_escape->setEnabled(true);
-            m_progress->setValue(0);
-            m_progress->show();
+            m_address->setProgress(0);
             applyIcons();
         }
     });
     connect(view, &QWebEngineView::loadProgress, this, [this, view](int progress) {
         if (view == currentView()) {
-            m_progress->setValue(progress);
+            m_address->setProgress(progress);
         }
     });
     connect(view, &QWebEngineView::loadFinished, this, [this, view, button](bool) {
@@ -632,7 +624,7 @@ void BrowserPage::connectTab(const Tab& tab)
         if (view == currentView()) {
             m_loading = false;
             m_escape->setEnabled(m_fullScreenView != nullptr || isDownloadBusy());
-            m_progress->hide();
+            m_address->setProgress(-1);
             applyIcons();
             syncToolbar();
         }
@@ -784,7 +776,7 @@ void BrowserPage::setCurrentIndex(int index)
     }
     scheduleSessionSave();
     m_loading = m_tabs.at(index).button->isLoading();
-    m_progress->setVisible(m_loading);
+    m_address->setProgress(m_loading ? 0 : -1);
     applyIcons();
     syncToolbar();
     syncDetected();
@@ -1092,7 +1084,7 @@ void BrowserPage::enterFullScreen(web::WebView* view)
     m_strip->hide();
     headerLayout()->parentWidget()->hide();
     hideFind();
-    m_progress->hide();
+    m_address->setProgress(-1);
     m_detected->hide();
     m_detectedDismiss->hide();
     m_escape->setEnabled(true);
@@ -1116,7 +1108,7 @@ void BrowserPage::exitFullScreen()
     }
     m_strip->show();
     headerLayout()->parentWidget()->show();
-    m_progress->setVisible(m_loading);
+    m_address->setProgress(m_loading ? 0 : -1);
     view->page()->triggerAction(QWebEnginePage::ExitFullScreen);
     Q_EMIT fullScreenChanged(false);
     syncDetected();

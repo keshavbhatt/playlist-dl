@@ -4,6 +4,7 @@
 #include <QIcon>
 #include <QString>
 
+class QTimer;
 class QToolButton;
 
 namespace pldl::core {
@@ -59,6 +60,7 @@ protected:
     void changeEvent(QEvent* event) override;
 
 private:
+    void tick();
     void applyTheme();
     void placeClose();
 
@@ -68,6 +70,8 @@ private:
     QIcon m_siteIcon;
     QString m_glyph;
     bool m_loading = false;
+    QTimer* m_spin = nullptr; ///< turns the loader while the page loads (owner: it looked frozen)
+    int m_spinAngle = 0;
     bool m_hover = false;
 };
 

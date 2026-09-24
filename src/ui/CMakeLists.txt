@@ -12,6 +12,8 @@ qt_add_library(pldl_ui STATIC
     actions.h
     badge_label.cpp
     badge_label.h
+    address_field.cpp
+    address_field.h
     browser_tab.cpp
     browser_tab.h
     bug_report_dialog.cpp
