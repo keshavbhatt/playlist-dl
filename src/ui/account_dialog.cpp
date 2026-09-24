@@ -275,15 +275,19 @@ void AccountDialog::refresh()
         }
         case Tier::Evaluation: {
             const int days = std::max(0, m_license.evaluationDaysRemaining());
+            // Until the first answer from the licence server the end of the
+            // evaluation is not known: no number is better than a wrong one.
+            const bool known = st.evaluationEndTimestamp > 0 || days > 0;
             badge = tr("Evaluation");
-            status = tr("Every Pro feature is unlocked, %1").arg(verified);
+            status = tr("No daily download limit during the evaluation, %1").arg(verified);
             expiryKey = tr("Evaluation ends");
-            expiry = st.evaluationEndTimestamp > 0
-                         ? tr("%1, %2").arg(dateText(st.evaluationEndTimestamp), daysLeft(days))
-                         : daysLeft(days);
-            bannerText = u"<b>%1</b> %2"_s.arg(days == 1 ? tr("Evaluation: 1 day left.")
+            expiry = !known                       ? tr("Checking…")
+                     : st.evaluationEndTimestamp > 0 ? tr("%1, %2").arg(dateText(st.evaluationEndTimestamp), daysLeft(days))
+                                                     : daysLeft(days);
+            bannerText = u"<b>%1</b> %2"_s.arg(!known    ? tr("Evaluation.")
+                                              : days == 1 ? tr("Evaluation: 1 day left.")
                                                           : tr("Evaluation: %1 days left.").arg(days),
-                                              tr("Every Pro feature is unlocked until then."));
+                                              tr("No daily download limit until then; Pro keeps it that way."));
             break;
         }
         case Tier::Free:
@@ -295,7 +299,8 @@ void AccountDialog::refresh()
                                                        : tr("%1 days after the first start").arg(m_license.evaluationDays());
             }
             bannerText = u"<b>%1</b> %2"_s.arg(
-                tr("Free plan."), tr("Pro adds unlimited downloads and whole playlists."));
+                tr("Free plan: %n download(s) a day.", nullptr, services::LicenseService::kFreeDownloadsPerDay),
+                tr("Pro has no daily limit."));
             break;
         }
         if (m_license.checking()) {
@@ -325,12 +330,13 @@ void AccountDialog::refresh()
     if (isVisible()) {
         fitToContent();
     }
-    m_planSummary->setText(pro ? tr("Every feature is unlocked: every preset up to 8K and lossless audio, batch "
-                                     "downloads, and playlist and channel downloads.")
-                               : tr("Free covers single downloads with the free preset, custom formats, subtitles, "
-                                    "files, torrents, the scheduler, quick conversions and browser sign-in. Pro "
-                                    "adds every preset up to 8K and lossless audio, batch downloads, and playlist "
-                                    "and channel downloads."));
+    m_planSummary->setText(
+        pro ? tr("Pro: unlimited downloads with no daily count, whole playlists in one go however long they "
+                 "are, and every quality up to 4K and lossless audio.")
+            : tr("Free covers search, the built-in browser with sign-in, every quality up to 4K and lossless "
+                 "audio, subtitles, and up to %n download(s) a day; a playlist counts each video you pick. "
+                 "Pro removes the daily limit.",
+                 nullptr, services::LicenseService::kFreeDownloadsPerDay));
     m_planBadge->setText(badge);
     m_planBadge->setProperty("pldlPro", pro);
     m_planBadge->style()->unpolish(m_planBadge);

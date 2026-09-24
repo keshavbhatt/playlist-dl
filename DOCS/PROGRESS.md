@@ -52,6 +52,10 @@
   delegate and filters. Verified live headless: `PLDL_DEBUG_DOWNLOAD` provisioned the
   engine and downloaded "Me at the zoo" (av1+aac, thumbnail embedded) in 151 s, exit 0.
   39 tests pass. Grabs of the demo queue in dark and light looked at.
+- Owner request: the Account and Plans sheets now state the real model (UMD's files,
+  torrents and 8K presets were still in the text): Free is 5 downloads a day with every
+  quality, a playlist counts each picked video, Pro has no daily limit; the evaluation shows
+  "Checking" instead of "0 days left" until the server has answered.
 - Owner report: the rail's bottom buttons missed clicks. Cause: the empty toast host (a
   transparent child widget at its default size) sat in the bottom-left corner over them and
   took the mouse. It now starts hidden and lives over the page area; tst_smoke checks that
