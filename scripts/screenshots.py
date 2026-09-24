@@ -108,7 +108,8 @@ def banner(dialog, size=(2160, 720)):
     layer = Image.new("RGBA", img.size, (0, 0, 0, 0))
     ld = ImageDraw.Draw(layer)
     x = x0
-    for pill in ("Playlist search", "Pick the videos", "Video or audio", "Built-in player", "Plays as a playlist"):
+    # Four pills: a fifth ran under the dialog frame on the right.
+    for pill in ("Playlist search", "Pick the videos", "Video or audio", "Plays as a playlist"):
         tw = ld.textlength(pill, font=pf)
         ld.rounded_rectangle((x, 470, x + tw + 56, 528), radius=29, fill=(255, 255, 255, 40))
         ld.text((x + 28, 483), pill, font=pf, fill=(255, 255, 255, 255))
