@@ -37,6 +37,30 @@ class TestSettingsDialog : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
+    void startPageChoiceDrivesTheSetting()
+    {
+        auto dialog = makeDialog(true);
+        auto* choice = dialog->findChild<QComboBox*>(u"startPageCombo"_s);
+        auto* address = dialog->findChild<QLineEdit*>(u"startPageEdit"_s);
+        QVERIFY(choice != nullptr && address != nullptr);
+        dialog->showPage(pldl::ui::SettingsDialog::Browser); // only the shown page counts as visible
+        QCOMPARE(choice->currentData().toInt(), 0); // Empty tab is the default
+        QVERIFY(!address->isVisibleTo(dialog.get()));
+        choice->setCurrentIndex(choice->findData(1));
+        QCOMPARE(m_settings->browserStartPage(), QString(pldl::core::Settings::kYouTubeStartPage));
+        choice->setCurrentIndex(choice->findData(2));
+        QVERIFY(address->isVisibleTo(dialog.get()));
+        address->setText(u"https://example.com/start"_s);
+        Q_EMIT address->editingFinished(); // the field stores when editing ends, not per keystroke
+        QCOMPARE(m_settings->browserStartPage(), u"https://example.com/start"_s);
+        choice->setCurrentIndex(choice->findData(0));
+        QCOMPARE(m_settings->browserStartPage(), QString(pldl::core::Settings::kEmptyStartPage));
+        QVERIFY(!address->isVisibleTo(dialog.get()));
+        // A change from elsewhere moves the choice.
+        m_settings->setBrowserStartPage(QString(pldl::core::Settings::kYouTubeStartPage));
+        QCOMPARE(choice->currentData().toInt(), 1);
+    }
+
     void init()
     {
         m_dir = std::make_unique<QTemporaryDir>();

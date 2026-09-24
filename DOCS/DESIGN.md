@@ -136,7 +136,8 @@ The 2.x playlistdownloadoptions page, as a sheet:
 
 UMD's browser page, unchanged in shape: tab strip, toolbar (back, forward, reload,
 address, "Ads blocked" badge, "Signed in" badge, **Download this** button), find bar, the
-web view, the floating "Download detected" button. Start page `https://www.youtube.com/`.
+web view, the floating "Download detected" button. A new tab opens empty by default
+(owner, 2026-09-24); Settings, Browser offers Empty tab, YouTube or a custom address.
 Additions for this app:
 
 - When the page is a playlist (`list=` in the address, or a `/playlist` page) the
@@ -175,8 +176,8 @@ The 2.x download widget rebuilt as a page:
   Embed thumbnail and metadata, Concurrent downloads (1 to 5), Speed limit, Skip already
   downloaded, Use my YouTube sign-in; **Engine card**: version, JS runtime, media converter,
   Check for updates, Update now, Auto-update daily, Use an engine already on this system.
-- **Browser**: Start page, Restore tabs, Block ads, Do Not Track, Browser identity (presets
-  and custom).
+- **Browser**: Start page (Empty tab, YouTube, Custom address), Restore tabs, Block ads, Do
+  Not Track, Browser identity (presets and custom).
 - **Search**: Search service (Automatic, Engine only), Results per page.
 - **Advanced**: Hardware acceleration, Clear cache, Sign out and clear session, Open log
   folder, Copy diagnostics, Reset settings.

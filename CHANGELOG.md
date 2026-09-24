@@ -13,7 +13,8 @@ a left rail for the Search, Playlist, Browser and Downloads pages.
 - Search: playlist search with suggestions as you type, recent queries, a card grid with
   the video count on every playlist, a list view, and Load more for the next page.
 - Paste a playlist or video link into the search field to open it directly.
-- Browser: the full YouTube site in tabs with sign-in, find in page, an ad blocker with a
+- Browser: tabs that open empty (or on YouTube, or an address of your own: Settings,
+  Browser), the full YouTube site with sign-in, find in page, an ad blocker with a
   blocked-request count, full screen, and a Download button that knows whether the page is
   a playlist or a video.
 - Downloads: one queue with pause, resume, retry, cancel, remove, open and show in folder;

@@ -171,6 +171,8 @@ public:
     void setBrowserStartPage(const QString& url);
     /// The start page value for an empty tab.
     static constexpr QLatin1StringView kEmptyStartPage{"about:blank"};
+    /// The YouTube choice of the Start page setting.
+    static constexpr QLatin1StringView kYouTubeStartPage{"https://www.youtube.com/"};
     [[nodiscard]] static bool isEmptyStartPage(const QString& url);
     /// Whether the Browser page reopens last time's tabs (off: one tab on the start page).
     [[nodiscard]] bool restoreBrowserTabs() const;

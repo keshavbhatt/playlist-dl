@@ -28,7 +28,7 @@ private Q_SLOTS:
         QVERIFY(m_settings->blockAds());
         QVERIFY(!m_settings->doNotTrack());
         QVERIFY(!m_settings->restoreBrowserTabs());
-        QCOMPARE(m_settings->browserStartPage(), u"https://www.youtube.com/"_s);
+        QCOMPARE(m_settings->browserStartPage(), u"about:blank"_s); // an empty tab by default
         QCOMPARE(m_settings->browserUserAgentPreset(), u"default"_s);
         QVERIFY(m_settings->browserUserAgent().isEmpty());
         QVERIFY(m_settings->browserSession().urls.isEmpty());
@@ -162,8 +162,10 @@ private Q_SLOTS:
         QVERIFY(Settings::isEmptyStartPage(u"about:blank"_s));
         QVERIFY(Settings::isEmptyStartPage(u" ABOUT:NEWTAB "_s));
         QVERIFY(!Settings::isEmptyStartPage(u"https://www.youtube.com/"_s));
-        m_settings->setBrowserStartPage(u"  "_s);
+        m_settings->setBrowserStartPage(QString(Settings::kYouTubeStartPage));
         QCOMPARE(m_settings->browserStartPage(), u"https://www.youtube.com/"_s);
+        m_settings->setBrowserStartPage(u"  "_s); // blank falls back to the default: an empty tab
+        QCOMPARE(m_settings->browserStartPage(), u"about:blank"_s);
         m_settings->setBrowserStartPage(QString(Settings::kEmptyStartPage));
         QCOMPARE(m_settings->browserStartPage(), u"about:blank"_s);
     }

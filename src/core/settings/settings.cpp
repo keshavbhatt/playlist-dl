@@ -24,7 +24,8 @@ constexpr Theme kDefaultTheme = Theme::System;
 constexpr double kDefaultInterfaceScale = 1.0;
 constexpr bool kDefaultBlockAds = true;
 constexpr bool kDefaultDoNotTrack = false;
-constexpr QLatin1StringView kDefaultBrowserStartPage{"https://www.youtube.com/"};
+// An empty tab (owner, 2026-09-24); YouTube and a custom address are the other choices.
+constexpr QLatin1StringView kDefaultBrowserStartPage{"about:blank"};
 constexpr bool kDefaultRestoreBrowserTabs = false;
 constexpr FilenamePattern kDefaultFilenamePattern = FilenamePattern::Title;
 constexpr bool kDefaultOrganiseDownloads = true;

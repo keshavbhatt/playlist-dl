@@ -481,18 +481,46 @@ QWidget* SettingsDialog::buildEngineCard()
 QWidget* SettingsDialog::buildBrowser()
 {
     using namespace settings_form;
-    m_browserStart = makeEdit(this, m_loading, u"https://www.youtube.com/"_s, [this](const QString& text) {
-        m_settings.setBrowserStartPage(text);
-        m_browserStart->setText(m_settings.browserStartPage());
+    // Start page: an empty tab (default), YouTube, or an address of the user's
+    // own; the address field shows only for the custom choice.
+    enum StartChoice
+    {
+        EmptyTab,
+        YouTube,
+        Custom,
+    };
+    m_browserStartChoice = makeCombo(this, m_loading,
+                                     {{tr("Empty tab"), EmptyTab}, {tr("YouTube"), YouTube}, {tr("Custom address"), Custom}},
+                                     [this](int choice) {
+                                         if (choice == EmptyTab) {
+                                             m_settings.setBrowserStartPage(QString(core::Settings::kEmptyStartPage));
+                                         } else if (choice == YouTube) {
+                                             m_settings.setBrowserStartPage(QString(core::Settings::kYouTubeStartPage));
+                                         } else if (!m_browserStart->text().trimmed().isEmpty()) {
+                                             m_settings.setBrowserStartPage(m_browserStart->text());
+                                         }
+                                         m_browserStartRow->setVisible(choice == Custom);
+                                         if (choice == Custom) {
+                                             m_browserStart->setFocus();
+                                         }
+                                     });
+    m_browserStartChoice->setObjectName(u"startPageCombo"_s);
+    m_browserStart = makeEdit(this, m_loading, u"https://example.com/"_s, [this](const QString& text) {
+        if (!text.trimmed().isEmpty()) {
+            m_settings.setBrowserStartPage(text);
+        }
     });
+    m_browserStart->setObjectName(u"startPageEdit"_s);
     m_restoreTabs = makeCheck(this, m_loading, [this](bool on) { m_settings.setRestoreBrowserTabs(on); });
     m_blockAds = makeCheck(this, m_loading, [this](bool on) { m_settings.setBlockAds(on); });
     m_doNotTrack = makeCheck(this, m_loading, [this](bool on) { m_settings.setDoNotTrack(on); });
     m_blockedCount = muted(QString(), this);
     m_blockedCount->setObjectName(u"blockedCount"_s);
 
+    m_browserStartRow = row(tr("Address"), m_browserStart);
     QWidget* pages = card(tr("Pages"),
-                          {row(tr("Start page"), m_browserStart),
+                          {row(tr("Start page"), m_browserStartChoice, tr("What a new browser tab opens with.")),
+                           m_browserStartRow,
                            row(tr("Restore tabs"), m_restoreTabs, tr("Reopen last time's tabs on start."))},
                           this);
     // The blocked-count line sits under Block ads as a row of its own.
@@ -664,9 +692,26 @@ void SettingsDialog::loadDownloadValues()
     setIdleText(m_engineSystemPath, m_settings.engineSystemPath());
 }
 
+void SettingsDialog::loadStartPageChoice()
+{
+    const QString start = m_settings.browserStartPage();
+    const bool empty = core::Settings::isEmptyStartPage(start);
+    const bool youtube = start == core::Settings::kYouTubeStartPage;
+    const bool custom = !empty && !youtube;
+    // "Custom address" just chosen stores nothing until an address is typed:
+    // a reload in between must not snap the choice back.
+    if (custom || m_browserStartChoice->currentData().toInt() != 2) {
+        selectData(m_browserStartChoice, empty ? 0 : (youtube ? 1 : 2));
+        m_browserStartRow->setVisible(custom);
+    }
+    if (custom) {
+        setIdleText(m_browserStart, start);
+    }
+}
+
 void SettingsDialog::loadBrowserValues()
 {
-    setIdleText(m_browserStart, m_settings.browserStartPage());
+    loadStartPageChoice();
     m_restoreTabs->setChecked(m_settings.restoreBrowserTabs());
     m_blockAds->setChecked(m_settings.blockAds());
     m_doNotTrack->setChecked(m_settings.doNotTrack());

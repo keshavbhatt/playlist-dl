@@ -98,7 +98,7 @@ name (ADR-002), the repository licence (ADR-005).
 | W4 | Sign-in works (sanitised Chrome UA, Firefox identity on Google sign-in hosts) and is shared with the engine | Firefox 72 UA everywhere | KEEP | done (`web::user_agent`, `web::CookieExporter`; the engine hand-off lands with E5) |
 | W5 | Theme follows the app (page background, PREF cookie for YouTube's scheme) | dark cookie on first run | KEEP | done (page background follows the scheme; YouTube's own dark mode follows the user's YouTube setting) |
 | W6 | Desktop or mobile site switch | yes | DROP | the Browser identity presets in Settings cover it |
-| W7 | Keep the player running when leaving the page; session restore | keepPlayer, history restore | KEEP as "Restore tabs" | done (`Settings::browserSession`, restore tabs) |
+| W7 | Keep the player running when leaving the page; session restore; a new tab opens empty by default, or on YouTube or a custom address (setting) | keepPlayer, history restore, always YouTube | KEEP as "Restore tabs" and "Start page" | done (`Settings::browserSession`, `browserStartPage`; tst_settings_dialog) |
 | W8 | Blocked request log window, comment blocking, theatre mode forced | yes | DROP | the badge count replaces the log; YouTube remembers theatre mode |
 | W9 | Age-restricted fallback page (`YtTest` wrapper, plain http) | yes | DROP | sign-in and the engine's cookies cover age gates |
 

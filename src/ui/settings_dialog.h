@@ -95,6 +95,7 @@ private:
     void loadValues();
     void loadDownloadValues();
     void loadBrowserValues();
+    void loadStartPageChoice();
     void refreshEngine(const services::EngineManager::Status& status);
     void refreshBlockedCount();
     void chooseDownloadFolder();
@@ -147,7 +148,9 @@ private:
     QCheckBox* m_engineUseSystem = nullptr;
     QLineEdit* m_engineSystemPath = nullptr;
     // browser
+    QComboBox* m_browserStartChoice = nullptr;
     QLineEdit* m_browserStart = nullptr;
+    QWidget* m_browserStartRow = nullptr;
     QCheckBox* m_restoreTabs = nullptr;
     QCheckBox* m_blockAds = nullptr;
     QLabel* m_blockedCount = nullptr;

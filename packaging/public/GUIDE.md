@@ -40,7 +40,8 @@ become the defaults for next time.
 
 ## Browser
 
-The full YouTube site in tabs. Sign in once and your subscriptions and history work as on
+A new tab opens empty; type an address or a search, or pick YouTube as the start page in
+Settings, Browser. Sign in once and your subscriptions and history work as on
 the website; the sign-in is also used for downloads, so age-restricted videos download too.
 Ads are blocked; the "Ads blocked" badge counts them. Ctrl+F finds text on the page, F11
 goes full screen, Ctrl+T opens a tab, Ctrl+W closes one.
@@ -68,7 +69,8 @@ the page title shows its state.
 - **Downloads**: the folder, a folder per playlist, numbering, the defaults for new
   downloads, concurrent downloads, speed limit, skip already downloaded, use my YouTube
   sign-in, and the download engine card (check for updates, update, auto-update).
-- **Browser**: start page, restore tabs, block ads, Do Not Track, browser identity.
+- **Browser**: start page (an empty tab, YouTube or an address of your own), restore tabs,
+  block ads, Do Not Track, browser identity.
 - **Search**: results per page.
 - **Advanced**: hardware acceleration, clear cache, sign out and clear session, reset
   permissions, open the log folder, copy diagnostics, reset settings.
