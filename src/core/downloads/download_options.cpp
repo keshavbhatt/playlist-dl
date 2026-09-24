@@ -3,6 +3,8 @@
 #include <QDir>
 #include <QJsonArray>
 
+#include <utility>
+
 using namespace Qt::StringLiterals;
 
 namespace pldl::core {
@@ -39,6 +41,26 @@ QString sanitizeForTemplate(QString text)
 }
 
 } // namespace
+
+QString sanitiseFolderName(QString title)
+{
+    static const QString kForbidden = u"/\\:*?\"<>|"_s;
+    QString out;
+    out.reserve(title.size());
+    for (const QChar c : std::as_const(title)) {
+        if (c.category() == QChar::Other_Control) {
+            continue;
+        }
+        out.append(kForbidden.contains(c) ? u'_' : c);
+    }
+    out = out.simplified();
+    while (out.startsWith(u'.')) {
+        out.remove(0, 1); // a leading dot hides the folder
+    }
+    out.truncate(120);
+    out = out.trimmed();
+    return out.isEmpty() ? u"Playlist"_s : out;
+}
 
 QString qualityLabel(VideoQuality quality)
 {
@@ -137,6 +159,8 @@ QJsonObject DownloadOptions::toJson() const
         {u"playlistItems"_s, playlistItems},
         {u"isPlaylist"_s, isPlaylist},
         {u"isChannel"_s, isChannel},
+        {u"numberPlaylistItems"_s, numberPlaylistItems},
+        {u"playlistSubfolder"_s, playlistSubfolder},
         {u"speedLimitKbps"_s, speedLimitKbps},
     };
 }
@@ -164,6 +188,8 @@ DownloadOptions DownloadOptions::fromJson(const QJsonObject& o)
     d.playlistItems = o.value(u"playlistItems"_s).toString();
     d.isPlaylist = o.value(u"isPlaylist"_s).toBool();
     d.isChannel = o.value(u"isChannel"_s).toBool();
+    d.numberPlaylistItems = o.value(u"numberPlaylistItems"_s).toBool(true);
+    d.playlistSubfolder = o.value(u"playlistSubfolder"_s).toBool(true);
     d.speedLimitKbps = o.value(u"speedLimitKbps"_s).toInt();
     return d;
 }
@@ -235,10 +261,15 @@ QString outputTemplate(const DownloadOptions& options)
         break;
     }
     if (options.isPlaylist) {
-        // A channel's playlist title is "<Channel> - Videos": use the channel's name instead.
-        name = (options.isChannel ? u"%(channel,uploader,playlist_uploader|Channel)s/"_s
-                                  : u"%(playlist_title,playlist_id|Playlist)s/"_s) +
-               u"%(playlist_index|0)03d - "_s + name;
+        if (options.numberPlaylistItems) {
+            name = u"%(playlist_index|0)03d - "_s + name;
+        }
+        if (options.playlistSubfolder) {
+            // A channel's playlist title is "<Channel> - Videos": use the channel's name instead.
+            name = (options.isChannel ? u"%(channel,uploader,playlist_uploader|Channel)s/"_s
+                                      : u"%(playlist_title,playlist_id|Playlist)s/"_s) +
+                   name;
+        }
     }
     return options.folder.isEmpty() ? name : options.folder + u'/' + name;
 }
@@ -259,11 +290,14 @@ QString expectedExtension(const DownloadOptions& options)
 }
 
 QString previewFileName(const DownloadOptions& options, const QString& title, const QString& id,
-                        const QString& uploader)
+                        const QString& uploader, int playlistIndex)
 {
     const QString ext = expectedExtension(options);
     const QString safeTitle = sanitizeForTemplate(title.isEmpty() ? u"Video"_s : title);
-    const QString prefix = options.folder.isEmpty() ? QString() : options.folder + u'/';
+    QString prefix = options.folder.isEmpty() ? QString() : options.folder + u'/';
+    if (options.isPlaylist && options.numberPlaylistItems && playlistIndex > 0) {
+        prefix += u"%1 - "_s.arg(playlistIndex, 3, 10, QLatin1Char('0'));
+    }
     switch (options.filenamePattern) {
     case FilenamePattern::Title:
         return prefix + safeTitle + u'.' + ext;

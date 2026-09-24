@@ -211,6 +211,12 @@ public:
     /// Preferred subtitle languages for the download default (e.g. {"en"}).
     [[nodiscard]] QStringList subtitleLanguages() const;
     void setSubtitleLanguages(const QStringList& languages);
+    /// The audio-only bitrate ceiling in kbps (0 = best), the sheet's default.
+    [[nodiscard]] int defaultAudioBitrate() const;
+    void setDefaultAudioBitrate(int kbps);
+    /// Playlist files start with their playlist index ("001 - "), default on.
+    [[nodiscard]] bool numberPlaylistFiles() const;
+    void setNumberPlaylistFiles(bool enabled);
 
     // search/
     [[nodiscard]] SearchMode searchMode() const;

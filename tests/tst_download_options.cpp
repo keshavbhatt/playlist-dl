@@ -114,6 +114,18 @@ private Q_SLOTS:
         QCOMPARE(previewFileName(o, u"T"_s, u"id"_s, u"Ch"_s), u"Ch - T.mp4"_s);
     }
 
+    void folderNames()
+    {
+        QCOMPARE(sanitiseFolderName(u"Music: Best of / 2024"_s), u"Music_ Best of _ 2024"_s);
+        QCOMPARE(sanitiseFolderName(u"  spaced   out  "_s), u"spaced out"_s);
+        QCOMPARE(sanitiseFolderName(u"a\\b|c<d>e?f*g\"h"_s), u"a_b_c_d_e_f_g_h"_s);
+        QCOMPARE(sanitiseFolderName(QString::fromUtf16(u"tab\there\u0001x")), u"tabherex"_s);
+        QCOMPARE(sanitiseFolderName(u"..hidden"_s), u"hidden"_s);
+        QCOMPARE(sanitiseFolderName(QString()), u"Playlist"_s);
+        QCOMPARE(sanitiseFolderName(u"///"_s), u"___"_s);
+        QCOMPARE(sanitiseFolderName(QString(200, u'x')).size(), 120);
+    }
+
     void organisedFolders()
     {
         QCOMPARE(downloadFolder(DownloadOptions::Kind::Video, false, false), u"Videos"_s);
@@ -151,6 +163,22 @@ private Q_SLOTS:
         o.isChannel = false;
         QCOMPARE(outputTemplate(o),
                  u"%(playlist_title,playlist_id|Playlist)s/%(playlist_index|0)03d - %(title)s.%(ext)s"_s);
+        // The options sheet names the folder itself and can turn the numbering off.
+        o.folder = u"My Playlist"_s;
+        o.playlistSubfolder = false;
+        QCOMPARE(outputTemplate(o), u"My Playlist/%(playlist_index|0)03d - %(title)s.%(ext)s"_s);
+        QCOMPARE(previewFileName(o, u"T"_s, u"id"_s, QString(), 7), u"My Playlist/007 - T.mp4"_s);
+        o.numberPlaylistItems = false;
+        QCOMPARE(outputTemplate(o), u"My Playlist/%(title)s.%(ext)s"_s);
+        QCOMPARE(previewFileName(o, u"T"_s, u"id"_s, QString(), 7), u"My Playlist/T.mp4"_s);
+        const DownloadOptions switched = DownloadOptions::fromJson(o.toJson());
+        QVERIFY(!switched.playlistSubfolder);
+        QVERIFY(!switched.numberPlaylistItems);
+        QVERIFY(DownloadOptions::fromJson(QJsonObject()).playlistSubfolder); // older jobs keep the old layout
+        QVERIFY(DownloadOptions::fromJson(QJsonObject()).numberPlaylistItems);
+        o.folder.clear();
+        o.playlistSubfolder = true;
+        o.numberPlaylistItems = true;
         const DownloadOptions back = DownloadOptions::fromJson([&] {
             o.folder = u"Channels"_s;
             o.isChannel = true;

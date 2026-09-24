@@ -50,6 +50,8 @@ inline constexpr QLatin1StringView kUseSessionCookies{"downloads/useSessionCooki
 inline constexpr QLatin1StringView kEmbedThumbnail{"downloads/embedThumbnail"};
 inline constexpr QLatin1StringView kEmbedMetadata{"downloads/embedMetadata"};
 inline constexpr QLatin1StringView kSubtitleLanguages{"downloads/subtitleLanguages"};
+inline constexpr QLatin1StringView kDefaultAudioBitrate{"downloads/defaultAudioBitrate"}; ///< kbps, 0 = best
+inline constexpr QLatin1StringView kNumberPlaylistFiles{"downloads/numberPlaylistFiles"}; ///< "001 - " prefix
 
 // search/
 inline constexpr QLatin1StringView kSearchServiceMode{"search/serviceMode"};       ///< Automatic / Engine only (ADR-003)

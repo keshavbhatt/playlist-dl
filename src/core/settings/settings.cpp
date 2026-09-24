@@ -35,6 +35,8 @@ constexpr int kDefaultSpeedLimit = 0;
 constexpr bool kDefaultUseSessionCookies = true;
 constexpr bool kDefaultEmbedThumbnail = true;
 constexpr bool kDefaultEmbedMetadata = true;
+constexpr int kDefaultAudioBitrate = 0;
+constexpr bool kDefaultNumberPlaylistFiles = true;
 constexpr SearchMode kDefaultSearchMode = SearchMode::Automatic;
 constexpr int kDefaultSearchResultsPerPage = 20;
 constexpr bool kDefaultKeepSearchHistory = true;
@@ -517,6 +519,30 @@ void Settings::setSubtitleLanguages(const QStringList& languages)
     }
     m_store->setValue(keys::kSubtitleLanguages, languages);
     Q_EMIT downloadDefaultsChanged();
+}
+
+int Settings::defaultAudioBitrate() const
+{
+    return std::max(0, intValue(keys::kDefaultAudioBitrate, kDefaultAudioBitrate));
+}
+
+void Settings::setDefaultAudioBitrate(int kbps)
+{
+    if (storeInt(keys::kDefaultAudioBitrate, kDefaultAudioBitrate, std::max(0, kbps))) {
+        Q_EMIT downloadDefaultsChanged();
+    }
+}
+
+bool Settings::numberPlaylistFiles() const
+{
+    return boolValue(keys::kNumberPlaylistFiles, kDefaultNumberPlaylistFiles);
+}
+
+void Settings::setNumberPlaylistFiles(bool enabled)
+{
+    if (storeBool(keys::kNumberPlaylistFiles, kDefaultNumberPlaylistFiles, enabled)) {
+        Q_EMIT downloadDefaultsChanged();
+    }
 }
 
 // ---- search/ ---------------------------------------------------------------
