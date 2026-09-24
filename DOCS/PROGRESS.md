@@ -28,6 +28,9 @@
 
 ### 2026-09-24, M6
 
+- Store copy and docs reworded for playlists from any site (owner: "update the readme and
+  docs"): public README, metainfo, snap description, repo README, changelog, guide intro.
+  The snapcraft.io listing is hand-maintained: paste the new summary and description there.
 - Owner direction: playlists from any site (ADR-006). Download this on a SoundCloud set said
   "not a YouTube link"; now any web link is probed and the answer decides (Playlist page or
   options sheet), from the Search field, the browser and the CLI. Untitled flat entries are

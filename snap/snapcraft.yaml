@@ -11,31 +11,33 @@ base: core24
 compression: lzo
 
 title: Playlist Downloader
-summary: Search, play and download YouTube playlists
+summary: Download playlists from any site, as video or audio
 description: |
-  Playlist Downloader finds YouTube playlists, plays them in a built-in player and saves
-  whole playlists offline as video or audio.
+  Playlist Downloader saves whole playlists offline as video or audio: search YouTube, or
+  paste a playlist link from SoundCloud, Bandcamp, Vimeo and hundreds of other sites, pick
+  the items and download them.
 
   **Find a playlist**
 
-  * Search YouTube playlists by keyword, with suggestions as you type, or paste a playlist
-    or video link.
-  * Browse the playlist: every video with its thumbnail and length, pick the ones you want,
+  * Search YouTube playlists by keyword, with suggestions as you type.
+  * Paste a playlist link from any site the download engine reads, or a link to a single
+    video or track.
+  * Browse the playlist: every item with its thumbnail and length, pick the ones you want,
     select a range, filter and sort.
 
   **Play**
 
-  * A built-in browser page for YouTube: sign in once, watch without ads, open videos and
-    playlists in tabs, go full screen.
+  * A built-in browser for any site: sign in once, watch without ads, open pages in tabs,
+    go full screen, and download what the page shows with one button.
 
   **Download**
 
-  * Save the selected videos as MP4, MKV or WebM up to 4K, or audio only as MP3, M4A, Opus,
+  * Save the selected items as MP4, MKV or WebM up to 4K, or audio only as MP3, M4A, Opus,
     FLAC or WAV, with subtitles, thumbnails and metadata embedded on request.
   * A queue that pauses, resumes and retries, files sorted into a folder per playlist and
     numbered in playlist order, notifications with Show in folder.
-  * The download engine sets itself up on first use and keeps itself updated. Your sign-in
-    is reused, so age-restricted videos download too.
+  * The download engine sets itself up on first use and keeps itself updated. Your sign-ins
+    are reused, so members-only and age-restricted items download too.
 
   **Made for the desktop**
 

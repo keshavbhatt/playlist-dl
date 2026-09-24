@@ -1,9 +1,9 @@
 # Playlist Downloader guide
 
-Playlist Downloader finds YouTube playlists, opens playlists from any site by link, plays them
-in a built-in browser page and saves
-whole playlists offline as video or audio. This guide walks through the four pages of the
-window and the settings that matter.
+Playlist Downloader saves whole playlists offline as video or audio: search YouTube, or
+paste a playlist link from any site the download engine reads (SoundCloud, Bandcamp, Vimeo
+and hundreds more), then pick the items and download them. This guide walks through the
+four pages of the window and the settings that matter.
 
 ## The window
 

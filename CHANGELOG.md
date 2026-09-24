@@ -12,11 +12,13 @@ a left rail for the Search, Playlist, Browser and Downloads pages.
 ### Added
 - Search: playlist search with suggestions as you type, recent queries, a card grid with
   the video count on every playlist, a list view, and Load more for the next page.
-- Paste a playlist or video link into the search field to open it directly.
+- Playlists from any site: paste a playlist link from SoundCloud, Bandcamp, Vimeo and
+  hundreds of other sites into the search field, or a link to a single video or track, and
+  the app opens it. YouTube links open directly.
 - Browser: tabs that open empty (or on YouTube, or an address of your own: Settings,
-  Browser), the full YouTube site with sign-in, find in page, an ad blocker with a
-  blocked-request count, full screen, and a Download button that knows whether the page is
-  a playlist or a video.
+  Browser), any site with sign-in, find in page, an ad blocker with a blocked-request
+  count, full screen, and a Download button that knows whether the page is a playlist or a
+  single item.
 - Downloads: one queue with pause, resume, retry, cancel, remove, open and show in folder;
   a playlist is one entry that shows which video it is on; filters for active, finished
   and failed; notifications with Open and Show in folder; taskbar progress; the screen
@@ -24,8 +26,8 @@ a left rail for the Search, Playlist, Browser and Downloads pages.
 - A downloaded playlist plays as a whole: a playlist file (.m3u8) is written next to the
   videos, and Open on the card lists the videos, lets you arrange them and plays them all
   in your media player.
-- The download engine sets itself up on first use and keeps itself updated; your YouTube
-  sign-in is reused for downloads.
+- The download engine sets itself up on first use and keeps itself updated; your sign-ins
+  in the browser are reused for downloads.
 - Light and dark themes drawn from the new icon, a tray icon, single instance with
   `playlist-dl <link>` and `playlist-dl --download <link>`, a shortcuts sheet, What's new,
   diagnostics and Report a bug.

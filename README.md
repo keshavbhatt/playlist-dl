@@ -1,6 +1,7 @@
 # Playlist Downloader
 
-Search, browse, play and download YouTube playlists on the Linux desktop. Version 3.0 is a
+Search, browse, play and download playlists from any site on the Linux desktop: YouTube by
+search, everything else by link. Version 3.0 is a
 rewrite of Playlist-Dl 2.x on Qt 6, C++20 and CMake; the 2.x code is on `main`.
 
 Everything about the project is under `DOCS/` (start with `DOCS/README.md`). Building and

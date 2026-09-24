@@ -3,8 +3,9 @@
 </p>
 
 <p align="center">
-  Search YouTube playlists, pick the videos, download them as video or audio, and play the
-  whole playlist in your media player. Native, lightweight, built with Qt&nbsp;6.
+  Playlists from any site: search YouTube or paste a link from SoundCloud, Bandcamp,
+  Vimeo and hundreds of others, pick the items, download them as video or audio, and play
+  the whole playlist in your media player. Native, lightweight, built with Qt&nbsp;6.
 </p>
 
 <p align="center">
@@ -26,23 +27,26 @@ sudo snap install playlist-dl
 ## Features
 
 **Find a playlist**
-- Search YouTube playlists by keyword, with suggestions as you type, or paste a playlist or
-  video link. Every result shows its cover, channel and video count, as cards or a list.
-- Browse the playlist: every video with its thumbnail and length; select all, a range or a
-  few; unavailable videos are set aside; play any video first.
+- Search YouTube playlists by keyword, with suggestions as you type. Every result shows its
+  cover, channel and video count, as cards or a list.
+- Paste a playlist link from any site the download engine reads (SoundCloud sets, Bandcamp
+  albums, Vimeo showcases and many more), or a link to a single video or track.
+- Browse the playlist: every item with its thumbnail and length; select all, a range or a
+  few; unavailable items are set aside; play any item first.
 
 **Download**
 - MP4, MKV or WebM up to 4K, or audio only as MP3, M4A, Opus, FLAC or WAV, with subtitles,
   thumbnails and metadata embedded. Your choices become the defaults for next time.
-- One queue for the whole playlist: progress per video, pause, resume, retry, a folder per
+- One queue for the whole playlist: progress per item, pause, resume, retry, a folder per
   playlist with files numbered in playlist order, and a notification with Show in folder.
-- A playlist file (.m3u8) lands next to the videos; open the finished playlist to arrange
+- A playlist file (.m3u8) lands next to the files; open the finished playlist to arrange
   the order and play it all in your media player.
 - The download engine sets itself up on first use and keeps itself updated.
 
 **Watch**
-- A built-in browser for YouTube: tabs, find in page, an ad blocker with a count, full
-  screen. Sign in once and the sign-in is reused for downloads, so restricted videos come too.
+- A built-in browser for any site: tabs, find in page, an ad blocker with a count, full
+  screen, and a Download button on every page. Sign in to a site once and the sign-in is
+  reused for downloads from it, so members-only and age-restricted items come too.
 
 **Made for the desktop**
 - Light and dark themes, a tray icon, taskbar progress, native Wayland and X11, a shortcuts
@@ -52,7 +56,7 @@ sudo snap install playlist-dl
 
 <table>
   <tr>
-    <td width="50%"><img src="screenshots/01-playlist.png" alt="Pick the videos"></td>
+    <td width="50%"><img src="screenshots/01-playlist.png" alt="Pick the items"></td>
     <td width="50%"><img src="screenshots/02-options.png" alt="Download options"></td>
   </tr>
   <tr>

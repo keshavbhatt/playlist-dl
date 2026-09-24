@@ -9,20 +9,22 @@
   </developer>
 
   <name>Playlist Downloader</name>
-  <summary>Download YouTube playlists offline</summary>
+  <summary>Download playlists from any site offline</summary>
 
   <description>
     <p>
-      Playlist Downloader finds YouTube playlists, plays them in a built-in player and saves
-      whole playlists offline as video or audio: a playlist downloader for the Linux desktop.
+      Playlist Downloader saves whole playlists offline as video or audio: search YouTube, or
+      paste a playlist link from SoundCloud, Bandcamp, Vimeo and hundreds of other sites, pick
+      the items and download them. A playlist downloader for the Linux desktop.
     </p>
     <ul>
-      <li>Search YouTube playlists by keyword, with suggestions as you type, or paste a playlist or video link</li>
-      <li>Browse the playlist: every video with its thumbnail and length; pick the ones you want or a range</li>
+      <li>Search YouTube playlists by keyword, with suggestions as you type</li>
+      <li>Paste a playlist link from any site the download engine reads, or a link to a single video or track</li>
+      <li>Browse the playlist: every item with its thumbnail and length; pick the ones you want or a range</li>
       <li>Download as MP4, MKV or WebM up to 4K, or audio only as MP3, M4A, Opus, FLAC or WAV, with subtitles, thumbnails and metadata embedded</li>
       <li>A queue with pause, resume and retry, files in a folder per playlist, numbered in playlist order, and a notification when the download finishes</li>
-      <li>A playlist file (m3u8) next to the videos, so your music player plays the whole playlist in order</li>
-      <li>A built-in browser to watch YouTube and sign in; age-restricted videos download too</li>
+      <li>A playlist file (m3u8) next to the files, so your music player plays the whole playlist in order</li>
+      <li>A built-in browser for any site with a Download button on every page; sign in once and members-only and age-restricted items download too</li>
       <li>The download engine sets itself up on first use and keeps itself updated</li>
     </ul>
   </description>
@@ -41,7 +43,7 @@
     </screenshot>
     <screenshot>
       <image>https://raw.githubusercontent.com/keshavbhatt/p-pldl/main/screenshots/01-playlist.png</image>
-      <caption>Pick the videos of a playlist</caption>
+      <caption>Pick the items of a playlist</caption>
     </screenshot>
     <screenshot>
       <image>https://raw.githubusercontent.com/keshavbhatt/p-pldl/main/screenshots/02-options.png</image>

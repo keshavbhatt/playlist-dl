@@ -81,7 +81,7 @@ The window remembers its geometry and the page it was on. Minimum size 960 by 60
 
 The 2.x home: a search field with online suggestions, results as playlist cards. Rebuilt:
 
-- Header: the title "Search", a wide field "Search YouTube playlists or paste a link",
+- Header: the title "Search", a wide field "Search YouTube playlists, or paste a playlist link from any site",
   a Search button (accent). Enter searches; a pasted playlist or video link resolves straight
   to the Playlist page (or the Browser page for a video, with a "Download" offer).
 - Suggestions drop down under the field as the user types (debounced 250 ms, from the
