@@ -56,6 +56,40 @@ private:
     QTcpServer m_server;
 };
 
+/// Answers every request with a 500.
+class BrokenServer : public QObject
+{
+    Q_OBJECT
+
+public:
+    int hits = 0;
+
+    bool listen()
+    {
+        connect(&m_server, &QTcpServer::newConnection, this, [this] {
+            while (QTcpSocket* socket = m_server.nextPendingConnection()) {
+                connect(socket, &QTcpSocket::readyRead, this, [this, socket] {
+                    if (!socket->readAll().contains("\r\n\r\n")) {
+                        return;
+                    }
+                    ++hits;
+                    socket->write("HTTP/1.1 500 Internal Server Error\r\nContent-Length: 0\r\nConnection: close\r\n\r\n");
+                    socket->disconnectFromHost();
+                });
+                connect(socket, &QTcpSocket::disconnected, socket, &QObject::deleteLater);
+            }
+        });
+        return m_server.listen(QHostAddress::LocalHost, 0);
+    }
+    [[nodiscard]] QUrl url() const
+    {
+        return QUrl(u"http://127.0.0.1:"_s + QString::number(m_server.serverPort()) + u"/complete/search"_s);
+    }
+
+private:
+    QTcpServer m_server;
+};
+
 } // namespace
 
 class TestSearchSuggestions : public QObject
@@ -63,6 +97,27 @@ class TestSearchSuggestions : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
+    void fallsBackToTheSecondEndpoint()
+    {
+        BrokenServer broken;
+        EchoServer echo;
+        QVERIFY(broken.listen());
+        QVERIFY(echo.listen());
+        SearchSuggestions suggestions;
+        QCOMPARE(suggestions.endpoints().size(), 2); // the shipped pair
+        suggestions.setEndpoints({broken.url(), echo.url()});
+        QSignalSpy spy(&suggestions, &SearchSuggestions::suggestions);
+        suggestions.request(u"lofi"_s);
+        QTRY_COMPARE_WITH_TIMEOUT(spy.count(), 1, 5000);
+        QCOMPARE(broken.hits, 1);
+        QCOMPARE(echo.queries, QStringList{u"lofi"_s});
+        QCOMPARE(spy.at(0).at(0).toStringList(), (QStringList{u"lofi radio"_s, u"lofi mix"_s}));
+        // The next request starts from the first endpoint again.
+        suggestions.request(u"jazz"_s);
+        QTRY_COMPARE_WITH_TIMEOUT(spy.count(), 2, 5000);
+        QCOMPARE(broken.hits, 2);
+    }
+
     void parsesTheShape()
     {
         const QStringList list =

@@ -52,6 +52,9 @@
   delegate and filters. Verified live headless: `PLDL_DEBUG_DOWNLOAD` provisioned the
   engine and downloaded "Me at the zoo" (av1+aac, thumbnail embedded) in 151 s, exit 0.
   39 tests pass. Grabs of the demo queue in dark and light looked at.
+- Owner report: suggestions looked missing. Cause: the suggestion host stalls for over 5 s
+  on some connections (curl reproduced it); a stall was a silent failure. Now a second host
+  is tried at once on any failure or timeout (4 s each), with a test; the popup grabbed live.
 - Owner request: the Search page switches between the card grid and a list of rows (two
   header buttons, `search/gridView`); grabbed in both modes.
 - Playlist page and Download options sheet merged: the playlist read flat through the
