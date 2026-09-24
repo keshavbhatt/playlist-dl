@@ -18,6 +18,8 @@ namespace {
 constexpr CloseAction kDefaultCloseAction = CloseAction::Quit;
 constexpr bool kDefaultNotifyOnDownloadFinish = true;
 constexpr bool kDefaultTrayEnabled = true;
+constexpr StartPage kDefaultStartPage = StartPage::Search;
+constexpr bool kDefaultShowWhatsNew = true;
 constexpr Theme kDefaultTheme = Theme::System;
 constexpr double kDefaultInterfaceScale = 1.0;
 constexpr bool kDefaultBlockAds = true;
@@ -26,6 +28,9 @@ constexpr QLatin1StringView kDefaultBrowserStartPage{"https://www.youtube.com/"}
 constexpr bool kDefaultRestoreBrowserTabs = false;
 constexpr FilenamePattern kDefaultFilenamePattern = FilenamePattern::Title;
 constexpr bool kDefaultOrganiseDownloads = true;
+constexpr bool kDefaultNumberPlaylistFiles = true;
+constexpr int kDefaultAudioBitrate = 0;
+constexpr bool kDefaultSkipExisting = true;
 constexpr VideoQuality kDefaultQuality = VideoQuality::Best;
 constexpr Container kDefaultContainer = Container::Mp4;
 constexpr AudioFormat kDefaultAudioFormat = AudioFormat::Best;
@@ -224,6 +229,30 @@ void Settings::setTrayEnabled(bool enabled)
     }
 }
 
+StartPage Settings::startPage() const
+{
+    return enumFromInt(intValue(keys::kStartPage, static_cast<int>(kDefaultStartPage)), kDefaultStartPage, 2);
+}
+
+void Settings::setStartPage(StartPage page)
+{
+    if (storeInt(keys::kStartPage, static_cast<int>(kDefaultStartPage), static_cast<int>(page))) {
+        Q_EMIT generalChanged();
+    }
+}
+
+bool Settings::showWhatsNew() const
+{
+    return boolValue(keys::kShowWhatsNew, kDefaultShowWhatsNew);
+}
+
+void Settings::setShowWhatsNew(bool enabled)
+{
+    if (storeBool(keys::kShowWhatsNew, kDefaultShowWhatsNew, enabled)) {
+        Q_EMIT generalChanged();
+    }
+}
+
 // ---- appearance/ -----------------------------------------------------------
 
 Theme Settings::theme() const
@@ -394,6 +423,18 @@ void Settings::setOrganiseDownloads(bool enabled)
     }
 }
 
+bool Settings::numberPlaylistFiles() const
+{
+    return boolValue(keys::kNumberPlaylistFiles, kDefaultNumberPlaylistFiles);
+}
+
+void Settings::setNumberPlaylistFiles(bool enabled)
+{
+    if (storeBool(keys::kNumberPlaylistFiles, kDefaultNumberPlaylistFiles, enabled)) {
+        Q_EMIT downloadDefaultsChanged();
+    }
+}
+
 VideoQuality Settings::defaultQuality() const
 {
     return enumFromInt(intValue(keys::kDefaultQuality, static_cast<int>(kDefaultQuality)), kDefaultQuality, 7);
@@ -432,6 +473,22 @@ void Settings::setDefaultAudioFormat(AudioFormat format)
     }
 }
 
+int Settings::defaultAudioBitrate() const
+{
+    const int stored = intValue(keys::kDefaultAudioBitrate, kDefaultAudioBitrate);
+    return std::ranges::find(kAudioBitrates, stored) != std::end(kAudioBitrates) ? stored
+                                                                                 : kDefaultAudioBitrate;
+}
+
+void Settings::setDefaultAudioBitrate(int kbps)
+{
+    const int valid =
+        std::ranges::find(kAudioBitrates, kbps) != std::end(kAudioBitrates) ? kbps : kDefaultAudioBitrate;
+    if (storeInt(keys::kDefaultAudioBitrate, kDefaultAudioBitrate, valid)) {
+        Q_EMIT downloadDefaultsChanged();
+    }
+}
+
 DownloadKind Settings::lastDownloadKind() const
 {
     return enumFromInt(intValue(keys::kLastDownloadKind, static_cast<int>(kDefaultDownloadKind)),
@@ -440,7 +497,9 @@ DownloadKind Settings::lastDownloadKind() const
 
 void Settings::setLastDownloadKind(DownloadKind kind)
 {
-    storeInt(keys::kLastDownloadKind, static_cast<int>(kDefaultDownloadKind), static_cast<int>(kind));
+    if (storeInt(keys::kLastDownloadKind, static_cast<int>(kDefaultDownloadKind), static_cast<int>(kind))) {
+        Q_EMIT downloadDefaultsChanged(); // Settings, Downloads shows it as the default kind
+    }
 }
 
 int Settings::concurrentDownloads() const
@@ -466,6 +525,18 @@ void Settings::setSpeedLimitKbps(int kbps)
     const int clamped = std::max(0, kbps);
     if (storeInt(keys::kSpeedLimitKbps, kDefaultSpeedLimit, clamped)) {
         Q_EMIT speedLimitChanged(clamped);
+    }
+}
+
+bool Settings::skipExisting() const
+{
+    return boolValue(keys::kSkipExisting, kDefaultSkipExisting);
+}
+
+void Settings::setSkipExisting(bool enabled)
+{
+    if (storeBool(keys::kSkipExisting, kDefaultSkipExisting, enabled)) {
+        Q_EMIT downloadDefaultsChanged();
     }
 }
 
@@ -758,6 +829,7 @@ void Settings::resetToDefaults()
     Q_EMIT closeActionChanged(closeAction());
     Q_EMIT notifyOnDownloadFinishChanged(notifyOnDownloadFinish());
     Q_EMIT trayEnabledChanged(trayEnabled());
+    Q_EMIT generalChanged();
     Q_EMIT themeChanged(theme());
     Q_EMIT interfaceScaleChanged(interfaceScale());
     Q_EMIT blockAdsChanged(blockAds());

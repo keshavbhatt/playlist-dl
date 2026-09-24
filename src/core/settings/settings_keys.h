@@ -23,6 +23,8 @@ inline constexpr QLatin1StringView kFreeDownloadsUsed{"licensing/freeDownloadsUs
 // general/
 inline constexpr QLatin1StringView kNotifyOnDownloadFinish{"general/notifyOnDownloadFinish"};
 inline constexpr QLatin1StringView kTrayEnabled{"general/trayEnabled"};
+inline constexpr QLatin1StringView kStartPage{"general/startPage"};       ///< Search or the last page
+inline constexpr QLatin1StringView kShowWhatsNew{"general/showWhatsNew"}; ///< the notes sheet after an update
 
 // appearance/
 inline constexpr QLatin1StringView kTheme{"appearance/theme"};
@@ -40,12 +42,15 @@ inline constexpr QLatin1StringView kBrowserUserAgent{"browser/userAgent"};      
 inline constexpr QLatin1StringView kDownloadDirectory{"downloads/directory"};
 inline constexpr QLatin1StringView kFilenamePattern{"downloads/filenamePattern"};
 inline constexpr QLatin1StringView kOrganiseDownloads{"downloads/organise"};
+inline constexpr QLatin1StringView kNumberPlaylistFiles{"downloads/numberPlaylistFiles"}; ///< "01 - Title" order
 inline constexpr QLatin1StringView kDefaultQuality{"downloads/defaultQuality"};
 inline constexpr QLatin1StringView kDefaultContainer{"downloads/defaultContainer"};
 inline constexpr QLatin1StringView kDefaultAudioFormat{"downloads/defaultAudioFormat"};
+inline constexpr QLatin1StringView kDefaultAudioBitrate{"downloads/defaultAudioBitrate"}; ///< 0 = best, else kbps
 inline constexpr QLatin1StringView kLastDownloadKind{"downloads/lastKind"};
 inline constexpr QLatin1StringView kConcurrentDownloads{"downloads/concurrent"};
 inline constexpr QLatin1StringView kSpeedLimitKbps{"downloads/speedLimitKbps"};
+inline constexpr QLatin1StringView kSkipExisting{"downloads/skipExisting"}; ///< leave files already there alone
 inline constexpr QLatin1StringView kUseSessionCookies{"downloads/useSessionCookies"};
 inline constexpr QLatin1StringView kEmbedThumbnail{"downloads/embedThumbnail"};
 inline constexpr QLatin1StringView kEmbedMetadata{"downloads/embedMetadata"};

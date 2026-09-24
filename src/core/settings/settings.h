@@ -27,6 +27,13 @@ enum class CloseAction
     MinimizeToTray,
 };
 
+/// The rail page the app opens on (Settings, General).
+enum class StartPage
+{
+    Search,
+    LastPage,
+};
+
 /// User-agent variants the browser layer can produce. The app has one mode;
 /// the enum stays because `web::effectiveUserAgent` is keyed on it.
 enum class AppMode
@@ -149,6 +156,11 @@ public:
     void setNotifyOnDownloadFinish(bool enabled);
     [[nodiscard]] bool trayEnabled() const;
     void setTrayEnabled(bool enabled);
+    [[nodiscard]] StartPage startPage() const;
+    void setStartPage(StartPage page);
+    /// Whether the What's new sheet opens after an update.
+    [[nodiscard]] bool showWhatsNew() const;
+    void setShowWhatsNew(bool enabled);
 
     // appearance/
     [[nodiscard]] Theme theme() const;
@@ -188,12 +200,19 @@ public:
     /// Downloads sorted into Videos / Music / Playlists / Channels (default on).
     [[nodiscard]] bool organiseDownloads() const;
     void setOrganiseDownloads(bool enabled);
+    /// Playlist entries get their index in the file name ("01 - Title").
+    [[nodiscard]] bool numberPlaylistFiles() const;
+    void setNumberPlaylistFiles(bool enabled);
     [[nodiscard]] VideoQuality defaultQuality() const;
     void setDefaultQuality(VideoQuality quality);
     [[nodiscard]] Container defaultContainer() const;
     void setDefaultContainer(Container container);
     [[nodiscard]] AudioFormat defaultAudioFormat() const;
     void setDefaultAudioFormat(AudioFormat format);
+    /// Audio-only bitrate in kbps for the download default: one of kAudioBitrates (0 = best).
+    [[nodiscard]] int defaultAudioBitrate() const;
+    void setDefaultAudioBitrate(int kbps);
+    static constexpr int kAudioBitrates[] = {0, 192, 128};
     [[nodiscard]] DownloadKind lastDownloadKind() const;
     void setLastDownloadKind(DownloadKind kind);
     [[nodiscard]] int concurrentDownloads() const;
@@ -202,6 +221,9 @@ public:
     /// 0 = unlimited.
     [[nodiscard]] int speedLimitKbps() const;
     void setSpeedLimitKbps(int kbps);
+    /// Files already in the download folder are left alone.
+    [[nodiscard]] bool skipExisting() const;
+    void setSkipExisting(bool enabled);
     [[nodiscard]] bool useSessionCookies() const;
     void setUseSessionCookies(bool enabled);
     [[nodiscard]] bool embedThumbnail() const;
@@ -269,6 +291,7 @@ Q_SIGNALS:
     void closeActionChanged(pldl::core::CloseAction action);
     void notifyOnDownloadFinishChanged(bool enabled);
     void trayEnabledChanged(bool enabled);
+    void generalChanged(); ///< the start page or the What's new choice
     void themeChanged(pldl::core::Theme theme);
     void interfaceScaleChanged(double scale);
     void blockAdsChanged(bool enabled);
@@ -299,6 +322,7 @@ private:
 
 Q_DECLARE_METATYPE(pldl::core::Theme)
 Q_DECLARE_METATYPE(pldl::core::CloseAction)
+Q_DECLARE_METATYPE(pldl::core::StartPage)
 Q_DECLARE_METATYPE(pldl::core::AppMode)
 Q_DECLARE_METATYPE(pldl::core::HardwareAcceleration)
 Q_DECLARE_METATYPE(pldl::core::SignInUserAgent)
