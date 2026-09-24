@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/downloads/download_job.h"
 #include "core/settings/settings.h"
 
 #include <QMainWindow>
@@ -25,10 +26,14 @@ namespace pldl::ui {
 class AccountDialog;
 class Actions;
 class BrowserPage;
+class DownloadsController;
+class DownloadsPage;
 class EngineSetupDialog;
 class Page;
+class PlansDialog;
 class SideRail;
 class ThemeApplier;
+class ToastHost;
 class TrayController;
 
 /// Top-level window (DESIGN.md section 2): rail | page stack. Owns the pages
@@ -65,6 +70,12 @@ public:
     /// closes the sheet or the install fails; the sheet shows the error).
     void ensureEngine(std::function<void()> then);
     void showEngineSetup();
+    /// The download queue's owner (created after the Browser page: it needs
+    /// the profile's cookies), for the Playlist and Search pages.
+    [[nodiscard]] DownloadsController& downloads() { return *m_downloadsController; }
+    /// A short confirmation in the window's corner ("Added to queue").
+    void toast(const QString& text);
+    void showPlans();
 
 public Q_SLOTS:
     void showAndRaise();
@@ -72,9 +83,14 @@ public Q_SLOTS:
     void showPage(PageId page);
     /// A link from the CLI or another instance: opens on the Browser page.
     void openUrl(const QString& url);
-    /// A link to download right away (the Downloads page is not built yet:
-    /// the link opens in the browser for now).
+    /// A link to download right away (the CLI's --download, another
+    /// instance): the engine is set up if needed, the link probed and queued
+    /// with the default options, the Downloads page shown.
     void downloadUrl(const QString& url);
+    /// Headless verification aid (PLDL_DEBUG_DOWNLOAD=<url>): queues the link
+    /// into a temporary folder, prints "state:<name>" lines and the file path
+    /// to stdout, then quits with 0 on Completed and 1 otherwise.
+    void debugDownload(const QString& url);
     void showSettings();
     void showShortcuts();
     void showAbout();
@@ -82,7 +98,8 @@ public Q_SLOTS:
     /// Headless verification aid: opens a screen by name: "about",
     /// "shortcuts", "account", "plans", "bug", "whatsnew", "settings",
     /// "browser:<url>" (a tab on that page), "browser-fullscreen", or a page
-    /// name ("search", "playlist", "browser", "downloads").
+    /// name ("search", "playlist", "browser", "downloads"), or
+    /// "downloads-demo" (the Downloads page with one canned job per state).
     void debugOpen(const QString& what);
     void quit();
 
@@ -90,6 +107,7 @@ protected:
     void closeEvent(QCloseEvent* event) override;
     void showEvent(QShowEvent* event) override;
     void hideEvent(QHideEvent* event) override;
+    void resizeEvent(QResizeEvent* event) override;
 
 private:
     void setupUi();
@@ -103,6 +121,8 @@ private:
     /// A browser video went full screen: the window follows, hiding its chrome.
     void setBrowserFullScreen(bool on);
     void handleRenderProcessGaveUp();
+    /// One canned job per state for the "downloads-demo" grab.
+    [[nodiscard]] static QList<core::DownloadJob> demoDownloads();
 
     core::Settings& m_settings;
     core::ThemeService& m_theme;
@@ -113,7 +133,10 @@ private:
     Page* m_search = nullptr;
     Page* m_playlist = nullptr;
     BrowserPage* m_browser = nullptr;
-    Page* m_downloads = nullptr;
+    DownloadsPage* m_downloads = nullptr;
+    DownloadsController* m_downloadsController = nullptr;
+    ToastHost* m_toasts = nullptr;
+    QPointer<PlansDialog> m_plans;
     TrayController* m_tray = nullptr;
     ThemeApplier* m_themeApplier = nullptr;
     services::LicenseService* m_license = nullptr;

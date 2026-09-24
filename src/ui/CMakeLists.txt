@@ -20,6 +20,12 @@ qt_add_library(pldl_ui STATIC
     busy_button.h
     diagnostics.cpp
     diagnostics.h
+    download_card_delegate.cpp
+    download_card_delegate.h
+    downloads_controller.cpp
+    downloads_controller.h
+    downloads_filter_proxy.cpp
+    downloads_filter_proxy.h
     engine_setup_dialog.cpp
     engine_setup_dialog.h
     icons.cpp
@@ -39,6 +45,8 @@ qt_add_library(pldl_ui STATIC
     message_sheet.h
     pages/browser_page.cpp
     pages/browser_page.h
+    pages/downloads_page.cpp
+    pages/downloads_page.h
     pages/page.cpp
     pages/page.h
     permission_prompt.cpp

@@ -10,19 +10,26 @@
 #include "ui/account_dialog.h"
 #include "ui/actions.h"
 #include "ui/bug_report_dialog.h"
+#include "ui/downloads_controller.h"
 #include "ui/engine_setup_dialog.h"
 #include "ui/icons.h"
 #include "ui/links.h"
 #include "ui/logging.h"
 #include "ui/message_sheet.h"
 #include "ui/pages/browser_page.h"
+#include "ui/pages/downloads_page.h"
 #include "ui/pages/page.h"
 #include "ui/permission_prompt.h"
+#include "ui/plans_dialog.h"
 #include "ui/shortcuts_dialog.h"
 #include "ui/side_rail.h"
 #include "ui/theme_applier.h"
+#include "ui/toast.h"
 #include "ui/tray_controller.h"
 #include "ui/whats_new_dialog.h"
+#include "web/web_profile.h"
+
+#include "core/downloads/download_queue.h"
 
 #include <QAction>
 #include <QApplication>
@@ -31,12 +38,15 @@
 #include <QHBoxLayout>
 #include <QSessionManager>
 #include <QStackedWidget>
+#include <QTemporaryDir>
+#include <QTextStream>
 #include <QTimer>
 
 #include <utility>
 #include <QtEnvironmentVariables>
 
 #include <algorithm>
+#include <memory>
 
 using namespace Qt::StringLiterals;
 
@@ -105,8 +115,9 @@ void MainWindow::setupUi()
     m_playlist = new Page(tr("Playlist"), m_theme, this);
     m_playlist->setPlaceholder(tr("A playlist's entries, ready to play or download. Coming soon."));
     m_browser = new BrowserPage(m_settings, m_theme, m_appVersion, this);
-    m_downloads = new Page(tr("Downloads"), m_theme, this);
-    m_downloads->setPlaceholder(tr("The download queue. Coming soon."));
+    m_downloadsController = new DownloadsController(m_settings, m_theme, *m_engine, *m_probe, *m_license,
+                                                    m_browser->profile().cookies(), this, this);
+    m_downloads = new DownloadsPage(*m_downloadsController, m_settings, m_theme, this);
     for (QWidget* page : {static_cast<QWidget*>(m_search), static_cast<QWidget*>(m_playlist),
                           static_cast<QWidget*>(m_browser), static_cast<QWidget*>(m_downloads)}) {
         m_pages->addWidget(page);
@@ -151,8 +162,24 @@ void MainWindow::connectActions()
     connect(m_browser, &BrowserPage::renderProcessGaveUp, this, &MainWindow::handleRenderProcessGaveUp);
     connect(m_browser, &BrowserPage::fullScreenChanged, this, &MainWindow::setBrowserFullScreen);
     connect(m_browser, &BrowserPage::permissionPromptRequested, this, &MainWindow::handlePermissionPrompt);
-    connect(m_browser, &BrowserPage::downloadRequested, this,
-            [this](const QUrl& url) { downloadUrl(url.toString()); });
+    // Download this: the link is probed and queued with the defaults; the
+    // browser's busy button is released when the request settles.
+    connect(m_browser, &BrowserPage::downloadRequested, this, [this](const QUrl& url) {
+        m_browser->setDownloadBusy(true);
+        ensureEngine([this, url] { m_downloadsController->requestDownload(url); });
+    });
+    connect(m_browser, &BrowserPage::cancelDownloadRequested, m_downloadsController,
+            &DownloadsController::cancelRequests);
+    connect(m_downloadsController, &DownloadsController::requestSettled, this,
+            [this](const QUrl&, bool) { m_browser->setDownloadBusy(false); });
+    connect(m_engine, &services::EngineManager::installFailed, this, [this] { m_browser->setDownloadBusy(false); });
+    connect(m_downloadsController, &DownloadsController::activeCountChanged, this, [this](int count) {
+        m_rail->setActiveDownloads(count);
+        m_tray->setActiveDownloads(count);
+    });
+    connect(m_downloadsController, &DownloadsController::toast, this, &MainWindow::toast);
+    connect(m_downloadsController, &DownloadsController::plansRequested, this, &MainWindow::showPlans);
+    connect(m_downloads, &DownloadsPage::engineSetupRequested, this, &MainWindow::showEngineSetup);
     // Browser shortcuts act while the Browser page is showing; New tab brings
     // it up. Ctrl+W is showHide's: it closes a tab there.
     auto onBrowser = [this](auto member) {
@@ -181,6 +208,7 @@ void MainWindow::start()
 {
     show();
     m_license->start();
+    m_downloadsController->start();
     m_engine->initialize();
     QTimer::singleShot(600, this, [this] {
         maybeShowGpuFallbackNotice();
@@ -237,8 +265,43 @@ void MainWindow::downloadUrl(const QString& url)
     if (url.trimmed().isEmpty()) {
         return;
     }
-    qCInfo(lcUi) << "download requested (queue not built yet), opening in the browser:" << url;
-    openUrl(url);
+    qCInfo(lcUi) << "download requested:" << url;
+    showAndRaise();
+    showPage(PageId::Downloads);
+    const QUrl link = QUrl::fromUserInput(url.trimmed());
+    ensureEngine([this, link] { m_downloadsController->requestDownload(link); });
+}
+
+void MainWindow::toast(const QString& text)
+{
+    if (m_toasts == nullptr) {
+        // Created on first use: the host must be the central widget's child
+        // to sit inside the window (and its grabs).
+        if (centralWidget() == nullptr) {
+            return;
+        }
+        m_toasts = new ToastHost(centralWidget());
+    }
+    m_toasts->show(text);
+}
+
+void MainWindow::showPlans()
+{
+    if (m_plans == nullptr) {
+        m_plans = new PlansDialog(*m_license, m_theme, this);
+        m_plans->setAttribute(Qt::WA_DeleteOnClose);
+    }
+    m_plans->show();
+    m_plans->raise();
+    m_plans->activateWindow();
+}
+
+void MainWindow::resizeEvent(QResizeEvent* event)
+{
+    QMainWindow::resizeEvent(event);
+    if (m_toasts != nullptr) {
+        m_toasts->reposition();
+    }
 }
 
 // ---- window state ----------------------------------------------------------
@@ -273,6 +336,7 @@ void MainWindow::closeEvent(QCloseEvent* event)
     }
     m_quitting = true;
     saveWindowState();
+    m_downloadsController->shutdown();
     event->accept();
     QApplication::quit();
 }
@@ -390,9 +454,155 @@ void MainWindow::debugOpen(const QString& what)
         showPage(PageId::Browser);
     } else if (what == u"downloads"_s) {
         showPage(PageId::Downloads);
+    } else if (what == u"downloads-demo"_s) {
+        m_downloadsController->queue().setJobs(demoDownloads());
+        showPage(PageId::Downloads);
     } else {
         qCWarning(lcUi) << "debugOpen: unknown target" << what;
     }
+}
+
+QList<core::DownloadJob> MainWindow::demoDownloads()
+{
+    // One card per state, newest first as the queue lists them; the ids are
+    // the queue's own so every card action resolves.
+    using core::DownloadState;
+    QList<core::DownloadJob> jobs;
+    quint64 id = 1;
+    auto make = [&id](const QString& title, const QString& uploader, DownloadState state) {
+        core::DownloadJob j;
+        j.id = id++;
+        j.url = u"https://www.youtube.com/watch?v=demo%1"_s.arg(j.id);
+        j.videoId = u"demo%1"_s.arg(j.id);
+        j.title = title;
+        j.uploader = uploader;
+        j.state = state;
+        j.options.kind = core::DownloadOptions::Kind::Video;
+        j.options.quality = core::VideoQuality::Q1080;
+        j.options.container = core::Container::Mp4;
+        j.createdAt = QDateTime::currentDateTime();
+        return j;
+    };
+    core::DownloadJob failed = make(u"Removed video (private since last week)"_s, u"Some channel"_s,
+                                    DownloadState::Failed);
+    failed.error = u"This video is unavailable."_s;
+    failed.finishedAt = QDateTime::currentDateTime();
+    jobs << failed;
+    core::DownloadJob cancelled = make(u"A talk I changed my mind about"_s, u"Conference"_s, DownloadState::Cancelled);
+    cancelled.finishedAt = QDateTime::currentDateTime();
+    jobs << cancelled;
+    core::DownloadJob completed = make(u"Me at the zoo"_s, u"jawed"_s, DownloadState::Completed);
+    completed.totalBytes = 118 * 1024 * 1024;
+    completed.downloadedBytes = completed.totalBytes;
+    completed.outputFiles << u"/tmp/Me at the zoo.mp4"_s;
+    completed.finishedAt = QDateTime::currentDateTime();
+    jobs << completed;
+    core::DownloadJob paused = make(u"Long documentary, part 2"_s, u"Docs channel"_s, DownloadState::Paused);
+    paused.totalBytes = 900 * 1024 * 1024;
+    paused.downloadedBytes = 300 * 1024 * 1024;
+    jobs << paused;
+    core::DownloadJob processing = make(u"Live concert (audio only)"_s, u"Band"_s, DownloadState::Processing);
+    processing.options.kind = core::DownloadOptions::Kind::Audio;
+    processing.options.audioFormat = core::AudioFormat::Mp3;
+    processing.stage = u"Converting"_s;
+    jobs << processing;
+    core::DownloadJob playlist = make(u"Learn Qt in 12 videos"_s, u"Tutorials"_s, DownloadState::Downloading);
+    playlist.options.isPlaylist = true;
+    playlist.itemIndex = 3;
+    playlist.itemCount = 12;
+    playlist.currentItemTitle = u"Signals and slots"_s;
+    playlist.totalBytes = 64 * 1024 * 1024;
+    playlist.downloadedBytes = 21 * 1024 * 1024;
+    playlist.bytesPerSecond = 3.2 * 1024 * 1024;
+    playlist.etaSeconds = 14;
+    jobs << playlist;
+    core::DownloadJob downloading = make(u"Keynote 2026"_s, u"Conference"_s, DownloadState::Downloading);
+    downloading.totalBytes = 118 * 1024 * 1024;
+    downloading.downloadedBytes = 12 * 1024 * 1024 + 400 * 1024;
+    downloading.bytesPerSecond = 3.2 * 1024 * 1024;
+    downloading.etaSeconds = 32;
+    jobs << downloading;
+    jobs << make(u"Waiting for a slot"_s, u"Some channel"_s, DownloadState::Probing);
+    jobs << make(u"Queued behind the others"_s, u"Some channel"_s, DownloadState::Queued);
+    std::reverse(jobs.begin(), jobs.end());
+    return jobs;
+}
+
+void MainWindow::debugDownload(const QString& url)
+{
+    // The hook's protocol goes to stdout (the caller parses it); the log
+    // keeps a copy.
+    auto say = [](const QString& line) {
+        QTextStream out(stdout);
+        out << line << Qt::endl;
+        qCInfo(lcUi) << "debug download:" << line;
+    };
+    auto* dir = new QTemporaryDir();
+    if (!dir->isValid()) {
+        say(u"error:no temporary directory"_s);
+        QTimer::singleShot(0, qApp, [] { qApp->exit(1); });
+        return;
+    }
+    dir->setAutoRemove(false); // the caller inspects the file
+    say(u"folder:"_s + dir->path());
+    showPage(PageId::Downloads);
+    // Every job the request queues lands in the temporary folder.
+    m_settings.setDownloadDirectory(dir->path());
+    auto* poll = new QTimer(this);
+    poll->setInterval(500);
+    auto lastState = std::make_shared<QString>();
+    auto watched = std::make_shared<quint64>(0);
+    core::DownloadQueue* queue = &m_downloadsController->queue();
+    connect(queue, &core::DownloadQueue::jobAdded, this, [this, say, poll, lastState, watched, queue](quint64 id) {
+        if (*watched != 0) {
+            return;
+        }
+        *watched = id;
+        say(u"queued:%1"_s.arg(id));
+        connect(poll, &QTimer::timeout, this, [say, lastState, watched, queue] {
+            if (const std::optional<core::DownloadJob> job = queue->job(*watched); job) {
+                const QString line = core::stateLabel(job->state) + u" "_s + job->statusLine();
+                if (line != *lastState) {
+                    *lastState = line;
+                    say(u"state:"_s + line);
+                }
+            }
+        });
+        poll->start();
+    });
+    connect(queue, &core::DownloadQueue::jobFinished, this,
+            [this, say, poll, watched, queue](quint64 id, core::DownloadState state) {
+                if (id != *watched) {
+                    return;
+                }
+                poll->stop();
+                const std::optional<core::DownloadJob> job = queue->job(id);
+                const bool ok = state == core::DownloadState::Completed && job && !job->primaryFile().isEmpty();
+                say(u"state:"_s + core::stateLabel(state));
+                say(u"file:"_s + (job ? job->primaryFile() : QString()));
+                if (job && !job->error.isEmpty()) {
+                    say(u"error:"_s + job->error);
+                }
+                m_downloadsController->shutdown();
+                QTimer::singleShot(1500, qApp, [ok] { qApp->exit(ok ? 0 : 1); });
+            });
+    connect(m_downloadsController, &DownloadsController::requestSettled, this, [say](const QUrl&, bool queued) {
+        if (!queued) {
+            say(u"error:the link was not queued"_s);
+            QTimer::singleShot(500, qApp, [] { qApp->exit(1); });
+        }
+    });
+    connect(m_engine, &services::EngineManager::installFailed, this, [say](const QString& error) {
+        say(u"error:engine setup failed: "_s + error);
+        QTimer::singleShot(500, qApp, [] { qApp->exit(1); });
+    });
+    if (!m_engine->isReady()) {
+        say(u"engine:setting up"_s);
+    }
+    ensureEngine([this, say, url] {
+        say(u"engine:"_s + m_engine->status().ytdlpVersion);
+        m_downloadsController->requestDownload(QUrl::fromUserInput(url));
+    });
 }
 
 void MainWindow::maybeShowGpuFallbackNotice()
