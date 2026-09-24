@@ -13,28 +13,62 @@
 
   <description>
     <p>
-      Playlist Downloader is a desktop app for YouTube playlists: search for playlists and videos,
-      browse a playlist's entries, play them in the built-in browser and download the ones you
-      want, or the whole playlist, as video or audio.
+      Playlist Downloader finds YouTube playlists, plays them in a built-in player and saves
+      whole playlists offline as video or audio: a playlist downloader for the Linux desktop.
     </p>
     <ul>
-      <li>Search YouTube for videos, playlists and channels without leaving the app</li>
-      <li>Open a playlist, pick entries one by one or take them all</li>
-      <li>A built-in browser to watch and sign in, so anything your account can see downloads too</li>
-      <li>Downloads as MP4, MKV or WebM up to 4K, or audio only as MP3, M4A, Opus, FLAC or WAV</li>
-      <li>A queue with pause, resume and retry, and a notification when a download finishes</li>
+      <li>Search YouTube playlists by keyword, with suggestions as you type, or paste a playlist or video link</li>
+      <li>Browse the playlist: every video with its thumbnail and length; pick the ones you want or a range</li>
+      <li>Download as MP4, MKV or WebM up to 4K, or audio only as MP3, M4A, Opus, FLAC or WAV, with subtitles, thumbnails and metadata embedded</li>
+      <li>A queue with pause, resume and retry, files in a folder per playlist, numbered in playlist order, and a notification when the download finishes</li>
+      <li>A playlist file (m3u8) next to the videos, so your music player plays the whole playlist in order</li>
+      <li>A built-in browser to watch YouTube and sign in; age-restricted videos download too</li>
+      <li>The download engine sets itself up on first use and keeps itself updated</li>
     </ul>
   </description>
 
   <launchable type="desktop-id">com.ktechpit.playlist-dl.desktop</launchable>
 
+  <branding>
+    <color type="primary" scheme_preference="light">#c061cb</color>
+    <color type="primary" scheme_preference="dark">#613583</color>
+  </branding>
+
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/keshavbhatt/p-pldl/main/screenshots/00-hero.png</image>
+      <caption>Search YouTube playlists</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/keshavbhatt/p-pldl/main/screenshots/01-playlist.png</image>
+      <caption>Pick the videos of a playlist</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/keshavbhatt/p-pldl/main/screenshots/02-options.png</image>
+      <caption>Video or audio, quality and format</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/keshavbhatt/p-pldl/main/screenshots/03-downloads.png</image>
+      <caption>The download queue</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/keshavbhatt/p-pldl/main/screenshots/04-browser.png</image>
+      <caption>The built-in browser</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/keshavbhatt/p-pldl/main/screenshots/05-items.png</image>
+      <caption>Play a downloaded playlist as a whole</caption>
+    </screenshot>
+  </screenshots>
+
   <keywords>
-    <keyword>youtube</keyword>
     <keyword>playlist</keyword>
-    <keyword>download</keyword>
+    <keyword>youtube</keyword>
     <keyword>downloader</keyword>
+    <keyword>download</keyword>
     <keyword>video</keyword>
     <keyword>music</keyword>
+    <keyword>mp3</keyword>
   </keywords>
 
   <url type="homepage">https://github.com/keshavbhatt/p-pldl</url>
@@ -42,6 +76,7 @@
   <url type="bugtracker">https://github.com/keshavbhatt/p-pldl/issues</url>
   <url type="donation">https://www.paypal.com/paypalme/keshavnrj/11</url>
   <url type="contact">https://ktechpit.com</url>
+  <url type="vcs-browser">https://github.com/keshavbhatt/p-pldl</url>
 
   <provides>
     <binary>playlist-dl</binary>

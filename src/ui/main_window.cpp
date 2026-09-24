@@ -39,6 +39,7 @@
 #include "web/web_profile.h"
 
 #include "core/downloads/download_queue.h"
+#include "core/downloads/playlist_file.h"
 
 #include <QAction>
 #include <QApplication>
@@ -53,6 +54,7 @@
 #include <QStackedWidget>
 #include <QTemporaryDir>
 #include <QTextStream>
+#include <QPushButton>
 #include <QTimer>
 #include <QtEnvironmentVariables>
 
@@ -115,6 +117,18 @@ void MainWindow::setupUi()
     m_probe = new services::MediaProbe(this);
     connect(m_engine, &services::EngineManager::ready, this, [this](const core::EnginePaths& paths) {
         m_probe->setEnginePaths(paths);
+        // A setup sheet the app opened on its own closes once the engine is
+        // there (after a moment, so the ready state is seen); one the user
+        // opened stays.
+        if (m_engineSetupAuto && m_engineSetup != nullptr) {
+            QPointer<EngineSetupDialog> sheet = m_engineSetup;
+            QTimer::singleShot(900, this, [sheet] {
+                if (sheet != nullptr) {
+                    sheet->close();
+                }
+            });
+        }
+        m_engineSetupAuto = false;
         const QList<std::function<void()>> waiting = std::exchange(m_awaitingEngine, {});
         for (const auto& then : waiting) {
             then();
@@ -322,6 +336,7 @@ void MainWindow::ensureEngine(std::function<void()> then)
         return;
     }
     m_awaitingEngine.append(std::move(then));
+    m_engineSetupAuto = true;
     showEngineSetup();
     if (!m_engine->status().isBusy()) {
         m_engine->install();
@@ -330,6 +345,8 @@ void MainWindow::ensureEngine(std::function<void()> then)
 
 void MainWindow::showEngineSetup()
 {
+    // Called from the UI (Settings, the Downloads chip) as well: unless
+    // ensureEngine just set the flag, this is the user's own sheet.
     if (m_engineSetup == nullptr) {
         m_engineSetup = new EngineSetupDialog(*m_engine, m_theme, this);
         m_engineSetup->setAttribute(Qt::WA_DeleteOnClose);
@@ -397,9 +414,49 @@ void MainWindow::downloadUrl(const QString& url)
 
 // ---- download options ------------------------------------------------------
 
+void MainWindow::debugWatchQueue()
+{
+    if (m_debugWatching) {
+        return;
+    }
+    m_debugWatching = true;
+    auto say = [](const QString& line) {
+        QTextStream out(stdout);
+        out << line << Qt::endl;
+        qCInfo(lcUi).noquote() << "autodownload:" << line;
+    };
+    core::DownloadQueue* queue = &m_downloadsController->queue();
+    connect(queue, &core::DownloadQueue::jobAdded, this, [say](quint64 id) { say(u"queued:%1"_s.arg(id)); });
+    connect(queue, &core::DownloadQueue::jobFinished, this, [this, say, queue](quint64 id, core::DownloadState state) {
+        const auto job = queue->job(id);
+        say(u"finished:%1 state:%2"_s.arg(id).arg(core::stateLabel(state)));
+        if (job) {
+            for (const QString& file : job->outputFiles) {
+                say(u"file:"_s + file);
+            }
+            say(u"entries:%1 downloaded:%2"_s.arg(job->entries.size()).arg(job->downloadedEntryCount()));
+            const QString list = core::playlist_file::pathFor(*job);
+            say(u"playlist:%1 exists:%2"_s.arg(list, QFileInfo::exists(list) ? u"yes"_s : u"no"_s));
+        }
+        const int code = state == core::DownloadState::Completed ? 0 : 1;
+        QTimer::singleShot(500, this, [this, code] {
+            m_downloadsController->shutdown(); // the list and the playlist file, as a real quit would
+            qApp->exit(code);
+        });
+    });
+}
+
 void MainWindow::showOptionsSheet(DownloadOptionsSheet* sheet)
 {
     sheet->setAttribute(Qt::WA_DeleteOnClose);
+    // Headless verification (ADR-000): PLDL_DEBUG_AUTODOWNLOAD=video|audio
+    // picks the kind and accepts the sheet, then the queue is watched and
+    // the app quits with the outcome (debugWatchQueue).
+    if (const QString kind = qEnvironmentVariable("PLDL_DEBUG_AUTODOWNLOAD"); !kind.isEmpty()) {
+        sheet->setKind(kind == u"audio"_s ? DownloadOptionsSheet::Kind::Audio : DownloadOptionsSheet::Kind::Video);
+        debugWatchQueue();
+        QTimer::singleShot(400, sheet, &QDialog::accept);
+    }
     connect(sheet, &QDialog::accepted, this, [this, sheet] {
         if (m_downloadsController->enqueue(sheet->job()) != 0) {
             showPage(PageId::Downloads);
@@ -680,6 +737,20 @@ void MainWindow::debugOpen(const QString& what)
         showPage(PageId::Playlist);
     } else if (what.startsWith(u"playlist:"_s)) {
         openPlaylist(QUrl::fromUserInput(what.mid(9)));
+        if (qEnvironmentVariableIsSet("PLDL_DEBUG_AUTODOWNLOAD")) {
+            // Press Download as soon as the playlist is in (the button enables
+            // with the first checked row); one press only.
+            auto* poll = new QTimer(this);
+            poll->setInterval(500);
+            connect(poll, &QTimer::timeout, this, [this, poll] {
+                if (m_playlist->downloadButton()->isEnabled()) {
+                    poll->stop();
+                    poll->deleteLater();
+                    m_playlist->downloadButton()->click();
+                }
+            });
+            poll->start();
+        }
     } else if (what == u"playlist-demo"_s) {
         m_playlist->openInfo(PlaylistPage::demoInfo());
         showPage(PageId::Playlist);
@@ -700,6 +771,9 @@ void MainWindow::debugOpen(const QString& what)
         showPage(PageId::Browser);
     } else if (what == u"downloads"_s) {
         showPage(PageId::Downloads);
+    } else if (what.startsWith(u"playlist-items:"_s)) {
+        showPage(PageId::Downloads);
+        showPlaylistItems(what.mid(15).toULongLong());
     } else if (what == u"playlist-items-demo"_s) {
         // A playlist with three of five files on disk, for a grab of the items sheet.
         core::DownloadJob job;

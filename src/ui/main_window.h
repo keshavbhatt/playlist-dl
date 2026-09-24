@@ -80,6 +80,9 @@ public:
     /// closes the sheet or the install fails; the sheet shows the error).
     void ensureEngine(std::function<void()> then);
     void showEngineSetup();
+    /// Headless verification: prints the queue's outcome to stdout and quits
+    /// with 0 on Completed, 1 otherwise (PLDL_DEBUG_AUTODOWNLOAD).
+    void debugWatchQueue();
     /// The download queue's owner (created after the Browser page: it needs
     /// the profile's cookies), for the Playlist and Search pages.
     [[nodiscard]] DownloadsController& downloads() { return *m_downloadsController; }
@@ -180,6 +183,8 @@ private:
     services::EngineManager* m_engine = nullptr;
     services::MediaProbe* m_probe = nullptr;
     QPointer<EngineSetupDialog> m_engineSetup;
+    bool m_engineSetupAuto = false;
+    bool m_debugWatching = false; ///< the sheet was opened by ensureEngine: it closes itself once ready
     QList<std::function<void()>> m_awaitingEngine;
     QPointer<AccountDialog> m_accountDialog;
     QPointer<SettingsDialog> m_settingsDialog;

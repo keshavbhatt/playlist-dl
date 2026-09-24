@@ -10,8 +10,8 @@
 | M3 Downloads | done |
 | M4 Player and browser shell | done (UMD's browser page; W rows) |
 | M5 Desktop integration | done (tray, notifications, taskbar, screen inhibit, crash handler, GPU fallback) |
-| M6 Polish and text | wip (sheets, shortcuts, About, What's new, guide, changelog done; screenshots, metainfo polish, plans wording open) |
-| M7 Packaging and release | wip (snap recipe and CI written, unbuilt; Flathub manifest and public repo open) |
+| M6 Polish and text | done (see 2026-09-24, M6) |
+| M7 Packaging and release | wip (snap recipe, CI workflow, metainfo, public README, guide and screenshots ready; the snap is unbuilt, the public repository and the Flathub manifest wait for the licence decision) |
 
 ## Open questions for the owner
 
@@ -25,6 +25,31 @@
    the snap keeps its name.
 
 ## Sessions (newest first)
+
+### 2026-09-24, M6
+
+- No `QMessageBox` anywhere; every question is a sheet. The About, Plans and Account text is
+  this app's; the engine's ffmpeg hint no longer names Red.
+- The engine setup sheet the app opens on its own closes itself once the engine is ready;
+  one the user opened stays.
+- `PLDL_DEBUG_AUTODOWNLOAD=video|audio` (ADR-000's hook family): with `PLDL_DEBUG_OPEN=
+  playlist:<url>` it presses Download once the playlist is in, picks the kind, accepts the
+  options sheet, prints the queue's outcome and quits with it. Verified live: the 13-entry
+  public playlist PLBCF2DAC6FFB574DE, 10 available entries downloaded as audio in playlist
+  order, every entry mapped to its file, the `.m3u8` written next to them, exit 0. Found and
+  fixed on the way: a finished job is now persisted at once (the debounce lost the last file
+  to a quit), and `/tmp` being full on the host showed up as "Disk quota exceeded".
+- Store text: metainfo summary within the badge limit, three single-word keywords first
+  (`playlist`, `youtube`, `downloader`), the description carrying the query words, branding
+  colours from the icon, six screenshots; `packaging/public/README.md` written; the guide
+  and changelog current.
+- Screenshots: `scripts/screenshots.py` recoloured to the brand and composed from live grabs
+  (search, playlist, options, downloads, browser, items) into `screenshots/` and
+  `screenshots/store/`, plus the banner.
+- Light theme checked on the playlist page, the options and items sheets, About and Plans.
+- Open: a few search cards get no count for some queries (the per-playlist count call
+  returns nothing for them; to be looked at with the engine's output); FEATURES rows stay
+  `done`, not `verified`, until the owner has run the app on a desktop.
 
 ### 2026-09-24
 

@@ -4,9 +4,9 @@
     scripts/screenshots.py <raw-dir>   # writes screenshots/*.png and screenshots/store/*.png
 
 Raw grabs (PLDL_DEBUG_GRAB output) expected in <raw-dir>:
-    desktop.png  tv.png  downloads.png  download-dialog.png  blocking.png
-Style: Red's brand gradient with soft circles, a headline, one-line subtitle,
-the window framed with rounded corners and a shadow (matches whatsie's set).
+    search.png  playlist.png  options.png  downloads.png  browser.png  items.png
+Style: the brand's purple gradient with soft circles, a headline, one-line
+subtitle, the window framed with rounded corners and a shadow.
 """
 import sys
 from pathlib import Path
@@ -17,11 +17,11 @@ ROOT = Path(__file__).resolve().parent.parent
 FONT_BOLD = "/usr/share/fonts/ubuntu/Ubuntu-B.ttf"
 FONT_REG = "/usr/share/fonts/ubuntu/Ubuntu-R.ttf"
 FONT_MED = "/usr/share/fonts/ubuntu/Ubuntu-M.ttf"
-LOGO = ROOT / "src/resources/icons/hicolor/512x512/apps/com.ktechpit.red.png"
+LOGO = ROOT / "src/resources/icons/hicolor/512x512/apps/com.ktechpit.playlist-dl.png"
 
-TOP = (0x8B, 0x0A, 0x0A)     # deep YouTube red
-BOTTOM = (0x2A, 0x05, 0x08)  # towards the dark ground
-ACCENT = (0xFF, 0x00, 0x00)
+TOP = (0x61, 0x35, 0x83)     # the icon's deep purple
+BOTTOM = (0x1C, 0x10, 0x26)  # towards the dark ground
+ACCENT = (0xF6, 0xD3, 0x2D)  # the badge yellow
 
 
 def font(path, size):
@@ -80,7 +80,7 @@ def compose(shot, headline, subtitle, size=(1280, 800), top=64):
     hf = font(FONT_BOLD, int(h * 0.062))
     sf = font(FONT_REG, int(h * 0.027))
     text_centered(d, top, headline, hf, (255, 255, 255), w)
-    text_centered(d, top + int(h * 0.085), subtitle, sf, (255, 220, 220), w)
+    text_centered(d, top + int(h * 0.085), subtitle, sf, (232, 214, 240), w)
     # Fit the window into the box under the text, keeping its aspect ratio.
     box_top = top + int(h * 0.15)
     box_w, box_h = int(w * 0.80), h - box_top - int(h * 0.05)
@@ -99,16 +99,16 @@ def banner(dialog, size=(2160, 720)):
     logo = Image.open(LOGO).convert("RGBA").resize((150, 150), Image.LANCZOS)
     x0 = 150
     img.alpha_composite(logo, (x0, 118))
-    d.text((x0 + 180, 96), "Red", font=font(FONT_BOLD, 150), fill=(255, 255, 255))
-    d.text((x0, 300), "YouTube, in a real desktop app.", font=font(FONT_REG, 54), fill=(255, 255, 255))
-    d.text((x0, 380), "Native and lightweight.",
-           font=font(FONT_REG, 30), fill=(255, 200, 200))
+    d.text((x0 + 180, 96), "Playlist Downloader", font=font(FONT_BOLD, 104), fill=(255, 255, 255))
+    d.text((x0, 300), "Save whole playlists offline.", font=font(FONT_REG, 54), fill=(255, 255, 255))
+    d.text((x0, 380), "Search, play and download YouTube playlists on the Linux desktop.",
+           font=font(FONT_REG, 30), fill=(232, 214, 240))
     # Translucent pills need their own layer: ImageDraw writes alpha, it does not blend.
     pf = font(FONT_MED, 27)
     layer = Image.new("RGBA", img.size, (0, 0, 0, 0))
     ld = ImageDraw.Draw(layer)
     x = x0
-    for pill in ("TV mode", "Music mode", "Ad & sponsor blocking", "Downloads", "Media keys"):
+    for pill in ("Playlist search", "Pick the videos", "Video or audio", "Built-in player", "Plays as a playlist"):
         tw = ld.textlength(pill, font=pf)
         ld.rounded_rectangle((x, 470, x + tw + 56, 528), radius=29, fill=(255, 255, 255, 40))
         ld.text((x + 28, 483), pill, font=pf, fill=(255, 255, 255, 255))
@@ -125,18 +125,19 @@ def main(raw):
     store = out / "store"
     store.mkdir(parents=True, exist_ok=True)
     shots = {k: Image.open(raw / f"{k}.png") for k in
-             ("desktop", "tv", "downloads", "download-dialog", "blocking")}
+             ("search", "playlist", "options", "downloads", "browser", "items")}
     plan = [
-        ("00-hero", "desktop", "YouTube, in a real desktop app", "Fast, native, ad-free: YouTube Music, media keys, a mini player and downloads built in."),
-        ("01-tv", "tv", "Lean back", "YouTube's living-room interface, driven by keyboard, mouse or gamepad. Ctrl+T switches any time."),
-        ("02-downloads", "downloads", "Download anything", "Videos, audio, playlists and channels, queued beside the page, with your sign-in for restricted videos."),
-        ("03-download-dialog", "download-dialog", "Video, audio, or the exact streams", "Quality presets, subtitles, chapters and cover art embedded. Playlists are detected from any link."),
-        ("04-blocking", "blocking", "Ads gone, sponsors skipped", "Ads stripped before YouTube renders them, SponsorBlock per category, dislikes back, Shorts hidden."),
+        ("00-hero", "search", "Find any YouTube playlist", "Search by keyword or paste a link: every playlist with its cover, channel and video count."),
+        ("01-playlist", "playlist", "Pick the videos you want", "Select all, a range or a few; unavailable videos are set aside; play any of them first."),
+        ("02-options", "options", "Video or audio, your quality", "MP4, MKV or WebM up to 4K, or MP3, M4A, Opus, FLAC and WAV, with subtitles and cover art embedded."),
+        ("03-downloads", "downloads", "One queue for the whole playlist", "Progress per video, pause, resume and retry; a notification with Show in folder when it is done."),
+        ("04-browser", "browser", "Watch, signed in, without ads", "The full YouTube site in tabs. Your sign-in is reused for downloads, so restricted videos come too."),
+        ("05-items", "items", "Play it as a playlist", "A playlist file lands next to the videos; arrange the order and play them all in your media player."),
     ]
     for name, key, head, sub in plan:
         compose(shots[key], head, sub).save(out / f"{name}.png", optimize=True)
         compose(shots[key], head, sub, size=(1600, 1000)).save(store / f"{name}.png", optimize=True)
-    banner(shots["download-dialog"]).save(out / "banner.png", optimize=True)
+    banner(shots["options"]).save(out / "banner.png", optimize=True)
     for f in sorted(out.glob("*.png")) + sorted(store.glob("*.png")):
         print(f.relative_to(ROOT), Image.open(f).size, f.stat().st_size // 1024, "KB")
 

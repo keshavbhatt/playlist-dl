@@ -482,6 +482,9 @@ void DownloadsController::handleJobFinished(quint64 id, core::DownloadState stat
     if (job->isPlaylist()) {
         writePlaylistFileFor(id); // whatever landed, even after a cancel or a failure
     }
+    // A finished job is saved at once: the debounce would lose the last file
+    // and the final state to a quit or a crash in the next half second.
+    persist();
     if (state == core::DownloadState::Completed) {
         Q_EMIT jobCompleted(id, job->title, job->primaryFile());
     }
