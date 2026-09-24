@@ -1,0 +1,82 @@
+#include "web/request_interceptor.h"
+
+#include "web/logging.h"
+#include "web/user_agent.h"
+
+#include <QWebEngineUrlRequestInfo>
+
+using namespace Qt::StringLiterals;
+
+namespace pldl::web {
+
+RequestInterceptor::RequestInterceptor(QObject* parent)
+    : QWebEngineUrlRequestInterceptor(parent)
+    , m_list(std::make_shared<const core::BlockList>(core::BlockList::none()))
+{}
+
+void RequestInterceptor::setBlockList(std::shared_ptr<const core::BlockList> list)
+{
+    const std::lock_guard<std::mutex> lock(m_mutex);
+    m_list = std::move(list);
+}
+
+void RequestInterceptor::setTvUserAgents(const QString& youtubeUa, const QString& genericUa)
+{
+    const std::lock_guard<std::mutex> lock(m_mutex);
+    m_youtubeUa = youtubeUa.toUtf8();
+    m_genericUa = genericUa.toUtf8();
+}
+
+void RequestInterceptor::setSignInUserAgent(const QString& userAgent)
+{
+    const std::lock_guard<std::mutex> lock(m_mutex);
+    m_signInUa = userAgent.toUtf8();
+}
+
+std::shared_ptr<const core::BlockList> RequestInterceptor::snapshot() const
+{
+    const std::lock_guard<std::mutex> lock(m_mutex);
+    return m_list;
+}
+
+void RequestInterceptor::interceptRequest(QWebEngineUrlRequestInfo& info)
+{
+    const QUrl url = info.requestUrl();
+    const QString host = url.host();
+
+    // The UA split needs the same lock as the list; take both once.
+    QByteArray youtubeUa;
+    QByteArray genericUa;
+    QByteArray signInUa;
+    std::shared_ptr<const core::BlockList> list;
+    {
+        const std::lock_guard<std::mutex> lock(m_mutex);
+        list = m_list;
+        youtubeUa = m_youtubeUa;
+        genericUa = m_genericUa;
+        signInUa = m_signInUa;
+    }
+    if (!youtubeUa.isEmpty()) {
+        info.setHttpHeader("User-Agent",
+                           host == QLatin1StringView("www.youtube.com") ? youtubeUa : genericUa);
+    } else if (!signInUa.isEmpty() && isGoogleSignInHost(host)) {
+        // Google rejects embedded Chrome on its sign-in pages (ADR-008).
+        info.setHttpHeader("User-Agent", signInUa);
+    }
+    if (m_doNotTrack.load(std::memory_order_relaxed)) {
+        info.setHttpHeader("DNT", "1");
+        info.setHttpHeader("Sec-GPC", "1");
+    }
+    if (list->isEmpty() || url.scheme() == u"data"_s || url.scheme() == u"blob"_s) {
+        return;
+    }
+    if (list->matches(host.toLower(), url.path())) {
+        info.block(true);
+        const quint64 n = m_blocked.fetch_add(1, std::memory_order_relaxed) + 1;
+        if (n % 100 == 0) {
+            qCDebug(lcWeb) << "blocked requests so far:" << n;
+        }
+    }
+}
+
+} // namespace pldl::web

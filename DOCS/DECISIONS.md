@@ -77,7 +77,7 @@ the new icon.
 
 **Decision.** The kit's token sheet (`ui::Tokens` and the `{{token}}` style sheet, applied by
 `ThemeApplier` on Fusion) with the palette in DESIGN.md section 1: the icon's purple as the
-accent, its yellow as the download badge and progress colour, a purple-tinted neutral scale
+accent, its yellow as the download badge colour, a purple-tinted neutral scale
 for both schemes. Theme setting System, Light, Dark; System follows the platform live. The
 page background of the browser follows the scheme. `tst_style_contrast` guards the pairs.
 

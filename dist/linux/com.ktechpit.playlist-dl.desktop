@@ -1,0 +1,23 @@
+[Desktop Entry]
+Name=Playlist Downloader
+GenericName=YouTube Playlist Downloader
+Comment=Search, browse, play and download YouTube playlists
+Icon=com.ktechpit.playlist-dl
+Exec=playlist-dl %U
+Terminal=false
+Type=Application
+Categories=Utility;Video;Qt;
+Keywords=YouTube;Playlist;Download;
+StartupWMClass=playlist-dl
+StartupNotify=true
+X-GNOME-UsesNotifications=true
+
+Actions=Download;Settings;
+
+[Desktop Action Download]
+Name=Download from a link
+Exec=playlist-dl --download ""
+
+[Desktop Action Settings]
+Name=Settings
+Exec=playlist-dl --settings

@@ -1,0 +1,159 @@
+#include "web/popup_window.h"
+
+#include "core/navigation_policy.h"
+#include "platform/file_manager.h"
+#include "web/full_screen_hint.h"
+#include "web/logging.h"
+#include "web/web_page.h"
+#include "web/web_profile.h"
+
+#include <QAuthenticator>
+#include <QKeyEvent>
+#include <QShortcut>
+#include <QVBoxLayout>
+#include <QWebEngineFullScreenRequest>
+#include <QWebEnginePage>
+#include <QWebEngineScript>
+#include <QWebEngineView>
+
+using namespace Qt::StringLiterals;
+
+namespace pldl::web {
+
+/// First navigation decides the fate of the window.
+class PopupWindow::Page : public QWebEnginePage
+{
+public:
+    Page(WebProfile& profile, PopupWindow* window)
+        : QWebEnginePage(&profile, window)
+        , m_window(window)
+    {
+        connect(this, &QWebEnginePage::authenticationRequired, this,
+                [this](const QUrl& requestUrl, QAuthenticator* authenticator) {
+                    answerAuthentication(requestUrl, authenticator, false, m_window->m_dialogs, m_window);
+                });
+        connect(this, &QWebEnginePage::proxyAuthenticationRequired, this,
+                [this](const QUrl&, QAuthenticator* authenticator, const QString& proxyHost) {
+                    answerAuthentication(QUrl(u"http://"_s + proxyHost), authenticator, true, m_window->m_dialogs,
+                                         m_window);
+                });
+    }
+
+protected:
+    bool acceptNavigationRequest(const QUrl& url, NavigationType type, bool isMainFrame) override
+    {
+        if (isMainFrame && core::shouldOpenExternally(url)) {
+            qCInfo(lcWeb) << "popup → system browser:" << url;
+            platform::openUrl(url.toString());
+            m_window->close();
+            return false;
+        }
+        return QWebEnginePage::acceptNavigationRequest(url, type, isMainFrame);
+    }
+
+    void javaScriptAlert(const QUrl& securityOrigin, const QString& msg) override
+    {
+        if (m_window->m_dialogs.alert) {
+            m_window->m_dialogs.alert(m_window, securityOrigin, msg);
+            return;
+        }
+        QWebEnginePage::javaScriptAlert(securityOrigin, msg);
+    }
+
+    bool javaScriptConfirm(const QUrl& securityOrigin, const QString& msg) override
+    {
+        if (m_window->m_dialogs.confirm) {
+            return m_window->m_dialogs.confirm(m_window, securityOrigin, msg);
+        }
+        return QWebEnginePage::javaScriptConfirm(securityOrigin, msg);
+    }
+
+    bool javaScriptPrompt(const QUrl& securityOrigin, const QString& msg, const QString& defaultValue,
+                          QString* result) override
+    {
+        if (m_window->m_dialogs.prompt) {
+            return m_window->m_dialogs.prompt(m_window, securityOrigin, msg, defaultValue, result);
+        }
+        return QWebEnginePage::javaScriptPrompt(securityOrigin, msg, defaultValue, result);
+    }
+
+private:
+    PopupWindow* m_window;
+};
+
+PopupWindow::PopupWindow(WebProfile& profile, QWidget* parent)
+    : QWidget(parent, Qt::Window)
+{
+    setAttribute(Qt::WA_DeleteOnClose);
+    setWindowTitle(u"Playlist Downloader"_s);
+    resize(900, 640);
+
+    m_view = new QWebEngineView(this);
+    auto* page = new Page(profile, this);
+    m_view->setPage(page);
+    auto* layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->addWidget(m_view);
+
+    connect(page, &QWebEnginePage::titleChanged, this, &QWidget::setWindowTitle);
+    connect(page, &QWebEnginePage::windowCloseRequested, this, &QWidget::close);
+    connect(page, &QWebEnginePage::fullScreenRequested, this, [this](QWebEngineFullScreenRequest request) {
+        request.accept();
+        if (request.toggleOn()) {
+            m_stateBeforeFullScreen = windowState();
+            showFullScreen();
+            m_exitFullScreen->setEnabled(true);
+            m_fullScreenHint->showHint(tr("Press Esc to exit full screen"));
+        } else {
+            exitFullScreen();
+        }
+    });
+
+    // The web view swallows most keys, so the way out of a full-screen video is
+    // easy to miss, hint it, Chrome-style.
+    m_fullScreenHint = new FullScreenHint(this);
+    // Esc leaves full screen even while the web view holds keyboard focus (a
+    // plain keyPressEvent never reaches us then); only active in full screen so
+    // it does not shadow Esc otherwise. FEATURES M3.
+    m_exitFullScreen = new QShortcut(QKeySequence(Qt::Key_Escape), this);
+    m_exitFullScreen->setContext(Qt::WindowShortcut);
+    m_exitFullScreen->setEnabled(false);
+    connect(m_exitFullScreen, &QShortcut::activated, this, &PopupWindow::exitFullScreen);
+    qCInfo(lcWeb) << "popup window created";
+}
+
+QWebEnginePage* PopupWindow::page() const
+{
+    return m_view->page();
+}
+
+void PopupWindow::exitFullScreen()
+{
+    m_fullScreenHint->hideHint();
+    m_exitFullScreen->setEnabled(false);
+    // Explicit restore (clearing the flag via setWindowState is unreliable on
+    // Wayland) and sync the page out of HTML full screen.
+    if (m_stateBeforeFullScreen & Qt::WindowMaximized) {
+        showMaximized();
+    } else {
+        showNormal();
+    }
+    page()->runJavaScript(u"if (document.fullscreenElement) { document.exitFullscreen(); }"_s,
+                          QWebEngineScript::MainWorld);
+}
+
+void PopupWindow::keyPressEvent(QKeyEvent* event)
+{
+    if (event->key() == Qt::Key_Escape) {
+        if (isFullScreen()) {
+            exitFullScreen();
+        } else {
+            close();
+        }
+        event->accept();
+        return;
+    }
+    QWidget::keyPressEvent(event);
+}
+
+} // namespace pldl::web

@@ -10,6 +10,7 @@ project(playlist-dl
 # ---------------------------------------------------------------------------
 # Options
 # ---------------------------------------------------------------------------
+option(PLDL_BUILD_TESTS "Build unit tests" ON)
 option(PLDL_WERROR "Treat warnings as errors" OFF)
 option(PLDL_ENABLE_CLANG_TIDY "Run clang-tidy during the build" OFF)
 
@@ -30,24 +31,38 @@ include(Warnings)
 include(Version)
 
 # ---------------------------------------------------------------------------
-# Qt version. Linux builds and runs on the Qt shipped by the
-# kde-qt6-core24-sdk snap and the kf6-core24 content snap (6.11 at the time
-# of writing); anything from 6.8 on is accepted for local builds.
+# Qt version. Linux builds and runs on 6.11, the version shipped by the
+# kde-qt6-core24-sdk snap and the Flathub KDE runtime (ADR-001).
 # ---------------------------------------------------------------------------
-set(PLDL_QT_MIN_VERSION "6.8" CACHE STRING "Minimum required Qt6 version")
+set(PLDL_QT_MIN_VERSION "6.11" CACHE STRING "Minimum required Qt6 version")
 find_package(Qt6 ${PLDL_QT_MIN_VERSION} REQUIRED COMPONENTS
     Core
     Gui
     Widgets
-    Network
     WebEngineWidgets
     WebChannel
+    Network
+    Sql
+    Concurrent
+    Svg
 )
 qt_standard_project_setup()
 include(SnapSdkWorkaround)
 
-# No debug output in release builds (mirrors the old qmake CONFIG(release)).
-add_compile_definitions($<$<CONFIG:Release>:QT_NO_DEBUG_OUTPUT>)
+if(MSVC)
+    add_compile_options(/utf-8 /bigobj)
+endif()
+
+# Qt hygiene: forces explicit string conversions and keyword-free signal syntax.
+add_compile_definitions(
+    QT_NO_CAST_FROM_ASCII
+    QT_NO_CAST_TO_ASCII
+    QT_NO_CAST_FROM_BYTEARRAY
+    QT_NO_KEYWORDS
+    QT_NO_FOREACH
+    QT_DISABLE_DEPRECATED_UP_TO=0x061100
+    QT_USE_QSTRINGBUILDER
+)
 
 if(PLDL_ENABLE_CLANG_TIDY)
     find_program(CLANG_TIDY_EXE NAMES clang-tidy)
@@ -64,15 +79,19 @@ endif()
 add_subdirectory(src)
 
 # ---------------------------------------------------------------------------
-# Desktop integration (Linux): .desktop and hicolor icons.
+# Desktop integration (Linux): .desktop, AppStream metainfo, hicolor icons.
 # ---------------------------------------------------------------------------
 if(LINUX)
     include(GNUInstallDirs)
-    install(FILES dist/linux/playlist-dl.desktop
+    install(FILES dist/linux/com.ktechpit.playlist-dl.desktop
         DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
-    foreach(size 16 32 64 128 256 512)
-        install(FILES src/icons/app/icon-${size}.png
-            DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/${size}x${size}/apps
-            RENAME playlist-dl.png)
-    endforeach()
+    install(FILES dist/linux/com.ktechpit.playlist-dl.metainfo.xml
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo)
+    install(DIRECTORY src/resources/icons/hicolor
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/icons)
+endif()
+
+if(PLDL_BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
 endif()

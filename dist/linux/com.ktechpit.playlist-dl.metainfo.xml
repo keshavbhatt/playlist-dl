@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.ktechpit.playlist-dl</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>LicenseRef-proprietary=https://raw.githubusercontent.com/keshavbhatt/p-pldl/main/LICENSE</project_license>
+
+  <developer id="com.ktechpit">
+    <name>Keshav Bhatt</name>
+  </developer>
+
+  <name>Playlist Downloader</name>
+  <summary>Search, browse, play and download YouTube playlists</summary>
+
+  <description>
+    <p>
+      Playlist Downloader is a desktop app for YouTube playlists: search for playlists and videos,
+      browse a playlist's entries, play them in the built-in browser and download the ones you
+      want, or the whole playlist, as video or audio.
+    </p>
+    <ul>
+      <li>Search YouTube for videos, playlists and channels without leaving the app</li>
+      <li>Open a playlist, pick entries one by one or take them all</li>
+      <li>A built-in browser to watch and sign in, so anything your account can see downloads too</li>
+      <li>Downloads as MP4, MKV or WebM up to 4K, or audio only as MP3, M4A, Opus, FLAC or WAV</li>
+      <li>A queue with pause, resume and retry, and a notification when a download finishes</li>
+    </ul>
+  </description>
+
+  <launchable type="desktop-id">com.ktechpit.playlist-dl.desktop</launchable>
+
+  <keywords>
+    <keyword>youtube</keyword>
+    <keyword>playlist</keyword>
+    <keyword>download</keyword>
+    <keyword>downloader</keyword>
+    <keyword>video</keyword>
+    <keyword>music</keyword>
+  </keywords>
+
+  <url type="homepage">https://github.com/keshavbhatt/p-pldl</url>
+  <url type="help">https://github.com/keshavbhatt/p-pldl/blob/main/GUIDE.md</url>
+  <url type="bugtracker">https://github.com/keshavbhatt/p-pldl/issues</url>
+  <url type="donation">https://www.paypal.com/paypalme/keshavnrj/11</url>
+  <url type="contact">https://ktechpit.com</url>
+
+  <provides>
+    <binary>playlist-dl</binary>
+  </provides>
+
+  <requires>
+    <display_length compare="ge">768</display_length>
+    <internet>always</internet>
+  </requires>
+  <supports>
+    <control>pointing</control>
+    <control>keyboard</control>
+  </supports>
+
+  <categories>
+    <category>Utility</category>
+    <category>Video</category>
+  </categories>
+
+  <content_rating type="oars-1.1" />
+
+  <releases>
+    <release version="3.0.0" date="2026-09-24" type="development">
+      <description>
+        <p>A new app, rebuilt from the ground up.</p>
+      </description>
+    </release>
+  </releases>
+
+  <update_contact>connect@ktechpit.com</update_contact>
+</component>

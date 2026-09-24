@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="face" x1="0" y1="20" x2="0" y2="108" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#9a4cb6"/>
+      <stop offset="1" stop-color="#813d9c"/>
+    </linearGradient>
+    <linearGradient id="badge" x1="0" y1="68" x2="0" y2="108" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f9f06b"/>
+      <stop offset="1" stop-color="#f6d32d"/>
+    </linearGradient>
+  </defs>
+  <!-- stacked playlist cards behind -->
+  <rect x="32" y="8" width="64" height="40" rx="8" fill="#e8b4ea"/>
+  <rect x="24" y="14" width="80" height="40" rx="8" fill="#c061cb"/>
+  <!-- main card: side + face (GNOME-style object thickness, not a shadow) -->
+  <rect x="16" y="24" width="96" height="88" rx="12" fill="#71409a"/>
+  <rect x="16" y="20" width="96" height="88" rx="12" fill="url(#face)"/>
+  <!-- track list -->
+  <path d="M29 32.5 L41 38 L29 43.5 Z" fill="#ffffff" stroke="#ffffff" stroke-width="2" stroke-linejoin="round"/>
+  <rect x="48" y="34" width="50" height="8" rx="4" fill="#ffffff"/>
+  <circle cx="35" cy="56" r="4.5" fill="#ffffff" fill-opacity="0.75"/>
+  <rect x="48" y="52" width="42" height="8" rx="4" fill="#ffffff" fill-opacity="0.75"/>
+  <circle cx="35" cy="74" r="4.5" fill="#ffffff" fill-opacity="0.75"/>
+  <rect x="48" y="70" width="18" height="8" rx="4" fill="#ffffff" fill-opacity="0.75"/>
+  <!-- download badge (ring in face colour separates it from the list) -->
+  <circle cx="88" cy="88" r="23" fill="#813d9c"/>
+  <circle cx="88" cy="91" r="20" fill="#e5a50a"/>
+  <circle cx="88" cy="88" r="20" fill="url(#badge)"/>
+  <rect x="84.5" y="73" width="7" height="14" rx="2" fill="#613583"/>
+  <path d="M77 84.5 L99 84.5 L88 96.5 Z" fill="#613583" stroke="#613583" stroke-width="3" stroke-linejoin="round"/>
+  <rect x="78" y="99.5" width="20" height="4" rx="2" fill="#613583"/>
+</svg>

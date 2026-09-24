@@ -1,11 +1,8 @@
 # Adds the project-wide warning set to a target.
 # Usage: pldl_set_warnings(<target>)
-#
-# The code base predates the CMake port and is not clean under the stricter
-# conversion warnings yet, so those stay off until the sources are tidied.
 function(pldl_set_warnings target)
     if(MSVC)
-        target_compile_options(${target} PRIVATE /W4 /permissive-)
+        target_compile_options(${target} PRIVATE /W4 /permissive- /w14640 /w14265 /w14062)
         if(PLDL_WERROR)
             target_compile_options(${target} PRIVATE /WX)
         endif()
@@ -13,8 +10,16 @@ function(pldl_set_warnings target)
         target_compile_options(${target} PRIVATE
             -Wall
             -Wextra
+            -Wpedantic
+            -Wshadow
+            -Wconversion
+            -Wsign-conversion
             -Wnon-virtual-dtor
+            -Wold-style-cast
             -Woverloaded-virtual
+            -Wnull-dereference
+            -Wdouble-promotion
+            -Wformat=2
         )
         if(PLDL_WERROR)
             target_compile_options(${target} PRIVATE -Werror)

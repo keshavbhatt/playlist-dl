@@ -30,7 +30,7 @@ download options, watch the queue.
 | `accentHover` | `#813D9C` | `#613583` | hover on primary |
 | `accentSoft` | `#2B1D33` | `#F3E8F6` | active rail and tab background, selected chips, banners |
 | `accentText` | `#FFFFFF` | `#FFFFFF` | text on accentStrong |
-| `badge` | `#F6D32D` | `#E5A50A` | the download badge on the rail, progress chunks, "new" chips |
+| `badge` | `#F6D32D` | `#E5A50A` | the download badge pill on the rail and "new" chips (never a bar: on light it cannot reach 3:1 against the track) |
 | `badgeText` | `#3D1D4B` | `#3D1D4B` | text on badge |
 | `bg` | `#141118` | `#F8F6FA` | window and page background |
 | `rail` | `#141118` | `#FFFFFF` | the rail (1 px border on the page side) |
@@ -155,7 +155,7 @@ The 2.x download widget rebuilt as a page:
   available"), Pause all, Resume all, a Clear menu (finished, failed, all), Open folder.
 - Cards (88 px): thumbnail 96 by 54 with a state bar, title, "playlist title, 3 of 12" for
   playlist entries or the channel for single videos, quality and format line, progress bar
-  (`badge` chunk on `border` track) with "12.4 MB of 118 MB, 3.2 MB/s, 00:32" or
+  (`accent` chunk on `border` track) with "12.4 MB of 118 MB, 3.2 MB/s, 00:32" or
   "Merging", "Finished, 118 MB", "Failed, reason". Hover actions: pause or resume, cancel,
   open, show in folder, retry, remove. Double click opens the file.
 - A playlist is one card that expands to its entries (chevron), with the aggregate progress

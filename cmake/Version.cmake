@@ -1,10 +1,10 @@
 # Derives version metadata for the build.
 #
-# PLDL_VERSION        -> "3.0.0" (from project(VERSION))
+# PLDL_VERSION        -> "5.0.0" (from project(VERSION))
 # PLDL_GIT_REVISION   -> short hash or "unknown"
 #
-# These reach the code through a generated header (see src/CMakeLists.txt),
-# never through string literals in sources.
+# These are handed to the code via a generated header (see src/app/CMakeLists.txt),
+# never via string literals in sources.
 
 set(PLDL_VERSION "${PROJECT_VERSION}")
 

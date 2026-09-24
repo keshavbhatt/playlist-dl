@@ -13,7 +13,6 @@ compile_commands.json
 *.user.*
 .cache/
 .qtcreator/
-CMakeLists.txt.user*
 
 # Generated
 *.o
@@ -30,6 +29,9 @@ qrc_*
 *.deb
 *.AppImage
 *.flatpak
+*.exe
+*.msi
+*.dmg
 squashfs-root/
 parts/
 prime/
@@ -38,3 +40,5 @@ stage/
 # OS
 .DS_Store
 Thumbs.db
+
+# Internal planning/tracking — kept local, not published

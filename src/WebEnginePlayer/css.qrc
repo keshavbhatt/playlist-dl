@@ -1,6 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>css/core.css</file>
-        <file>css/scroll.css</file>
-    </qresource>
-</RCC>
