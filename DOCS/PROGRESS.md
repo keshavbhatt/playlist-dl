@@ -52,6 +52,9 @@
   delegate and filters. Verified live headless: `PLDL_DEBUG_DOWNLOAD` provisioned the
   engine and downloaded "Me at the zoo" (av1+aac, thumbnail embedded) in 151 s, exit 0.
   39 tests pass. Grabs of the demo queue in dark and light looked at.
+- Engine search verified live: 20 playlists for "lofi" with thumbnails, the sizes asked
+  per playlist (`SearchService::countPlaylist`) filling the pills, Load more visible; the grid
+  now keeps 4 px of slack so a row does not wrap one card short beside a scrollbar.
 - Owner decision: the ktechpit search service is dropped; the engine is the single search
   source (ADR-003 revised). The service client, the fallback, the source chip and the
   "Search service" setting are removed; Load more now pages every search.

@@ -56,6 +56,19 @@ class TestSearchPage : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
+    void aCountedPlaylistUpdatesItsCard()
+    {
+        QList<SearchResult> results = canned(2);
+        results[0].itemCount = -1;
+        m_page->showResults(results, false);
+        QCOMPARE(m_page->resultsView()->model()->index(0, 0).data(SearchCardDelegate::CountRole).toLongLong(), -1);
+        m_page->setPlaylistCount(results[0].url, 42);
+        QCOMPARE(m_page->results().at(0).itemCount, 42);
+        QCOMPARE(m_page->resultsView()->model()->index(0, 0).data(SearchCardDelegate::CountRole).toLongLong(), 42);
+        m_page->setPlaylistCount(u"https://example.test/unknown"_s, 7); // no such card: nothing changes
+        QCOMPARE(m_page->results().at(1).itemCount, results[1].itemCount);
+    }
+
     void viewToggleSwitchesBetweenCardsAndRows()
     {
         QVERIFY(m_page->gridViewButton()->isChecked());

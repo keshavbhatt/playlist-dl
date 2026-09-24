@@ -89,6 +89,9 @@ public:
     /// Classifies a typed text (pure): the URL to emit lands in `url`.
     [[nodiscard]] static Link linkOf(const QString& text, QUrl* url = nullptr);
 
+    /// A playlist's size arrived (the engine's flat search carries none; the
+    /// count is asked for per result): the card's pill updates.
+    void setPlaylistCount(const QString& url, qint64 count);
     [[nodiscard]] State state() const { return m_state; }
     [[nodiscard]] const QList<services::SearchResult>& results() const { return m_results; }
     [[nodiscard]] services::PlaylistSearch& playlistSearch() { return *m_search; }

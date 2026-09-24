@@ -28,6 +28,7 @@
 #include <QStackedWidget>
 #include <QStandardItemModel>
 #include <QStyle>
+#include <QTimer>
 #include <QToolButton>
 #include <QVBoxLayout>
 
@@ -72,6 +73,7 @@ SearchPage::SearchPage(core::Settings& settings, core::ThemeService& theme, Thum
     connect(m_search, &services::PlaylistSearch::finished, this, &SearchPage::handleFinished);
     connect(m_search, &services::PlaylistSearch::failed, this, &SearchPage::handleFailed);
     connect(m_search, &services::PlaylistSearch::engineNeeded, this, &SearchPage::engineNeeded);
+    connect(&m_search->engine(), &services::SearchService::playlistCounted, this, &SearchPage::setPlaylistCount);
     connect(m_suggestions, &services::SearchSuggestions::suggestions, this, &SearchPage::showSuggestions);
     connect(&m_thumbnails, &ThumbnailCache::ready, this,
             [this](const QString&) { m_list->viewport()->update(); });
@@ -323,6 +325,9 @@ void SearchPage::setState(State state)
         break;
     case State::Results:
         m_stage->setCurrentWidget(m_resultsPane);
+        // The pane may have been hidden since the last resize: lay the grid
+        // out against its real width once it is on screen.
+        QTimer::singleShot(0, this, [this] { layoutGrid(); });
         break;
     case State::Loading:
         m_status->setText(tr("Searching"));
@@ -543,6 +548,23 @@ void SearchPage::appendResults(const QList<services::SearchResult>& results)
         item->setToolTip(result.title);
         item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
         m_model->appendRow(item);
+        if (result.itemCount < 0) {
+            m_search->engine().countPlaylist(result.url);
+        }
+    }
+}
+
+void SearchPage::setPlaylistCount(const QString& url, qint64 count)
+{
+    for (int row = 0; row < m_results.size(); ++row) {
+        if (m_results.at(row).url != url) {
+            continue;
+        }
+        m_results[row].itemCount = count;
+        if (QStandardItem* item = m_model->item(row)) {
+            item->setData(count, SearchCardDelegate::CountRole);
+        }
+        break;
     }
 }
 
@@ -823,6 +845,10 @@ void SearchPage::layoutGrid()
     if (!m_list->verticalScrollBar()->isVisible()) {
         width -= m_list->style()->pixelMetric(QStyle::PM_ScrollBarExtent, nullptr, m_list) + 2;
     }
+    // The view keeps a few pixels for itself: without this slack a row that
+    // fits by the maths wraps one card short (a scrollbar showing, 1166 px
+    // viewport, four 291 px columns).
+    width -= 4;
     if (width <= 0) {
         return;
     }
@@ -844,6 +870,8 @@ void SearchPage::layoutGrid()
     // columns instead of huge cards.
     const int columns = std::max(1, width / (SearchCardDelegate::kMinCardWidth + gap));
     const int cardWidth = std::min(SearchCardDelegate::kMaxCardWidth, width / columns - gap);
+    qCDebug(lcUi) << "search grid: viewport" << m_list->viewport()->width() << "usable" << width << "columns" << columns
+                  << "card" << cardWidth << "visible" << m_list->isVisible() << "pane" << m_resultsPane->isVisible();
     if (cardWidth == m_delegate->cardWidth() && m_list->gridSize() == m_delegate->itemSize()) {
         return;
     }
