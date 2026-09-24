@@ -203,7 +203,26 @@ void SearchCardDelegate::paintRow(QPainter* painter, const QStyleOptionViewItem&
     const QString thumbUrl = index.data(ThumbnailRole).toString();
     const QPixmap pixmap = thumbUrl.isEmpty() ? QPixmap() : m_thumbnails.get(thumbUrl);
     thumbs::paintThumbnail(painter, thumb, pixmap, {t.accent, u"playlist"_s, 20}, dpr, 8);
-    paintCountPill(painter, option, thumb, index.data(CountRole).toLongLong());
+
+    // The count pill at the row's right end (the small picture would hide
+    // under it); the text takes the room between.
+    int pillWidth = 0;
+    if (const QString count = countText(index.data(CountRole).toLongLong()); !count.isEmpty()) {
+        QFont pillFont = option.font;
+        pillFont.setPointSizeF(std::max(7.0, option.font.pointSizeF() - 1.5));
+        pillFont.setWeight(QFont::DemiBold);
+        const QFontMetrics pm(pillFont);
+        pillWidth = pm.horizontalAdvance(count) + 12;
+        const int h = pm.height() + 4;
+        const QRect pill(row.right() - kPad - pillWidth, row.center().y() - h / 2, pillWidth, h);
+        QPainterPath pillPath;
+        pillPath.addRoundedRect(pill, h / 2, h / 2);
+        painter->fillPath(pillPath, t.badge);
+        painter->setFont(pillFont);
+        painter->setPen(t.badgeText);
+        painter->drawText(pill, Qt::AlignCenter, count);
+        pillWidth += kPad;
+    }
 
     // Title on one line, the channel under it; both centred on the picture.
     QFont titleFont = option.font;
@@ -211,7 +230,7 @@ void SearchCardDelegate::paintRow(QPainter* painter, const QStyleOptionViewItem&
     const QFontMetrics tm(titleFont);
     const QFontMetrics fm(option.font);
     const int textLeft = thumb.right() + 1 + kPad;
-    const int textWidth = row.right() - kPad - textLeft;
+    const int textWidth = row.right() - kPad - pillWidth - textLeft;
     const int block = tm.height() + kLineGap + fm.height();
     const int top = thumb.top() + (thumb.height() - block) / 2;
     painter->setFont(titleFont);
