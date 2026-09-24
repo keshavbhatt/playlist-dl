@@ -124,6 +124,53 @@ private Q_SLOTS:
         QCOMPARE(saved.current, 1);
     }
 
+    void searchKeys()
+    {
+        QCOMPARE(m_settings->searchMode(), SearchMode::Automatic);
+        QCOMPARE(m_settings->searchResultsPerPage(), 20);
+        QVERIFY(m_settings->keepSearchHistory());
+        QVERIFY(m_settings->recentQueries().isEmpty());
+
+        QSignalSpy changed(m_settings.get(), &Settings::searchChanged);
+        m_settings->setSearchMode(SearchMode::EngineOnly);
+        m_settings->setSearchMode(SearchMode::EngineOnly);
+        QCOMPARE(m_settings->searchMode(), SearchMode::EngineOnly);
+        QCOMPARE(changed.count(), 1);
+        m_settings->setSearchResultsPerPage(5);
+        QCOMPARE(m_settings->searchResultsPerPage(), Settings::kMinSearchResultsPerPage);
+        m_settings->setSearchResultsPerPage(99);
+        QCOMPARE(m_settings->searchResultsPerPage(), Settings::kMaxSearchResultsPerPage);
+        QCOMPARE(changed.count(), 3);
+        m_settings->setKeepSearchHistory(false);
+        QVERIFY(!m_settings->keepSearchHistory());
+        QCOMPARE(changed.count(), 4);
+
+        // Recent queries: most recent first, no duplicates, at most eight,
+        // blanks ignored.
+        m_settings->addRecentQuery(u"  "_s);
+        QCOMPARE(changed.count(), 4);
+        for (int i = 1; i <= 9; ++i) {
+            m_settings->addRecentQuery(u"query %1"_s.arg(i));
+        }
+        QCOMPARE(m_settings->recentQueries().size(), Settings::kMaxRecentQueries);
+        QCOMPARE(m_settings->recentQueries().first(), u"query 9"_s);
+        QCOMPARE(m_settings->recentQueries().last(), u"query 2"_s);
+        m_settings->addRecentQuery(u" Query 5 "_s);
+        QCOMPARE(m_settings->recentQueries().first(), u"Query 5"_s);
+        QCOMPARE(m_settings->recentQueries().count(u"query 5"_s), 0);
+        QCOMPARE(m_settings->recentQueries().size(), Settings::kMaxRecentQueries);
+        m_settings->sync();
+        Settings again(m_dir->filePath(u"pldl.ini"_s));
+        QCOMPARE(again.recentQueries(), m_settings->recentQueries());
+        QCOMPARE(again.searchMode(), SearchMode::EngineOnly);
+        const qsizetype before = changed.count();
+        m_settings->clearRecentQueries();
+        QVERIFY(m_settings->recentQueries().isEmpty());
+        QCOMPARE(changed.count(), before + 1);
+        m_settings->clearRecentQueries();
+        QCOMPARE(changed.count(), before + 1);
+    }
+
     void gpuFallbackResetsOnExplicitChoice()
     {
         m_settings->setGpuAutoDisabled(true);

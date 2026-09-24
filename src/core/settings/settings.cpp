@@ -35,6 +35,9 @@ constexpr int kDefaultSpeedLimit = 0;
 constexpr bool kDefaultUseSessionCookies = true;
 constexpr bool kDefaultEmbedThumbnail = true;
 constexpr bool kDefaultEmbedMetadata = true;
+constexpr SearchMode kDefaultSearchMode = SearchMode::Automatic;
+constexpr int kDefaultSearchResultsPerPage = 20;
+constexpr bool kDefaultKeepSearchHistory = true;
 constexpr bool kDefaultEngineAutoUpdate = true;
 constexpr bool kDefaultEngineUseSystem = false;
 constexpr HardwareAcceleration kDefaultHardwareAcceleration = HardwareAcceleration::Auto;
@@ -516,6 +519,87 @@ void Settings::setSubtitleLanguages(const QStringList& languages)
     Q_EMIT downloadDefaultsChanged();
 }
 
+// ---- search/ ---------------------------------------------------------------
+
+SearchMode Settings::searchMode() const
+{
+    return enumFromInt(intValue(keys::kSearchServiceMode, static_cast<int>(kDefaultSearchMode)),
+                       kDefaultSearchMode, 2);
+}
+
+void Settings::setSearchMode(SearchMode mode)
+{
+    if (storeInt(keys::kSearchServiceMode, static_cast<int>(kDefaultSearchMode), static_cast<int>(mode))) {
+        Q_EMIT searchChanged();
+    }
+}
+
+int Settings::searchResultsPerPage() const
+{
+    return std::clamp(intValue(keys::kSearchResultsPerPage, kDefaultSearchResultsPerPage), kMinSearchResultsPerPage,
+                      kMaxSearchResultsPerPage);
+}
+
+void Settings::setSearchResultsPerPage(int count)
+{
+    const int clamped = std::clamp(count, kMinSearchResultsPerPage, kMaxSearchResultsPerPage);
+    if (storeInt(keys::kSearchResultsPerPage, kDefaultSearchResultsPerPage, clamped)) {
+        Q_EMIT searchChanged();
+    }
+}
+
+bool Settings::keepSearchHistory() const
+{
+    return boolValue(keys::kSearchKeepHistory, kDefaultKeepSearchHistory);
+}
+
+void Settings::setKeepSearchHistory(bool enabled)
+{
+    if (storeBool(keys::kSearchKeepHistory, kDefaultKeepSearchHistory, enabled)) {
+        Q_EMIT searchChanged();
+    }
+}
+
+QStringList Settings::recentQueries() const
+{
+    QStringList out;
+    for (const QString& query : m_store->value(keys::kSearchRecentQueries).toStringList()) {
+        const QString trimmed = query.trimmed();
+        if (!trimmed.isEmpty() && !out.contains(trimmed, Qt::CaseInsensitive)) {
+            out << trimmed;
+        }
+        if (out.size() >= kMaxRecentQueries) {
+            break;
+        }
+    }
+    return out;
+}
+
+void Settings::addRecentQuery(const QString& query)
+{
+    const QString trimmed = query.trimmed();
+    if (trimmed.isEmpty()) {
+        return;
+    }
+    QStringList list = recentQueries();
+    list.removeIf([&trimmed](const QString& q) { return q.compare(trimmed, Qt::CaseInsensitive) == 0; });
+    list.prepend(trimmed);
+    while (list.size() > kMaxRecentQueries) {
+        list.removeLast();
+    }
+    m_store->setValue(keys::kSearchRecentQueries, list);
+    Q_EMIT searchChanged();
+}
+
+void Settings::clearRecentQueries()
+{
+    if (recentQueries().isEmpty()) {
+        return;
+    }
+    m_store->remove(keys::kSearchRecentQueries);
+    Q_EMIT searchChanged();
+}
+
 // ---- engine/ ---------------------------------------------------------------
 
 bool Settings::engineAutoUpdate() const
@@ -683,6 +767,7 @@ void Settings::resetToDefaults()
     Q_EMIT downloadDefaultsChanged();
     Q_EMIT concurrentDownloadsChanged(concurrentDownloads());
     Q_EMIT speedLimitChanged(speedLimitKbps());
+    Q_EMIT searchChanged();
     Q_EMIT engineConfigChanged();
     Q_EMIT hardwareAccelerationChanged(hardwareAcceleration());
     Q_EMIT hardwareVideoDecodeChanged(hardwareVideoDecode());
