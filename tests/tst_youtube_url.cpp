@@ -83,6 +83,12 @@ private Q_SLOTS:
         QVERIFY(!canonicalVideoUrl(QUrl(u"https://www.youtube.com/"_s)));
         QVERIFY(isDownloadable(QUrl(u"https://www.youtube.com/playlist?list=PL1"_s)));
         QVERIFY(!isDownloadable(QUrl(u"https://www.youtube.com/feed/history"_s)));
+        // Playlists from anywhere: any web page on another site may hold media.
+        QVERIFY(isDownloadable(QUrl(u"https://soundcloud.com/discover/sets/artist-stations:3789802:166237090"_s)));
+        QVERIFY(isDownloadable(QUrl(u"http://example.com/set"_s)));
+        QVERIFY(!isDownloadable(QUrl(u"mailto:x@example.com"_s)));
+        QVERIFY(!isDownloadable(QUrl(u"file:///tmp/x.mp4"_s)));
+        QVERIFY(!isDownloadable(QUrl()));
         QCOMPARE(thumbnailUrl(u"abc"_s).toString(), u"https://i.ytimg.com/vi/abc/mqdefault.jpg"_s);
         QCOMPARE(videoIdFromTvHash(u"/watch?v=aqz-KE-bpKQ"_s), u"aqz-KE-bpKQ"_s);
         QCOMPARE(videoIdFromTvHash(u"/browse"_s), QString());

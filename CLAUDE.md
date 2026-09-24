@@ -1,7 +1,8 @@
 # Playlist Downloader: project instructions
 
 Playlist Downloader (snap and binary `playlist-dl`, formerly "Playlist-Dl") is a proprietary
-YouTube playlist search, browse, play and download app (Qt 6.11, C++20, CMake). Version 3.0 is
+playlist search, browse, play and download app (Qt 6.11, C++20, CMake): playlists from any
+site the engine reads (owner, 2026-09-24), with YouTube as the search source. Version 3.0 is
 a from-scratch rewrite on branch `v3-rewrite`; the 2.x code on `main` (and its Qt 6 port on
 `qt6-cmake-migration`) is the frozen reference. Read `DOCS/` for the feature contract
 (FEATURES), design (DESIGN), decisions (DECISIONS, ADRs), lessons (LESSONS) and the progress

@@ -15,6 +15,36 @@ namespace pldl::core {
 
 namespace {
 
+/// The largest thumbnail with a stated size; without any, the last one. The
+/// last entry alone is not safe: SoundCloud lists an "original" file there
+/// that its server refuses, while the sized ones are served.
+QString bestThumbnail(const QJsonArray& thumbs)
+{
+    QString best;
+    int bestWidth = -1;
+    for (const auto& v : thumbs) {
+        const QJsonObject t = v.toObject();
+        const QString url = t.value(u"url"_s).toString();
+        if (url.isEmpty()) {
+            continue;
+        }
+        const int width = t.value(u"width"_s).toInt(-1);
+        if (width > bestWidth) {
+            best = url;
+            bestWidth = width;
+        }
+    }
+    if (best.isEmpty() && !thumbs.isEmpty()) {
+        best = thumbs.last().toObject().value(u"url"_s).toString();
+    }
+    return best;
+}
+
+} // namespace
+
+
+namespace {
+
 qint64 toInt64(const QJsonValue& value, qint64 def = -1)
 {
     if (value.isDouble()) {
@@ -134,10 +164,7 @@ MediaInfo MediaInfo::fromJson(const QJsonObject& o)
     info.description = o.value(u"description"_s).toString();
     info.thumbnail = o.value(u"thumbnail"_s).toString();
     if (info.thumbnail.isEmpty()) {
-        const QJsonArray thumbs = o.value(u"thumbnails"_s).toArray();
-        if (!thumbs.isEmpty()) {
-            info.thumbnail = thumbs.last().toObject().value(u"url"_s).toString();
-        }
+        info.thumbnail = bestThumbnail(o.value(u"thumbnails"_s).toArray());
     }
     // yt-dlp's pick is often i9.ytimg.com/…/maxresdefault.jpg, which is not
     // served for every video; the standard i.ytimg.com frame always is.

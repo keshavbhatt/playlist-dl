@@ -62,7 +62,8 @@ public:
         None,        ///< a query
         Playlist,    ///< a playlist link or a bare list id
         Video,       ///< a video link without a playlist
-        Unsupported, ///< a link that is neither
+        Other,       ///< a web link on any site: the engine says what it is
+        Unsupported, ///< not a web link
     };
     Q_ENUM(Link)
 
@@ -112,6 +113,9 @@ Q_SIGNALS:
     void playlistRequested(const QUrl& url);
     /// A video link was pasted: the Browser page opens it.
     void videoRequested(const QUrl& url);
+    /// A link on any other site was pasted: the window probes it (a playlist
+    /// opens the Playlist page, a single item the options sheet).
+    void linkRequested(const QUrl& url);
     /// The chosen card's result, with everything the Playlist page can show at once.
     void playlistChosen(const pldl::services::SearchResult& result);
     /// The engine is needed and not provisioned: the window sets it up and

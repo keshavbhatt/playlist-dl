@@ -295,7 +295,7 @@ private Q_SLOTS:
         auto controller = makeController();
         QSignalSpy settled(controller.get(), &pldl::ui::DownloadsController::requestSettled);
         QSignalSpy toasts(controller.get(), &pldl::ui::DownloadsController::toast);
-        controller->requestDownload(QUrl(u"https://example.com/not-youtube"_s));
+        controller->requestDownload(QUrl(u"mailto:not-a-page@example.com"_s)); // not a web page
         QCOMPARE(settled.count(), 1);
         QCOMPARE(settled.at(0).at(1).toBool(), false);
         // A YouTube link before the engine exists: settled too, with a toast.

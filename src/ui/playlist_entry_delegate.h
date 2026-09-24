@@ -1,5 +1,7 @@
 #pragma once
 
+#include "core/downloads/media_info.h"
+
 #include <QPersistentModelIndex>
 #include <QPoint>
 #include <QRect>
@@ -72,6 +74,9 @@ public:
     /// flat read gives "[Private video]" / "[Deleted video]" for some, and no
     /// title at all (no duration, no channel either) for the rest.
     [[nodiscard]] static bool isUnavailableTitle(const QString& title);
+    /// The whole verdict: a marker title, or no title on a YouTube link; an
+    /// untitled entry from another site is a plain item (ADR-006).
+    [[nodiscard]] static bool isUnavailableEntry(const core::MediaEntry& entry);
     /// The badge word for an unavailable title: "Private", "Removed",
     /// "Unavailable" for a missing title, else empty.
     [[nodiscard]] static QString unavailableLabel(const QString& title);

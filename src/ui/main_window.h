@@ -160,6 +160,10 @@ private:
     /// engine, a full probe, the sheet, the queue. The browser's busy button
     /// is released when the probe answers or the sheet closes.
     void openVideoOptions(const QUrl& url);
+    /// A link on any site: probed flat; a playlist opens the Playlist page, a
+    /// single item the options sheet (FEATURES B4, W3).
+    void openAnyLink(const QUrl& url);
+    void presentVideoOptions(const QUrl& probed, const core::MediaInfo& info);
     void showOptionsSheet(DownloadOptionsSheet* sheet);
 
     core::Settings& m_settings;
@@ -172,6 +176,7 @@ private:
     PlaylistPage* m_playlist = nullptr;
     std::optional<services::SearchResult> m_knownPlaylist; ///< the card chosen on Search, for the header
     QHash<quint64, QUrl> m_videoProbes;                    ///< openVideoOptions probes in flight
+    QHash<quint64, QUrl> m_linkProbes;                     ///< openAnyLink probes in flight
     BrowserPage* m_browser = nullptr;
     DownloadsPage* m_downloads = nullptr;
     DownloadsController* m_downloadsController = nullptr;

@@ -141,8 +141,11 @@ private Q_SLOTS:
         QCOMPARE(
             SearchPage::linkOf(u"https://www.youtube.com/watch?v=jNQXAC9IVRw&list=RDjNQXAC9IVRw"_s, &url),
             SearchPage::Link::Video);
-        QCOMPARE(SearchPage::linkOf(u"https://example.com/watch?v=jNQXAC9IVRw"_s, &url),
-                 SearchPage::Link::Unsupported);
+        // Any other site is a link for the engine to read (playlists from anywhere).
+        QCOMPARE(SearchPage::linkOf(u"https://example.com/watch?v=jNQXAC9IVRw"_s, &url), SearchPage::Link::Other);
+        QCOMPARE(SearchPage::linkOf(u"https://soundcloud.com/discover/sets/artist-stations:3789802:166237090"_s, &url),
+                 SearchPage::Link::Other);
+        QCOMPARE(url.host(), u"soundcloud.com"_s);
         QCOMPARE(SearchPage::linkOf(u"https://www.youtube.com/"_s, &url), SearchPage::Link::Unsupported);
         QCOMPARE(SearchPage::linkOf(u"playlist"_s, &url), SearchPage::Link::None);
     }
@@ -198,7 +201,17 @@ private Q_SLOTS:
         QCOMPARE(video.first().at(0).toUrl().toString(), u"https://www.youtube.com/watch?v=jNQXAC9IVRw"_s);
         QCOMPARE(playlist.size(), 1);
 
-        m_page->search(u"https://example.com/nothing"_s);
+        // A link on any other site goes out for the engine to read (playlists from anywhere).
+        QSignalSpy other(m_page.get(), &SearchPage::linkRequested);
+        m_page->search(u"https://soundcloud.com/discover/sets/artist-stations:3789802:166237090"_s);
+        QCOMPARE(other.size(), 1);
+        QCOMPARE(other.first().at(0).toUrl().host(), u"soundcloud.com"_s);
+        QCOMPARE(m_page->state(), SearchPage::State::Empty);
+        QVERIFY(m_settings->recentQueries().isEmpty());
+
+        // A page known to hold nothing (YouTube's home): an error, no request.
+        m_page->search(u"https://www.youtube.com/"_s);
+        QCOMPARE(other.size(), 1);
         QCOMPARE(m_page->state(), SearchPage::State::Error);
         QVERIFY(!m_page->retryButton()->isVisible());
     }

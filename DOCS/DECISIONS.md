@@ -104,6 +104,25 @@ the owner decides between a private repository with a metadata-only public one (
 model) and keeping the GPL, in which case the copied code has to be relicensed by its
 owner. Recorded as the first open question in PROGRESS.md.
 
+## ADR-006: playlists from any site (2026-09-24)
+
+The owner: "playlist-dl is not anymore just for YouTube, it's playlists from anywhere", and
+the browser is tied to no site. Consequences:
+
+- Every http(s) link is a candidate (`core::isDownloadable`); the engine says what it is.
+  A link on another site, from the Search field, the browser's Download this or the CLI, is
+  probed flat: a playlist answer opens the Playlist page, a single item the options sheet
+  (`MainWindow::openAnyLink`). YouTube links keep their shortcuts (a playlist opens the
+  page without a probe, a video probes in full, a channel queues with the defaults).
+- Flat entries from other sites may carry no title (a SoundCloud set lists links alone);
+  they are items, not unavailable ones, named "Item N" until the engine names the file. A
+  full read of such a set took 90 s, so the flat answer has to do. Only YouTube's markers
+  ("[Private video]", "[Deleted video]") mean an item is gone.
+- The Playlist page says "items" off YouTube and "videos" on it.
+- The web layer carries no site gate (navigation, cookies, badges: ADR-000 revised).
+- Search stays YouTube (the engine's playlist search); other sites are reached by link.
+  Store copy still leads with YouTube and should be revised at release (owner).
+
 ## ADR-003: search through the ktechpit service, the engine as the fallback (2026-09-24)
 
 **Context.** 2.x searched playlists through one PHP proxy on the author's shared host

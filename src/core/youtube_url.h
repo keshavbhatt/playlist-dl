@@ -44,6 +44,8 @@ struct YouTubeUrlInfo
 [[nodiscard]] std::optional<QUrl> canonicalVideoUrl(const QUrl& url);
 /// https://music.youtube.com/watch?v=<id>, with the playlist when given.
 [[nodiscard]] QUrl musicVideoUrl(const QString& videoId, const QString& playlistId = {});
+/// Any web link the engine may read: every http(s) page on any site, except
+/// YouTube pages known to hold nothing (feeds, the home page).
 [[nodiscard]] bool isDownloadable(const QUrl& url);
 [[nodiscard]] QUrl thumbnailUrl(const QString& videoId, const QString& size = QStringLiteral("mqdefault"));
 

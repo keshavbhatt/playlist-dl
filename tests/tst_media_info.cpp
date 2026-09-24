@@ -65,6 +65,21 @@ private Q_SLOTS:
         QCOMPARE(info.entries.at(1).thumbnail, u"t"_s);
     }
 
+    void picksTheLargestSizedThumbnail()
+    {
+        // SoundCloud's list ends with an "original" file the server refuses;
+        // the largest sized entry is the one that loads.
+        const QByteArray json = "{\"_type\":\"playlist\",\"id\":\"s1\",\"title\":\"Set\",\"entries\":[],"
+                                "\"thumbnails\":[{\"url\":\"small.jpg\",\"width\":32},{\"url\":\"t500.jpg\",\"width\":500},"
+                                "{\"url\":\"original.png\",\"preference\":10}]}";
+        const MediaInfo info = parseMediaInfo(json);
+        QCOMPARE(info.thumbnail, u"t500.jpg"_s);
+        // No sizes at all: the last one, as before.
+        const MediaInfo plain = parseMediaInfo(
+            "{\"_type\":\"playlist\",\"id\":\"s2\",\"title\":\"Set\",\"entries\":[],\"thumbnails\":[{\"url\":\"a\"},{\"url\":\"b\"}]}");
+        QCOMPARE(plain.thumbnail, u"b"_s);
+    }
+
     void rejectsGarbage()
     {
         QString error;

@@ -113,6 +113,17 @@ private Q_SLOTS:
         QVERIFY(PlaylistEntryDelegate::isUnavailableTitle(QString()));
         QVERIFY(PlaylistEntryDelegate::isUnavailableTitle(u"   "_s));
         QCOMPARE(PlaylistEntryDelegate::unavailableLabel(QString()), u"Unavailable"_s);
+        // The whole entry: no title on a YouTube link is a removed video; no
+        // title on another site's link is a plain item (a SoundCloud set read flat).
+        pldl::core::MediaEntry gone;
+        gone.url = u"https://www.youtube.com/watch?v=abc"_s;
+        QVERIFY(PlaylistEntryDelegate::isUnavailableEntry(gone));
+        pldl::core::MediaEntry track;
+        track.url = u"https://api-v2.soundcloud.com/tracks/166237090"_s;
+        QVERIFY(!PlaylistEntryDelegate::isUnavailableEntry(track));
+        track.title = u"[Private video]"_s;
+        QVERIFY(PlaylistEntryDelegate::isUnavailableEntry(track));
+        QVERIFY(PlaylistEntryDelegate::isUnavailableEntry(pldl::core::MediaEntry{}));
         QVERIFY(PlaylistEntryDelegate::unavailableLabel(u"Fine"_s).isEmpty());
     }
 

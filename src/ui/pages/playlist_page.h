@@ -75,6 +75,8 @@ public:
     void open(const QUrl& playlistUrl, const std::optional<services::SearchResult>& known = std::nullopt);
     /// A playlist read elsewhere: fills the page without probing.
     void openInfo(const core::MediaInfo& info);
+    /// The same for a link the window probed itself (any site).
+    void openInfo(const QUrl& playlistUrl, const core::MediaInfo& info);
     /// Reads the current playlist (again): Retry, and the window's answer to engineNeeded.
     void reload();
     /// The error state with `reason` (the window, when the engine setup failed).
@@ -150,6 +152,8 @@ private:
     void buildStatus();
     void applyIcons();
     void setState(State state);
+    /// "video" on a YouTube playlist, "item" anywhere else (playlists come from any site).
+    [[nodiscard]] QString itemWord(int count) const;
     void fillHeader(const QString& title, const QString& channel, const QString& thumbnail, int count,
                     double totalDuration);
     void renderThumbnail();

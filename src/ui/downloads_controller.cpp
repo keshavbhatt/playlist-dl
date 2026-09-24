@@ -358,8 +358,8 @@ core::DownloadOptions DownloadsController::defaultOptions(bool playlist) const
 void DownloadsController::requestDownload(const QUrl& url)
 {
     if (!core::isDownloadable(url)) {
-        qCInfo(lcUi) << "download request: not a YouTube video or playlist link" << url;
-        Q_EMIT toast(tr("That is not a YouTube video or playlist link."));
+        qCInfo(lcUi) << "download request: not a link the engine can read" << url;
+        Q_EMIT toast(tr("That is not a link to a page with media."));
         Q_EMIT requestSettled(url, false);
         return;
     }
@@ -369,8 +369,10 @@ void DownloadsController::requestDownload(const QUrl& url)
         Q_EMIT requestSettled(url, false);
         return;
     }
+    // A YouTube video is read in full; anything else flat, which lists a
+    // playlist's entries and still answers a single item with its formats.
     const core::YouTubeUrlInfo shape = core::classifyYouTubeUrl(url);
-    const bool flat = shape.kind == core::YouTubeUrlKind::Playlist || shape.kind == core::YouTubeUrlKind::Channel;
+    const bool flat = shape.kind != core::YouTubeUrlKind::Video;
     const quint64 id = m_probe.probe(url, flat);
     m_pendingProbes.insert(id, url);
     qCInfo(lcUi) << "download request: probing" << url << (flat ? "(flat)" : "");

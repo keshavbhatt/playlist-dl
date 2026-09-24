@@ -28,6 +28,11 @@
 
 ### 2026-09-24, M6
 
+- Owner direction: playlists from any site (ADR-006). Download this on a SoundCloud set said
+  "not a YouTube link"; now any web link is probed and the answer decides (Playlist page or
+  options sheet), from the Search field, the browser and the CLI. Untitled flat entries are
+  items, not unavailable; the page says items off YouTube. Verified live: the SoundCloud set
+  reads as "Sia", 50 items; a track opens the options sheet with Audio only.
 - Owner report: the Signed in badge (a YouTube session) showed on SoundCloud's sign-in page;
   the owner had it removed, and stated the browser is tied to no site. The cookie mirror now
   keeps every site's cookies, so a sign-in anywhere reaches the engine; the YouTube-only

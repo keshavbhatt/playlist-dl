@@ -79,7 +79,7 @@ public:
     /// The download options the settings' defaults describe (the sheet's
     /// starting point, the CLI's and the browser's whole choice).
     [[nodiscard]] core::DownloadOptions defaultOptions(bool playlist) const;
-    /// Probes `url` (flat for a playlist or channel, full for a video) and
+    /// Probes `url` (full for a YouTube video, flat for anything else) and
     /// queues one job with the default options: the CLI's --download and the
     /// browser's Download this until the options sheet exists. Needs the
     /// engine (the window's ensureEngine); requestSettled follows either way.

@@ -164,9 +164,14 @@ QUrl musicVideoUrl(const QString& videoId, const QString& playlistId)
 
 bool isDownloadable(const QUrl& url)
 {
-    const YouTubeUrlKind kind = classifyYouTubeUrl(url).kind;
-    return kind == YouTubeUrlKind::Video || kind == YouTubeUrlKind::Playlist ||
-           kind == YouTubeUrlKind::Channel;
+    // Playlists come from any site (owner, 2026-09-24): every web link is a
+    // candidate and the engine says what it is. YouTube's own feed pages are
+    // the one known dead end.
+    if (!url.isValid() || (url.scheme() != u"http"_s && url.scheme() != u"https"_s) || url.host().isEmpty()) {
+        return false;
+    }
+    const YouTubeUrlInfo info = classifyYouTubeUrl(url);
+    return info.kind != YouTubeUrlKind::Other;
 }
 
 QUrl thumbnailUrl(const QString& videoId, const QString& size)

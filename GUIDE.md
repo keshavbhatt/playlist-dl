@@ -1,6 +1,7 @@
 # Playlist Downloader guide
 
-Playlist Downloader finds YouTube playlists, plays them in a built-in browser page and saves
+Playlist Downloader finds YouTube playlists, opens playlists from any site by link, plays them
+in a built-in browser page and saves
 whole playlists offline as video or audio. This guide walks through the four pages of the
 window and the settings that matter.
 
@@ -17,6 +18,8 @@ Suggest as I type); the results
 are playlist cards with the number of videos on each. Click a card to open the playlist.
 The two buttons at the right end of the header switch between cards and a list of rows.
 Recent searches come back as chips under the field (Settings, General, Keep search history).
+A playlist link from any other site (a SoundCloud set, for example) opens on the Playlist page
+too; a link to a single track or video opens the download options.
 
 You can also paste a link: a playlist link opens the Playlist page, a video link offers to
 download that video.
@@ -76,7 +79,7 @@ the page title shows its state.
   search history, What's new after updates, notifications.
 - **Appearance**: light, dark or the system theme; interface scale.
 - **Downloads**: the folder, a folder per playlist, numbering, the defaults for new
-  downloads, concurrent downloads, speed limit, skip already downloaded, use my YouTube
+  downloads, concurrent downloads, speed limit, skip already downloaded, use my
   sign-in, and the download engine card (check for updates, update, auto-update).
 - **Browser**: start page (an empty tab, YouTube or an address of your own), restore tabs,
   block ads, Do Not Track, browser identity.

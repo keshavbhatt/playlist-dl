@@ -252,7 +252,7 @@ void PlaylistPage::buildToolbar()
 
     m_skip = new QCheckBox(tr("Skip already downloaded"), row);
     m_skip->setObjectName(u"skipBox"_s);
-    m_skip->setToolTip(tr("Leave out videos that already have a file in the playlist's folder"));
+    m_skip->setToolTip(tr("Leave out items that already have a file in the playlist's folder"));
     m_skip->setChecked(m_skipDownloaded);
     connect(m_skip, &QCheckBox::toggled, this, &PlaylistPage::setSkipDownloaded);
     layout->addWidget(m_skip);
@@ -396,6 +396,13 @@ void PlaylistPage::openInfo(const core::MediaInfo& info)
     Q_EMIT hasPlaylistChanged(true);
 }
 
+void PlaylistPage::openInfo(const QUrl& playlistUrl, const core::MediaInfo& info)
+{
+    m_url = playlistUrl;
+    m_model->clear();
+    openInfo(info);
+}
+
 void PlaylistPage::showError(const QString& reason)
 {
     m_probeId = 0;
@@ -440,7 +447,7 @@ void PlaylistPage::setState(State state)
         m_status->setText(tr("Reading the playlist"));
         break;
     case State::Empty:
-        m_status->setText(tr("This playlist has no videos"));
+        m_status->setText(tr("This playlist is empty"));
         break;
     case State::Ready:
     case State::Error:
@@ -461,7 +468,7 @@ void PlaylistPage::fillHeader(const QString& title, const QString& channel, cons
     m_channel->setVisible(!channel.isEmpty());
     QString countText;
     if (count >= 0) {
-        countText = count == 1 ? tr("1 video") : tr("%1 videos").arg(count);
+        countText = itemWord(count);
         if (totalDuration > 0) {
             countText += u", "_s + core::formatDuration(totalDuration);
         }
@@ -682,8 +689,7 @@ void PlaylistPage::updateSelectionUi()
     const int selected = selectedCount();
     const int total = m_model->rowCount();
     m_footer->setText(tr("%1 of %2 selected").arg(selected).arg(total));
-    m_download->setText(selected == 1 ? tr("Download 1 video")
-                                      : (selected > 1 ? tr("Download %1 videos").arg(selected) : tr("Download")));
+    m_download->setText(selected > 0 ? tr("Download %1").arg(itemWord(selected)) : tr("Download"));
     if (!busy::isBusy(m_download)) {
         m_download->setEnabled(m_state == State::Ready && selected > 0);
     }
@@ -720,6 +726,14 @@ void PlaylistPage::handleRowAction(const QModelIndex& index, int action)
     } else {
         Q_EMIT videoDownloadRequested(entry);
     }
+}
+
+QString PlaylistPage::itemWord(int count) const
+{
+    if (core::isYouTubeHost(m_url.host())) {
+        return count == 1 ? tr("1 video") : tr("%1 videos").arg(count);
+    }
+    return count == 1 ? tr("1 item") : tr("%1 items").arg(count);
 }
 
 QUrl PlaylistPage::playAllUrl() const

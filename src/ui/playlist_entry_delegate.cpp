@@ -1,5 +1,7 @@
 #include "ui/playlist_entry_delegate.h"
 
+#include "core/youtube_url.h"
+
 #include "core/downloads/media_info.h"
 #include "core/theme/theme_service.h"
 #include "ui/icons.h"
@@ -71,6 +73,18 @@ QSize PlaylistEntryDelegate::sizeHint(const QStyleOptionViewItem& option, const 
 bool PlaylistEntryDelegate::isUnavailableTitle(const QString& title)
 {
     return !unavailableLabel(title).isEmpty();
+}
+
+bool PlaylistEntryDelegate::isUnavailableEntry(const core::MediaEntry& entry)
+{
+    // YouTube's flat shape for a removed video is a marker title, or no title
+    // at all. Another site's flat playlist (a SoundCloud set) lists its
+    // entries by link alone: no title there means nothing, the engine names
+    // the item when it downloads.
+    if (entry.title.trimmed().isEmpty()) {
+        return entry.url.isEmpty() || core::isYouTubeHost(QUrl(entry.url).host());
+    }
+    return isUnavailableTitle(entry.title);
 }
 
 QString PlaylistEntryDelegate::unavailableLabel(const QString& title)
@@ -247,8 +261,8 @@ void PlaylistEntryDelegate::paint(QPainter* painter, const QStyleOptionViewItem&
     const QFontMetrics titleMetrics(titleFont);
     QString title = index.data(TitleRole).toString();
     const QString badge = unavailable ? unavailableLabel(title) : (downloaded ? tr("Downloaded") : QString());
-    if (unavailable && title.trimmed().isEmpty()) {
-        title = tr("Unavailable video");
+    if (title.trimmed().isEmpty()) {
+        title = unavailable ? tr("Unavailable") : tr("Item %1").arg(index.row() + 1);
     }
     const int badgeWidth = badge.isEmpty() ? 0 : smallMetrics.horizontalAdvance(badge) + kBadgePad * 2 + 8;
     const QStringList lines = twoLines(title, titleFont, textWidth - badgeWidth);

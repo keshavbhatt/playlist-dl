@@ -52,7 +52,7 @@ void PlaylistModel::setEntries(const QList<core::MediaEntry>& entries, const QSt
     for (const core::MediaEntry& entry : entries) {
         ++index;
         auto* item = new QStandardItem;
-        const bool unavailable = PlaylistEntryDelegate::isUnavailableTitle(entry.title);
+        const bool unavailable = PlaylistEntryDelegate::isUnavailableEntry(entry);
         const bool downloaded = !unavailable && looksDownloaded(downloadedFiles, entry.id, entry.title);
         item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
         item->setData(index, Role::IndexRole);

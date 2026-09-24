@@ -98,7 +98,7 @@ void SearchPage::buildHeader()
 {
     m_field = new QLineEdit(this);
     m_field->setObjectName(u"queryField"_s);
-    m_field->setPlaceholderText(tr("Search YouTube playlists or paste a link"));
+    m_field->setPlaceholderText(tr("Search YouTube playlists, or paste a playlist link from any site"));
     m_field->setAccessibleName(tr("Search query"));
     m_field->setClearButtonEnabled(true);
     m_field->installEventFilter(this);
@@ -395,6 +395,12 @@ SearchPage::Link SearchPage::linkOf(const QString& text, QUrl* url)
         }
         return Link::Video;
     }
+    if (core::isDownloadable(parsed)) {
+        if (url != nullptr) {
+            *url = parsed;
+        }
+        return Link::Other; // any site: the engine decides
+    }
     return Link::Unsupported;
 }
 
@@ -429,10 +435,14 @@ void SearchPage::search(const QString& text)
         qCInfo(lcUi) << "search: video link" << url.toString();
         Q_EMIT videoRequested(url);
         return;
+    case Link::Other:
+        qCInfo(lcUi) << "search: link on another site" << url.toString();
+        Q_EMIT linkRequested(url);
+        return;
     case Link::Unsupported:
         cancelSearch();
         m_query = trimmed;
-        m_status->setText(tr("That link is not a YouTube playlist or video."));
+        m_status->setText(tr("That is not a link to a page with media."));
         setState(State::Error);
         m_retry->hide();
         return;

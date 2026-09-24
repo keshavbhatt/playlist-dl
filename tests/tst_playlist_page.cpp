@@ -259,6 +259,28 @@ private Q_SLOTS:
         QVERIFY(m_page->skipBox()->isChecked());
     }
 
+    void anotherSitesUntitledEntriesAreItems()
+    {
+        // A SoundCloud set read flat: entries by link alone, no titles.
+        MediaInfo info;
+        info.type = MediaInfo::Type::Playlist;
+        info.id = u"166237090"_s;
+        info.title = u"Sia"_s;
+        info.url = u"https://soundcloud.com/discover/sets/artist-stations:3789802:166237090"_s;
+        for (int i = 0; i < 3; ++i) {
+            MediaEntry e;
+            e.id = QString::number(1000 + i);
+            e.url = u"https://api-v2.soundcloud.com/tracks/"_s + e.id;
+            info.entries << e;
+        }
+        m_page->openInfo(QUrl(info.url), info);
+        QCOMPARE(m_page->model()->rowCount(), 3);
+        QVERIFY(!m_page->model()->isUnavailable(0));
+        QVERIFY(m_page->model()->isChecked(0)); // downloadable like any other
+        QCOMPARE(m_page->downloadButton()->text(), u"Download 3 items"_s);
+        QVERIFY(m_page->titleLabel()->toolTip().contains(u"Sia"_s));
+    }
+
     void emptyLoadingAndErrorStates()
     {
         MediaInfo empty;
@@ -267,7 +289,7 @@ private Q_SLOTS:
         empty.title = u"Nothing here"_s;
         m_page->openInfo(empty);
         QCOMPARE(m_page->state(), State::Empty);
-        QCOMPARE(m_page->statusLabel()->text(), u"This playlist has no videos"_s);
+        QCOMPARE(m_page->statusLabel()->text(), u"This playlist is empty"_s);
         QVERIFY(!m_page->list()->isVisible());
         QVERIFY(!m_page->retryButton()->isVisible());
         QCOMPARE(m_page->countLabel()->text(), u"0 videos"_s);
