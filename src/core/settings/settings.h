@@ -97,6 +97,14 @@ enum class FilenamePattern
     ChannelTitle, ///< Channel - Title.ext
 };
 
+/// Where a playlist search goes (ADR-003): the search service first with
+/// the engine as the fallback, or the engine alone.
+enum class SearchMode
+{
+    Automatic,
+    EngineOnly,
+};
+
 /// Typed facade over QSettings. The only place in the code base allowed to
 /// construct a QSettings. Defaults live in one table (settings.cpp), every
 /// setter emits a change signal so the rest of the app reacts instead of
@@ -204,6 +212,24 @@ public:
     [[nodiscard]] QStringList subtitleLanguages() const;
     void setSubtitleLanguages(const QStringList& languages);
 
+    // search/
+    [[nodiscard]] SearchMode searchMode() const;
+    void setSearchMode(SearchMode mode);
+    /// Results per page of the engine's search, kMinSearchResultsPerPage to kMaxSearchResultsPerPage.
+    [[nodiscard]] int searchResultsPerPage() const;
+    void setSearchResultsPerPage(int count);
+    static constexpr int kMinSearchResultsPerPage = 10;
+    static constexpr int kMaxSearchResultsPerPage = 50;
+    /// Whether the Search page remembers the last queries as chips.
+    [[nodiscard]] bool keepSearchHistory() const;
+    void setKeepSearchHistory(bool enabled);
+    /// The last queries, most recent first, at most kMaxRecentQueries.
+    [[nodiscard]] QStringList recentQueries() const;
+    /// Puts `query` first (dropping an older copy); a blank query is ignored.
+    void addRecentQuery(const QString& query);
+    void clearRecentQueries();
+    static constexpr int kMaxRecentQueries = 8;
+
     // engine/
     [[nodiscard]] bool engineAutoUpdate() const;
     void setEngineAutoUpdate(bool enabled);
@@ -252,6 +278,7 @@ Q_SIGNALS:
     void downloadDefaultsChanged(); ///< any downloads/ default a download sheet reads
     void concurrentDownloadsChanged(int count);
     void speedLimitChanged(int kbps);
+    void searchChanged();       ///< any search/ key
     void engineConfigChanged(); ///< auto-update / system path
     void hardwareAccelerationChanged(pldl::core::HardwareAcceleration mode);
     void hardwareVideoDecodeChanged(bool enabled);
@@ -280,3 +307,4 @@ Q_DECLARE_METATYPE(pldl::core::Container)
 Q_DECLARE_METATYPE(pldl::core::AudioFormat)
 Q_DECLARE_METATYPE(pldl::core::DownloadKind)
 Q_DECLARE_METATYPE(pldl::core::FilenamePattern)
+Q_DECLARE_METATYPE(pldl::core::SearchMode)
