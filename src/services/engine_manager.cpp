@@ -164,7 +164,7 @@ void EngineManager::detect()
     const bool complete = !s.ytdlpPath.isEmpty() && !s.jsRuntime.isEmpty() && !s.ffmpegMissing;
     s.state = complete ? State::Ready : State::NotInstalled;
     if (s.ffmpegMissing) {
-        s.error = tr("The media converter (ffmpeg) is not installed. Red needs it to merge video and audio. "
+        s.error = tr("The media converter (ffmpeg) is not installed. The app needs it to merge video and audio. "
                      "Install it with: %1, then check again.")
                       .arg(core::ffmpegInstallHint());
     }
