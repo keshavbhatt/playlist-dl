@@ -6,6 +6,8 @@
 #include <QPointer>
 #include <QUrl>
 
+#include <functional>
+
 class QStackedWidget;
 class QWebEnginePermission;
 
@@ -13,14 +15,17 @@ namespace pldl::core {
 class ThemeService;
 }
 namespace pldl::services {
+class EngineManager;
 class LicenseService;
-}
+class MediaProbe;
+} // namespace pldl::services
 
 namespace pldl::ui {
 
 class AccountDialog;
 class Actions;
 class BrowserPage;
+class EngineSetupDialog;
 class Page;
 class SideRail;
 class ThemeApplier;
@@ -49,6 +54,17 @@ public:
     ~MainWindow() override;
 
     void start();
+
+    /// The download engine and the probe, shared by the Search (engine
+    /// fallback), Playlist and Downloads pages. Created with the window,
+    /// initialised in start().
+    [[nodiscard]] services::EngineManager& engine() { return *m_engine; }
+    [[nodiscard]] services::MediaProbe& probe() { return *m_probe; }
+    /// Runs `then` once the engine is ready: at once when it is, otherwise
+    /// after the setup sheet has provisioned it (nothing runs when the user
+    /// closes the sheet or the install fails; the sheet shows the error).
+    void ensureEngine(std::function<void()> then);
+    void showEngineSetup();
 
 public Q_SLOTS:
     void showAndRaise();
@@ -101,6 +117,10 @@ private:
     TrayController* m_tray = nullptr;
     ThemeApplier* m_themeApplier = nullptr;
     services::LicenseService* m_license = nullptr;
+    services::EngineManager* m_engine = nullptr;
+    services::MediaProbe* m_probe = nullptr;
+    QPointer<EngineSetupDialog> m_engineSetup;
+    QList<std::function<void()>> m_awaitingEngine;
     QPointer<AccountDialog> m_accountDialog;
     bool m_quitting = false;
     Qt::WindowStates m_stateBeforeFullScreen = Qt::WindowNoState;

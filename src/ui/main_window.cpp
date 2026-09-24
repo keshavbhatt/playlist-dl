@@ -3,11 +3,14 @@
 #include "core/log_sink.h"
 #include "core/theme/theme_service.h"
 #include "platform/file_manager.h"
+#include "services/engine_manager.h"
 #include "services/licensing/license_service.h"
+#include "services/media_probe.h"
 #include "ui/about_dialog.h"
 #include "ui/account_dialog.h"
 #include "ui/actions.h"
 #include "ui/bug_report_dialog.h"
+#include "ui/engine_setup_dialog.h"
 #include "ui/icons.h"
 #include "ui/links.h"
 #include "ui/logging.h"
@@ -29,6 +32,8 @@
 #include <QSessionManager>
 #include <QStackedWidget>
 #include <QTimer>
+
+#include <utility>
 #include <QtEnvironmentVariables>
 
 #include <algorithm>
@@ -79,6 +84,20 @@ void MainWindow::setupUi()
     m_license = new services::LicenseService(m_settings, this);
     connect(m_license, &services::LicenseService::upgradeRequested, this, &MainWindow::promptUpgrade);
     m_tray = new TrayController(m_settings, *m_actions, this);
+
+    m_engine = new services::EngineManager(m_settings, this);
+    m_probe = new services::MediaProbe(this);
+    connect(m_engine, &services::EngineManager::ready, this, [this](const core::EnginePaths& paths) {
+        m_probe->setEnginePaths(paths);
+        const QList<std::function<void()>> waiting = std::exchange(m_awaitingEngine, {});
+        for (const auto& then : waiting) {
+            then();
+        }
+    });
+    connect(m_engine, &services::EngineManager::installFailed, this, [this](const QString& error) {
+        qCWarning(lcUi) << "engine setup failed:" << error;
+        m_awaitingEngine.clear();
+    });
 
     m_pages = new QStackedWidget(this);
     m_search = new Page(tr("Search"), m_theme, this);
@@ -162,10 +181,37 @@ void MainWindow::start()
 {
     show();
     m_license->start();
+    m_engine->initialize();
     QTimer::singleShot(600, this, [this] {
         maybeShowGpuFallbackNotice();
         QTimer::singleShot(3000, this, [this] { maybeShowWhatsNew(); });
     });
+}
+
+// ---- engine ----------------------------------------------------------------
+
+void MainWindow::ensureEngine(std::function<void()> then)
+{
+    if (m_engine->isReady()) {
+        then();
+        return;
+    }
+    m_awaitingEngine.append(std::move(then));
+    showEngineSetup();
+    if (!m_engine->status().isBusy()) {
+        m_engine->install();
+    }
+}
+
+void MainWindow::showEngineSetup()
+{
+    if (m_engineSetup == nullptr) {
+        m_engineSetup = new EngineSetupDialog(*m_engine, m_theme, this);
+        m_engineSetup->setAttribute(Qt::WA_DeleteOnClose);
+    }
+    m_engineSetup->show();
+    m_engineSetup->raise();
+    m_engineSetup->activateWindow();
 }
 
 // ---- pages -----------------------------------------------------------------
