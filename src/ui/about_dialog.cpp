@@ -45,7 +45,7 @@ void AboutDialog::setupUi()
 {
     setWindowTitle(tr("About Playlist Downloader"));
     setModal(true);
-    setMinimumWidth(520);
+    setMinimumWidth(680);
     auto* root = new QVBoxLayout(this);
     root->setContentsMargins(24, 24, 24, 18);
     root->setSpacing(14);
