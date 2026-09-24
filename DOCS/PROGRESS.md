@@ -28,6 +28,9 @@
 
 ### 2026-09-24, M6
 
+- Owner report: signing in to SoundCloud in the built-in browser sent every link off the
+  sign-in page to the system browser. `core::shouldOpenExternally` now keeps all http and
+  https in the app (UMD's rule); only mailto, tel and magnet leave, file: never.
 - UMD change ported (owner request): the page-load progress is a hairline inside the
   address field (`ui::AddressField`), no bar in the layout, so the page never moves; the
   tab's loader glyph turns while the page loads. Both back-ported to the rewrite kit.

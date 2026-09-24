@@ -2,26 +2,41 @@
 
 #include "core/youtube_url.h"
 
+#include <QStringList>
 #include <QUrlQuery>
 
 using namespace Qt::StringLiterals;
 
 namespace pldl::core {
 
+namespace {
+
+bool isWebScheme(const QString& scheme)
+{
+    return scheme == u"http"_s || scheme == u"https"_s;
+}
+
+bool isInternalScheme(const QString& scheme)
+{
+    return scheme == u"data"_s || scheme == u"about"_s || scheme == u"blob"_s || scheme == u"qrc"_s;
+}
+
+} // namespace
+
 bool shouldOpenExternally(const QUrl& url)
 {
     if (!url.isValid() || url.isEmpty()) {
         return false;
     }
-    const QString scheme = url.scheme();
-    if (scheme == u"data"_s || scheme == u"about"_s || scheme == u"blob"_s || scheme == u"qrc"_s) {
+    const QString scheme = url.scheme().toLower();
+    if (isInternalScheme(scheme) || isWebScheme(scheme)) {
         return false;
     }
-    if (scheme != u"http"_s && scheme != u"https"_s) {
-        return true; // mailto:, magnet: … belong to the desktop
-    }
-    const QString host = url.host();
-    return !isYouTubeHost(host) && !isGoogleServiceHost(host);
+    // Only a short list of schemes may leave the app: a page (or an unwrapped
+    // redirect) must not be able to hand file: or an arbitrary protocol
+    // handler to the desktop.
+    static const QStringList kAllowed{u"mailto"_s, u"tel"_s, u"magnet"_s};
+    return kAllowed.contains(scheme);
 }
 
 bool isInAppPopupUrl(const QUrl& url)
@@ -29,7 +44,8 @@ bool isInAppPopupUrl(const QUrl& url)
     if (url.isEmpty()) {
         return true; // about:blank pop-ups decide on their first navigation
     }
-    return isGoogleServiceHost(url.host()) || isYouTubeHost(url.host());
+    const QString scheme = url.scheme().toLower();
+    return isWebScheme(scheme) || isInternalScheme(scheme);
 }
 
 QUrl unwrapRedirect(const QUrl& url)

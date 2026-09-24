@@ -2,18 +2,20 @@
 
 #include <QUrl>
 
-// Pure navigation rules (FEATURES S11): what stays in the app and what goes
-// to the system browser.
+// Pure navigation rules (FEATURES W1): what stays in the app and what goes to
+// the desktop. The built-in browser is general purpose, so every web page
+// stays in it; the owner signed in to SoundCloud and every link off the
+// sign-in page left for the system browser under the old YouTube-only rule.
 namespace pldl::core {
 
-/// True for links that should open in the system browser: anything that is
-/// neither YouTube nor a Google service host (sign-in, consent, CDN).
+/// True only for the few non-web schemes the desktop handles (mailto, tel,
+/// magnet). http and https never leave the app.
 [[nodiscard]] bool shouldOpenExternally(const QUrl& url);
 
-/// True for pop-ups that must stay in-app (Google sign-in windows).
+/// True for pop-ups that stay in-app: any web page (sign-in windows included).
 [[nodiscard]] bool isInAppPopupUrl(const QUrl& url);
 
-/// Rewrites YouTube's redirect wrapper (youtube.com/redirect?q=…) to its target.
+/// Rewrites YouTube's redirect wrapper (youtube.com/redirect?q=...) to its target.
 [[nodiscard]] QUrl unwrapRedirect(const QUrl& url);
 
 } // namespace pldl::core
