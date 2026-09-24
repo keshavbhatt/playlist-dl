@@ -124,6 +124,49 @@ private Q_SLOTS:
         QVERIFY(!controller->writePlaylistFileFor(43)); // no such job
     }
 
+    void removeAsksAndCanDeleteTheFiles()
+    {
+        auto controller = makeController();
+        QTemporaryDir folder;
+        QVERIFY(folder.isValid());
+        pldl::core::DownloadJob job;
+        job.id = 77;
+        job.title = u"Done"_s;
+        job.options.outputDirectory = folder.path();
+        const QString file = folder.filePath(u"done.mp4"_s);
+        QFile f(file);
+        QVERIFY(f.open(QIODevice::WriteOnly));
+        f.close();
+        job.outputFiles << file;
+        job.state = pldl::core::DownloadState::Completed;
+        controller->queue().setJobs({job});
+        // Remove on a job with a file asks; the list is untouched meanwhile.
+        controller->handleCardAction(77, pldl::ui::DownloadCardDelegate::Action::Remove);
+        QVERIFY(controller->removeSheet() != nullptr);
+        QVERIFY(controller->queue().job(77));
+        controller->removeSheet()->reject();
+        QTRY_VERIFY(controller->removeSheet() == nullptr);
+        QVERIFY(controller->queue().job(77));
+        QVERIFY(QFile::exists(file));
+        // Removed from the list, the file stays.
+        controller->removeJob(77, false);
+        QVERIFY(!controller->queue().job(77));
+        QVERIFY(QFile::exists(file));
+        // Back in, then removed with the file.
+        controller->queue().setJobs({job});
+        controller->removeJob(77, true);
+        QVERIFY(!controller->queue().job(77));
+        QVERIFY(!QFile::exists(file));
+        // Nothing on disk and not running: removed without asking.
+        pldl::core::DownloadJob bare;
+        bare.id = 78;
+        bare.state = pldl::core::DownloadState::Failed;
+        controller->queue().setJobs({bare});
+        controller->handleCardAction(78, pldl::ui::DownloadCardDelegate::Action::Remove);
+        QVERIFY(controller->removeSheet() == nullptr);
+        QVERIFY(!controller->queue().job(78));
+    }
+
     void defaultOptionsFollowTheSettings()
     {
         m_settings->setLastDownloadKind(pldl::core::DownloadKind::Audio);

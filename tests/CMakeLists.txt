@@ -89,4 +89,5 @@ pldl_add_test(tst_playlist_entry_delegate tst_playlist_entry_delegate.cpp pldl_u
 pldl_add_test(tst_playlist_page       tst_playlist_page.cpp       pldl_ui GUI)
 pldl_add_test(tst_download_options_sheet tst_download_options_sheet.cpp pldl_ui GUI)
 pldl_add_test(tst_playlist_file        tst_playlist_file.cpp        pldl_core)
+pldl_add_test(tst_job_files            tst_job_files.cpp            pldl_core)
 pldl_add_test(tst_playlist_items_sheet tst_playlist_items_sheet.cpp pldl_ui GUI)

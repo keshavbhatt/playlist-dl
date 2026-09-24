@@ -58,7 +58,8 @@ play one, show it in the folder, untick the ones to leave out, arrange or shuffl
 **Play all** writes a playlist file
 (.m3u8) next to the videos and opens it in your media player. The file is also written when
 the playlist finishes downloading (Settings, Downloads, Write a playlist file). Hover a card for pause or resume, cancel, retry, open,
-show in folder and remove. The filters show active, finished or failed downloads; the
+show in folder and remove. Removing a download that has files asks whether to keep them or
+delete them too. The filters show active, finished or failed downloads; the
 Clear menu removes finished or failed ones; Open folder opens your download folder.
 
 On the free version a chip next to the page title counts today's remaining downloads.

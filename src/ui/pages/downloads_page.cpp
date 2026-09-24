@@ -440,28 +440,9 @@ void DownloadsPage::removeCurrent()
     if (!current.isValid()) {
         return;
     }
-    const quint64 id = current.data(core::DownloadQueue::IdRole).toULongLong();
-    const auto state = current.data(core::DownloadQueue::StateRole).value<core::DownloadState>();
-    if (core::isFinishedState(state)) {
-        m_controller.handleCardAction(id, DownloadCardDelegate::Action::Remove);
-        return;
-    }
-    if (m_removeSheet != nullptr) {
-        return;
-    }
-    auto* sheet = new MessageSheet(window(), MessageSheet::Tone::Danger, tr("Remove this download?"),
-                                   tr("It has not finished. Removing it stops the transfer; whatever has "
-                                      "arrived stays in the download folder."));
-    sheet->setAttribute(Qt::WA_DeleteOnClose);
-    sheet->addButton(tr("Keep"));
-    sheet->addButton(tr("Remove"), MessageSheet::Role::Destructive);
-    connect(sheet, &QDialog::finished, this, [this, sheet, id](int) {
-        if (sheet->clickedIndex() == 1) {
-            m_controller.handleCardAction(id, DownloadCardDelegate::Action::Remove);
-        }
-    });
-    m_removeSheet = sheet;
-    sheet->open();
+    // The controller asks when something is running or on disk.
+    m_controller.handleCardAction(current.data(core::DownloadQueue::IdRole).toULongLong(),
+                                  DownloadCardDelegate::Action::Remove);
 }
 
 bool DownloadsPage::eventFilter(QObject* watched, QEvent* event)

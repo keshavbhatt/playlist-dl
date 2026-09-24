@@ -16,6 +16,8 @@ qt_add_library(pldl_core STATIC
     downloads/download_runner.h
     downloads/engine_spec.cpp
     downloads/engine_spec.h
+    downloads/job_files.cpp
+    downloads/job_files.h
     downloads/media_info.cpp
     downloads/playlist_file.cpp
     downloads/playlist_file.h

@@ -11,6 +11,7 @@
 #include "ui/badge_label.h"
 #include "ui/downloads_controller.h"
 #include "ui/pages/downloads_page.h"
+#include "ui/message_sheet.h"
 #include "web/cookie_exporter.h"
 
 #include <QApplication>
@@ -218,6 +219,7 @@ private Q_SLOTS:
         list->setCurrentIndex(list->model()->index(0, 0));
         QTest::keyClick(list, Qt::Key_Delete);
         QCOMPARE(m_controller->queue().rowCount(), 5);
+        QVERIFY(m_controller->removeSheet() != nullptr);
         for (QWidget* top : QApplication::topLevelWidgets()) {
             if (top != m_page.get() && top->isWindow() && top->isVisible()) {
                 top->close();

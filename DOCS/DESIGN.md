@@ -159,7 +159,9 @@ The 2.x download widget rebuilt as a page:
   playlist entries or the channel for single videos, quality and format line, progress bar
   (`accent` chunk on `border` track) with "12.4 MB of 118 MB, 3.2 MB/s, 00:32" or
   "Merging", "Finished, 118 MB", "Failed, reason". Hover actions: pause or resume, cancel,
-  open, show in folder, retry, remove. Double click opens the file.
+  open, show in folder, retry, remove. Double click opens the file. Remove on a download that
+  is running or has files asks: Keep, Remove from list, or Delete the files too (owner
+  request, 2026-09-24); a playlist's own folder goes with its files when it is left empty.
 - A playlist is one card with the aggregate progress and the current entry. Open on it
   shows the **Playlist items** sheet (owner, 2026-09-24): every entry with its state
   (downloaded, not downloaded, file missing) and a check box to leave it out (Select all

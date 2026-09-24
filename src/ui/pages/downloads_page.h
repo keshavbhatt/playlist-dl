@@ -110,7 +110,6 @@ private:
     QLabel* m_emptyMark = nullptr;
     QLabel* m_emptyTitle = nullptr;
     QLabel* m_emptyBody = nullptr;
-    QPointer<MessageSheet> m_removeSheet;
     services::EngineManager::Status m_engine;
 };
 

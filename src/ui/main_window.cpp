@@ -771,6 +771,9 @@ void MainWindow::debugOpen(const QString& what)
         showPage(PageId::Browser);
     } else if (what == u"downloads"_s) {
         showPage(PageId::Downloads);
+    } else if (what.startsWith(u"remove:"_s)) {
+        showPage(PageId::Downloads);
+        m_downloadsController->handleCardAction(what.mid(7).toULongLong(), DownloadCardDelegate::Action::Remove);
     } else if (what.startsWith(u"playlist-items:"_s)) {
         showPage(PageId::Downloads);
         showPlaylistItems(what.mid(15).toULongLong());

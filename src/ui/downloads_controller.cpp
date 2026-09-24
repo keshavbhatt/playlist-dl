@@ -1,6 +1,7 @@
 #include "ui/downloads_controller.h"
 
 #include "core/downloads/download_queue.h"
+#include "core/downloads/job_files.h"
 #include "core/downloads/playlist_file.h"
 #include "core/notifications/notification_service.h"
 #include "core/settings/settings.h"
@@ -430,8 +431,80 @@ void DownloadsController::handleCardAction(quint64 id, Action action)
         }
         break;
     case Action::Remove:
-        m_queue->remove(id);
+        // Nothing on disk and nothing running: gone at once. Otherwise ask,
+        // and offer to delete what the download left behind (owner request).
+        if (core::job_files::existingFiles(*job).isEmpty() && !job->isActive() &&
+            job->state != core::DownloadState::Queued) {
+            m_queue->remove(id);
+        } else {
+            confirmRemove(*job);
+        }
         break;
+    }
+}
+
+void DownloadsController::confirmRemove(const core::DownloadJob& job)
+{
+    if (m_removeSheet != nullptr) {
+        return;
+    }
+    const QStringList files = core::job_files::existingFiles(job);
+    const bool running = job.isActive() || job.state == core::DownloadState::Queued;
+    QString body;
+    if (running) {
+        body = tr("It has not finished. Removing it stops the transfer.");
+    }
+    if (!files.isEmpty()) {
+        const QString folder = QFileInfo(files.first()).absolutePath();
+        const QString count = files.size() == 1 ? tr("1 file is") : tr("%1 files are").arg(files.size());
+        body += (body.isEmpty() ? QString() : u" "_s) + tr("%1 in %2.").arg(count, folder);
+    }
+    const quint64 id = job.id;
+    auto* sheet = new MessageSheet(m_sheetParent, MessageSheet::Tone::Danger, tr("Remove this download?"), body);
+    sheet->setObjectName(u"removeSheet"_s);
+    sheet->setAttribute(Qt::WA_DeleteOnClose);
+    sheet->addButton(tr("Keep"));
+    sheet->addButton(files.isEmpty() ? tr("Remove") : tr("Remove from list"), files.isEmpty()
+                                                                                    ? MessageSheet::Role::Destructive
+                                                                                    : MessageSheet::Role::Normal);
+    if (!files.isEmpty()) {
+        sheet->addButton(tr("Delete the files too"), MessageSheet::Role::Destructive);
+    }
+    connect(sheet, &QDialog::finished, this, [this, sheet, id](int) {
+        const int clicked = sheet->clickedIndex();
+        if (clicked == 1) {
+            removeJob(id, false);
+        } else if (clicked == 2) {
+            removeJob(id, true);
+        }
+    });
+    m_removeSheet = sheet;
+    sheet->open();
+}
+
+void DownloadsController::removeJob(quint64 id, bool deleteFiles)
+{
+    const auto job = m_queue->job(id);
+    if (!job) {
+        return;
+    }
+    // Stop the transfer first so nothing is written after the delete.
+    m_queue->remove(id);
+    if (!deleteFiles) {
+        Q_EMIT toast(tr("Removed from the list"));
+        return;
+    }
+    const core::job_files::Removal removal = core::job_files::removeJobFiles(*job);
+    qCInfo(lcUi) << "removed job" << id << "files deleted" << removal.filesRemoved << "failed" << removal.filesFailed
+                 << "folder" << removal.folderRemoved;
+    if (removal.filesFailed > 0) {
+        Q_EMIT toast(tr("Removed; %1 of %2 files could not be deleted")
+                         .arg(removal.filesFailed)
+                         .arg(removal.filesRemoved + removal.filesFailed));
+    } else if (removal.filesRemoved == 1) {
+        Q_EMIT toast(tr("Removed and 1 file deleted"));
+    } else {
+        Q_EMIT toast(tr("Removed and %1 files deleted").arg(removal.filesRemoved));
     }
 }
 

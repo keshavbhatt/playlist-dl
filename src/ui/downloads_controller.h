@@ -88,6 +88,11 @@ public:
     void cancelRequests();
     void openDownloadFolder();
     void handleCardAction(quint64 id, Action action);
+    /// Removes the job from the list; with `deleteFiles` its files, playlist
+    /// file and (when left empty) its own folder go too.
+    void removeJob(quint64 id, bool deleteFiles);
+    /// The sheet asking whether to keep the files, while it is open (tests).
+    [[nodiscard]] MessageSheet* removeSheet() const { return m_removeSheet.data(); }
     /// Writes the playlist file (.m3u8) for a playlist job that has files, when
     /// the setting is on; false when nothing was written. Called as jobs finish.
     bool writePlaylistFileFor(quint64 id);
@@ -129,6 +134,7 @@ private:
     [[nodiscard]] static int itemsOf(const core::DownloadJob& job);
     [[nodiscard]] bool alreadyQueued(const core::DownloadJob& job) const;
     void showLimitSheet(int requested, int remaining, QWidget* parent);
+    void confirmRemove(const core::DownloadJob& job);
     void applySpeedLimit(core::DownloadJob& job) const;
 
     core::Settings& m_settings;
@@ -150,6 +156,7 @@ private:
     QHash<QString, QList<quint64>> m_awaitingThumbnail;  ///< url to jobs waiting for keep()
     QHash<quint64, QUrl> m_pendingProbes;                ///< probe id to the requested url
     QPointer<MessageSheet> m_limitSheet;
+    QPointer<MessageSheet> m_removeSheet;
 };
 
 } // namespace pldl::ui

@@ -28,6 +28,9 @@
 
 ### 2026-09-24, M6
 
+- Owner request: Remove on a download that is running or has files asks Keep, Remove from
+  list or Delete the files too (`core::job_files`, the controller's one sheet; the page's
+  own confirm is gone).
 - Owner request: Shuffle on the playlist items sheet puts the items in a random order (never
   the one shown); Original restores the playlist's order; unticked items stay unticked.
 
