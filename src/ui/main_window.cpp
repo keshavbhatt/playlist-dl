@@ -1,7 +1,9 @@
 #include "ui/main_window.h"
 
+#include "core/downloads/media_info.h"
 #include "core/log_sink.h"
 #include "core/theme/theme_service.h"
+#include "core/youtube_url.h"
 #include "platform/file_manager.h"
 #include "services/engine_manager.h"
 #include "services/licensing/license_service.h"
@@ -10,6 +12,7 @@
 #include "ui/account_dialog.h"
 #include "ui/actions.h"
 #include "ui/bug_report_dialog.h"
+#include "ui/download_options_sheet.h"
 #include "ui/downloads_controller.h"
 #include "ui/diagnostics.h"
 #include "ui/engine_setup_dialog.h"
@@ -20,6 +23,7 @@
 #include "ui/pages/browser_page.h"
 #include "ui/pages/downloads_page.h"
 #include "ui/pages/page.h"
+#include "ui/pages/playlist_page.h"
 #include "ui/pages/search_page.h"
 #include "ui/permission_prompt.h"
 #include "ui/plans_dialog.h"
@@ -119,6 +123,9 @@ void MainWindow::setupUi()
         if (m_search != nullptr) {
             m_search->retryPending(); // a search waiting for the engine fails with a message
         }
+        if (m_playlist != nullptr && m_playlist->state() == PlaylistPage::State::Loading) {
+            m_playlist->showError(tr("The download engine could not be set up."));
+        }
     });
 
     m_pages = new QStackedWidget(this);
@@ -128,6 +135,8 @@ void MainWindow::setupUi()
     m_downloadsController = new DownloadsController(m_settings, m_theme, *m_engine, *m_probe, *m_license,
                                                     m_browser->profile().cookies(), this, this);
     m_search = new SearchPage(m_settings, m_theme, m_downloadsController->thumbnails(), this);
+    connect(m_search, &SearchPage::playlistChosen, this,
+            [this](const services::SearchResult& result) { m_knownPlaylist = result; });
     connect(m_search, &SearchPage::playlistRequested, this, &MainWindow::openPlaylist);
     connect(m_search, &SearchPage::videoRequested, this,
             [this](const QUrl& url) { openUrl(url.toString()); });
@@ -138,8 +147,42 @@ void MainWindow::setupUi()
         });
     });
     connect(m_engine, &services::EngineManager::ready, m_search, &SearchPage::setEnginePaths);
-    m_playlist = new Page(tr("Playlist"), m_theme, this);
-    m_playlist->setPlaceholder(tr("A playlist's entries, ready to play or download. Coming soon."));
+    m_playlist = new PlaylistPage(m_settings, m_theme, *m_probe, m_downloadsController->thumbnails(), this);
+    connect(m_playlist, &PlaylistPage::backRequested, this, [this] { showPage(PageId::Search); });
+    connect(m_playlist, &PlaylistPage::playRequested, this, [this](const QUrl& url) { openUrl(url.toString()); });
+    connect(m_playlist, &PlaylistPage::toast, this, &MainWindow::toast);
+    connect(m_playlist, &PlaylistPage::hasPlaylistChanged, m_actions->playlist, &QAction::setEnabled);
+    connect(m_playlist, &PlaylistPage::engineNeeded, this, [this] { ensureEngine([this] { m_playlist->reload(); }); });
+    connect(m_playlist, &PlaylistPage::downloadRequested, this, &MainWindow::openPlaylistOptions);
+    connect(m_playlist, &PlaylistPage::videoDownloadRequested, this,
+            [this](const core::MediaEntry& entry) { openVideoOptions(QUrl(entry.url)); });
+    m_actions->playlist->setEnabled(false);
+    // The answers to openVideoOptions' probes: the sheet, or a toast.
+    connect(m_probe, &services::MediaProbe::finished, this, [this](quint64 id, const core::MediaInfo& info) {
+        if (!m_videoProbes.contains(id)) {
+            return;
+        }
+        const QUrl probed = m_videoProbes.take(id);
+        core::MediaEntry entry;
+        entry.id = info.id;
+        entry.url = probed.toString();
+        entry.title = info.title;
+        entry.uploader = info.uploader;
+        entry.thumbnail = info.thumbnail;
+        entry.duration = info.duration;
+        auto* sheet = new DownloadOptionsSheet(m_settings, m_theme, this);
+        sheet->setVideo(entry, probed);
+        connect(sheet, &QDialog::finished, this, [this] { m_browser->setDownloadBusy(false); });
+        showOptionsSheet(sheet);
+    });
+    connect(m_probe, &services::MediaProbe::failed, this, [this](quint64 id, const QString& error) {
+        if (!m_videoProbes.contains(id)) {
+            return;
+        }
+        m_videoProbes.remove(id);
+        toast(tr("Could not read that link: %1").arg(error));
+        m_browser->setDownloadBusy(false);
+    });
     m_downloads = new DownloadsPage(*m_downloadsController, m_settings, m_theme, this);
     for (QWidget* page : {static_cast<QWidget*>(m_search), static_cast<QWidget*>(m_playlist),
                           static_cast<QWidget*>(m_browser), static_cast<QWidget*>(m_downloads)}) {
@@ -190,14 +233,33 @@ void MainWindow::connectActions()
     connect(m_browser, &BrowserPage::renderProcessGaveUp, this, &MainWindow::handleRenderProcessGaveUp);
     connect(m_browser, &BrowserPage::fullScreenChanged, this, &MainWindow::setBrowserFullScreen);
     connect(m_browser, &BrowserPage::permissionPromptRequested, this, &MainWindow::handlePermissionPrompt);
-    // Download this: the link is probed and queued with the defaults; the
-    // browser's busy button is released when the request settles.
+    // Download this (FEATURES W3): a playlist page lands on the Playlist
+    // page, a video goes through the options sheet, anything else is probed
+    // and queued with the defaults. The browser's busy button is released
+    // when the request settles.
     connect(m_browser, &BrowserPage::downloadRequested, this, [this](const QUrl& url) {
+        const core::YouTubeUrlKind kind = core::classifyYouTubeUrl(url).kind;
+        if (kind == core::YouTubeUrlKind::Playlist) {
+            m_browser->setDownloadBusy(false);
+            openPlaylist(url);
+            return;
+        }
         m_browser->setDownloadBusy(true);
+        if (kind == core::YouTubeUrlKind::Video) {
+            ensureEngine([this, url] { openVideoOptions(url); });
+            return;
+        }
         ensureEngine([this, url] { m_downloadsController->requestDownload(url); });
     });
-    connect(m_browser, &BrowserPage::cancelDownloadRequested, m_downloadsController,
-            &DownloadsController::cancelRequests);
+    connect(m_browser, &BrowserPage::cancelDownloadRequested, this, [this] {
+        m_downloadsController->cancelRequests();
+        const QList<quint64> ids = m_videoProbes.keys();
+        for (const quint64 id : ids) {
+            m_probe->cancel(id);
+            m_videoProbes.remove(id);
+        }
+        m_browser->setDownloadBusy(false);
+    });
     connect(m_downloadsController, &DownloadsController::requestSettled, this,
             [this](const QUrl&, bool) { m_browser->setDownloadBusy(false); });
     connect(m_engine, &services::EngineManager::installFailed, this, [this] { m_browser->setDownloadBusy(false); });
@@ -290,9 +352,15 @@ void MainWindow::openUrl(const QString& url)
 
 void MainWindow::openPlaylist(const QUrl& url)
 {
-    // TODO(playlist page): hand the url to the Playlist page once it lands; the
-    // placeholder page is shown for now.
     qCInfo(lcUi) << "playlist requested:" << url.toString();
+    // The Search page says which card was chosen right before it asks; that
+    // card's data fills the header while the playlist is read.
+    std::optional<services::SearchResult> known;
+    if (m_knownPlaylist && QUrl(m_knownPlaylist->url) == url) {
+        known = m_knownPlaylist;
+    }
+    m_knownPlaylist.reset();
+    m_playlist->open(url, known);
     showPage(PageId::Playlist);
 }
 
@@ -303,9 +371,60 @@ void MainWindow::downloadUrl(const QString& url)
     }
     qCInfo(lcUi) << "download requested:" << url;
     showAndRaise();
-    showPage(PageId::Downloads);
     const QUrl link = QUrl::fromUserInput(url.trimmed());
+    switch (core::classifyYouTubeUrl(link).kind) {
+    case core::YouTubeUrlKind::Playlist:
+        openPlaylist(link);
+        return;
+    case core::YouTubeUrlKind::Video:
+        ensureEngine([this, link] { openVideoOptions(link); });
+        return;
+    case core::YouTubeUrlKind::Channel:
+    case core::YouTubeUrlKind::Other:
+    case core::YouTubeUrlKind::NotYouTube:
+        break;
+    }
+    showPage(PageId::Downloads);
     ensureEngine([this, link] { m_downloadsController->requestDownload(link); });
+}
+
+// ---- download options ------------------------------------------------------
+
+void MainWindow::showOptionsSheet(DownloadOptionsSheet* sheet)
+{
+    sheet->setAttribute(Qt::WA_DeleteOnClose);
+    connect(sheet, &QDialog::accepted, this, [this, sheet] {
+        if (m_downloadsController->enqueue(sheet->job()) != 0) {
+            showPage(PageId::Downloads);
+        }
+    });
+    sheet->open();
+}
+
+void MainWindow::openPlaylistOptions(const core::MediaInfo& info, const QList<int>& indexes)
+{
+    if (indexes.isEmpty()) {
+        return;
+    }
+    ensureEngine([this, info, indexes] {
+        auto* sheet = new DownloadOptionsSheet(m_settings, m_theme, this);
+        sheet->setPlaylist(info, indexes);
+        showOptionsSheet(sheet);
+    });
+}
+
+void MainWindow::openVideoOptions(const QUrl& url)
+{
+    const std::optional<QUrl> canonical = core::canonicalVideoUrl(url);
+    const QUrl link = canonical ? *canonical : url;
+    if (!m_probe->hasEngine()) {
+        toast(tr("The download engine is not ready yet."));
+        m_browser->setDownloadBusy(false);
+        return;
+    }
+    const quint64 id = m_probe->probe(link, false);
+    m_videoProbes.insert(id, link);
+    qCInfo(lcUi) << "video options: probing" << link << "probe" << id;
 }
 
 void MainWindow::showPlans()
@@ -544,6 +663,24 @@ void MainWindow::debugOpen(const QString& what)
         m_search->showResults(SearchPage::demoResults(), true, services::PlaylistSearch::Source::Service);
     } else if (what == u"playlist"_s) {
         showPage(PageId::Playlist);
+    } else if (what.startsWith(u"playlist:"_s)) {
+        openPlaylist(QUrl::fromUserInput(what.mid(9)));
+    } else if (what == u"playlist-demo"_s) {
+        m_playlist->openInfo(PlaylistPage::demoInfo());
+        showPage(PageId::Playlist);
+    } else if (what == u"options-demo"_s) {
+        m_playlist->openInfo(PlaylistPage::demoInfo());
+        showPage(PageId::Playlist);
+        auto* sheet = new DownloadOptionsSheet(m_settings, m_theme, this);
+        sheet->setPlaylist(PlaylistPage::demoInfo(), {1, 2, 3, 5, 6});
+        showOptionsSheet(sheet);
+    } else if (what == u"options-video-demo"_s) {
+        m_playlist->openInfo(PlaylistPage::demoInfo());
+        showPage(PageId::Playlist);
+        auto* sheet = new DownloadOptionsSheet(m_settings, m_theme, this);
+        const core::MediaEntry entry = PlaylistPage::demoInfo().entries.first();
+        sheet->setVideo(entry, QUrl(entry.url));
+        showOptionsSheet(sheet);
     } else if (what == u"browser"_s) {
         showPage(PageId::Browser);
     } else if (what == u"downloads"_s) {

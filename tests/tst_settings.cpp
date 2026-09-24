@@ -58,12 +58,21 @@ private Q_SLOTS:
         QCOMPARE(m_settings->defaultAudioFormat(), AudioFormat::Best);
         QCOMPARE(m_settings->lastDownloadKind(), DownloadKind::Video);
         QCOMPARE(m_settings->filenamePattern(), FilenamePattern::Title);
+        QCOMPARE(m_settings->defaultAudioBitrate(), 0);
+        QVERIFY(m_settings->numberPlaylistFiles());
+        QSignalSpy defaults(m_settings.get(), &Settings::downloadDefaultsChanged);
+        m_settings->setDefaultAudioBitrate(192);
+        QCOMPARE(m_settings->defaultAudioBitrate(), 192);
+        m_settings->setDefaultAudioBitrate(-5); // clamped to "best"
+        QCOMPARE(m_settings->defaultAudioBitrate(), 0);
+        m_settings->setNumberPlaylistFiles(false);
+        QVERIFY(!m_settings->numberPlaylistFiles());
+        m_settings->setNumberPlaylistFiles(false);
+        QCOMPARE(defaults.count(), 3);
         QVERIFY(m_settings->engineAutoUpdate());
         QVERIFY(!m_settings->engineUseSystem());
         QCOMPARE(m_settings->startPage(), StartPage::Search);
         QVERIFY(m_settings->showWhatsNew());
-        QVERIFY(m_settings->numberPlaylistFiles());
-        QCOMPARE(m_settings->defaultAudioBitrate(), 0);
         QVERIFY(m_settings->skipExisting());
     }
 

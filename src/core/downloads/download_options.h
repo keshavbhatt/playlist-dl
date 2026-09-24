@@ -42,6 +42,12 @@ struct DownloadOptions
     QString playlistItems; ///< yt-dlp item spec ("1,3-5"); empty = all
     bool isPlaylist = false;
     bool isChannel = false; ///< the playlist is a channel: its folder takes the channel's name
+    /// Playlists: every file starts with its playlist index ("001 - "); off keeps the plain name.
+    bool numberPlaylistItems = true;
+    /// Playlists: a `%(playlist_title)s` folder under `folder`, for the paths with no title in
+    /// hand (the CLI, a pasted link). The options sheet puts the sanitised title into `folder`
+    /// itself and turns this off.
+    bool playlistSubfolder = true;
     int speedLimitKbps = 0;
 
     [[nodiscard]] QJsonObject toJson() const;
@@ -68,9 +74,10 @@ struct EnginePaths
 [[nodiscard]] QString downloadFolder(DownloadOptions::Kind kind, bool playlist, bool channel);
 /// The container extension the options will produce ("mp4", "mp3", …), for the preview.
 [[nodiscard]] QString expectedExtension(const DownloadOptions& options);
-/// A filename preview for the dialog ("Title [id].mp4").
+/// A filename preview for the dialog ("Title [id].mp4"); `playlistIndex` (1-based) adds the
+/// "001 - " prefix a numbered playlist file gets.
 [[nodiscard]] QString previewFileName(const DownloadOptions& options, const QString& title, const QString& id,
-                                      const QString& uploader);
+                                      const QString& uploader, int playlistIndex = 0);
 
 /// The full argv (without the program) for one download of `url`. With
 /// `thumbnailTemplate` (an output template such as "/dir/42.%(ext)s") the
@@ -90,6 +97,11 @@ inline constexpr QLatin1StringView kProgressPrefix{"RED:"};
 inline constexpr QLatin1StringView kPostprocessPrefix{"REDPP:"};
 inline constexpr QLatin1StringView kItemPrefix{"REDITEM:"};
 inline constexpr QLatin1StringView kFilePrefix{"REDFILE:"};
+
+/// A playlist title as a folder name: `/`, `\`, `:` and the characters no
+/// file system takes become `_`, control characters go, the result is trimmed
+/// and cut at 120 characters; "Playlist" when nothing is left (FEATURES O4).
+[[nodiscard]] QString sanitiseFolderName(QString title);
 
 [[nodiscard]] QString qualityLabel(VideoQuality quality);
 [[nodiscard]] int qualityHeight(VideoQuality quality); ///< 0 for Best

@@ -1,13 +1,17 @@
 #pragma once
 
 #include "core/downloads/download_job.h"
+#include "core/downloads/media_info.h"
 #include "core/settings/settings.h"
+#include "services/search_service.h"
 
+#include <QHash>
 #include <QMainWindow>
 #include <QPointer>
 #include <QUrl>
 
 #include <functional>
+#include <optional>
 
 class QStackedWidget;
 class QWebEnginePermission;
@@ -26,11 +30,13 @@ namespace pldl::ui {
 class AccountDialog;
 class Actions;
 class BrowserPage;
+class DownloadOptionsSheet;
 class DownloadsController;
 class DownloadsPage;
 class EngineSetupDialog;
 class Page;
 class PlansDialog;
+class PlaylistPage;
 class SearchPage;
 class SettingsDialog;
 class SideRail;
@@ -41,8 +47,9 @@ class TrayController;
 
 /// Top-level window (DESIGN.md section 2): rail | page stack. Owns the pages
 /// and the window-level behaviours (page switching, close-to-tray, browser
-/// full screen, permission prompts). The Search, Playlist and Downloads pages
-/// are placeholders until their own classes land; the Browser page is real.
+/// full screen, permission prompts), and runs the download flow between the
+/// pages: a playlist lands on the Playlist page, a video goes through the
+/// Download options sheet into the queue.
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -107,8 +114,12 @@ public Q_SLOTS:
     /// "search:<query>" (types and searches), "search-engine:<query>" (the
     /// same with the engine forced), "search-typing:<text>" (typed, with
     /// the suggestions), "search-demo" (canned results), "downloads-demo"
-    /// (the Downloads page with one canned job per state), or a page name
-    /// ("search", "playlist", "browser", "downloads").
+    /// (the Downloads page with one canned job per state), "playlist:<url>"
+    /// (opens and reads that playlist), "playlist-demo" (a canned playlist,
+    /// no engine), "options-demo" (the options sheet on the canned playlist
+    /// with five entries chosen), "options-video-demo" (the sheet on one
+    /// canned video), or a page name ("search", "playlist", "browser",
+    /// "downloads").
     void debugOpen(const QString& what);
     void quit();
 
@@ -139,6 +150,13 @@ private:
     void handleRenderProcessGaveUp();
     /// One canned job per state for the "downloads-demo" grab.
     [[nodiscard]] static QList<core::DownloadJob> demoDownloads();
+    /// The Playlist page's Download: the engine, the sheet, the queue.
+    void openPlaylistOptions(const core::MediaInfo& info, const QList<int>& indexes);
+    /// One video (a row's download, a pasted or browsed video link): the
+    /// engine, a full probe, the sheet, the queue. The browser's busy button
+    /// is released when the probe answers or the sheet closes.
+    void openVideoOptions(const QUrl& url);
+    void showOptionsSheet(DownloadOptionsSheet* sheet);
 
     core::Settings& m_settings;
     core::ThemeService& m_theme;
@@ -147,7 +165,9 @@ private:
     SideRail* m_rail = nullptr;
     QStackedWidget* m_pages = nullptr;
     SearchPage* m_search = nullptr;
-    Page* m_playlist = nullptr;
+    PlaylistPage* m_playlist = nullptr;
+    std::optional<services::SearchResult> m_knownPlaylist; ///< the card chosen on Search, for the header
+    QHash<quint64, QUrl> m_videoProbes;                    ///< openVideoOptions probes in flight
     BrowserPage* m_browser = nullptr;
     DownloadsPage* m_downloads = nullptr;
     DownloadsController* m_downloadsController = nullptr;

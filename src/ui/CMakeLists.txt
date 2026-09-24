@@ -22,6 +22,8 @@ qt_add_library(pldl_ui STATIC
     diagnostics.h
     download_card_delegate.cpp
     download_card_delegate.h
+    download_options_sheet.cpp
+    download_options_sheet.h
     downloads_controller.cpp
     downloads_controller.h
     downloads_filter_proxy.cpp
@@ -49,12 +51,18 @@ qt_add_library(pldl_ui STATIC
     pages/downloads_page.h
     pages/page.cpp
     pages/page.h
+    pages/playlist_page.cpp
+    pages/playlist_page.h
     pages/search_page.cpp
     pages/search_page.h
     permission_prompt.cpp
     permission_prompt.h
     plans_dialog.cpp
     plans_dialog.h
+    playlist_entry_delegate.cpp
+    playlist_entry_delegate.h
+    playlist_model.cpp
+    playlist_model.h
     pldl_style.cpp
     pldl_style.h
     range_slider.cpp

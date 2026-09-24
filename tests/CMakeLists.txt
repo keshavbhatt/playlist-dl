@@ -86,3 +86,6 @@ pldl_add_test(tst_download_card_delegate tst_download_card_delegate.cpp pldl_ui 
 pldl_add_test(tst_downloads_controller tst_downloads_controller.cpp pldl_ui GUI)
 pldl_add_test(tst_downloads_page      tst_downloads_page.cpp      pldl_ui GUI)
 pldl_add_test(tst_settings_dialog     tst_settings_dialog.cpp     pldl_ui GUI)
+pldl_add_test(tst_playlist_entry_delegate tst_playlist_entry_delegate.cpp pldl_ui GUI)
+pldl_add_test(tst_playlist_page       tst_playlist_page.cpp       pldl_ui GUI)
+pldl_add_test(tst_download_options_sheet tst_download_options_sheet.cpp pldl_ui GUI)
