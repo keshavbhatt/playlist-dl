@@ -28,9 +28,11 @@ class BrowserPage;
 class EngineSetupDialog;
 class Page;
 class SearchPage;
+class SettingsDialog;
 class SideRail;
 class ThemeApplier;
 class ThumbnailCache;
+class ToastHost;
 class TrayController;
 
 /// Top-level window (DESIGN.md section 2): rail | page stack. Owns the pages
@@ -94,6 +96,11 @@ public Q_SLOTS:
     void debugOpen(const QString& what);
     void quit();
 
+Q_SIGNALS:
+    /// Settings, "Sign out and clear session", confirmed: the application
+    /// writes the clear-session marker and relaunches.
+    void clearSessionRequested();
+
 protected:
     void closeEvent(QCloseEvent* event) override;
     void showEvent(QShowEvent* event) override;
@@ -105,6 +112,9 @@ private:
     void restoreWindowState();
     void saveWindowState();
     void maybeShowWhatsNew(bool force = false);
+    void connectSettingsDialog(SettingsDialog* dialog);
+    void confirmClearSession();
+    void toast(const QString& text);
     void maybeShowGpuFallbackNotice();
     void promptUpgrade(const QString& feature);
     void handlePermissionPrompt(const QWebEnginePermission& permission);
@@ -131,6 +141,8 @@ private:
     QPointer<EngineSetupDialog> m_engineSetup;
     QList<std::function<void()>> m_awaitingEngine;
     QPointer<AccountDialog> m_accountDialog;
+    QPointer<SettingsDialog> m_settingsDialog;
+    ToastHost* m_toasts = nullptr;
     bool m_quitting = false;
     Qt::WindowStates m_stateBeforeFullScreen = Qt::WindowNoState;
 };

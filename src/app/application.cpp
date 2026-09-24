@@ -16,6 +16,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QIcon>
+#include <QProcess>
 #include <QStandardPaths>
 #include <QTextStream>
 
@@ -185,13 +186,46 @@ void Application::applyChromiumFlags()
     qCInfo(lcApp) << "chromium flags:" << merged;
 }
 
+namespace {
+QString clearSessionMarkerPath()
+{
+    return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + u"/clear-session"_s;
+}
+} // namespace
+
+void Application::relaunch()
+{
+    const QStringList args = QCoreApplication::arguments().mid(1);
+    m_settings->sync();
+    m_instance->release();
+    if (QProcess::startDetached(QCoreApplication::applicationFilePath(), args)) {
+        QCoreApplication::quit();
+    } else {
+        qCWarning(lcApp) << "relaunch failed to start; staying on the current configuration";
+    }
+}
+
+void Application::clearSessionAndRelaunch()
+{
+    const QString marker = clearSessionMarkerPath();
+    QDir().mkpath(QFileInfo(marker).path());
+    QFile file(marker);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+        qCWarning(lcApp) << "could not write the clear-session marker" << marker;
+        return;
+    }
+    file.close();
+    qCInfo(lcApp) << "session clear requested; relaunching";
+    relaunch();
+}
+
 void Application::honourClearSessionMarker()
 {
     // Settings, "Sign out and clear session" leaves this marker; the profile
     // directories are removed here, before the web engine touches them.
     const QString dataDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     const QString cacheDir = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
-    const QString marker = dataDir + u"/clear-session"_s;
+    const QString marker = clearSessionMarkerPath();
     if (!QFile::exists(marker)) {
         return;
     }

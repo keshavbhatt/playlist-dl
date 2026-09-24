@@ -10,6 +10,7 @@
 #include "ui/account_dialog.h"
 #include "ui/actions.h"
 #include "ui/bug_report_dialog.h"
+#include "ui/diagnostics.h"
 #include "ui/engine_setup_dialog.h"
 #include "ui/icons.h"
 #include "ui/links.h"
@@ -19,15 +20,19 @@
 #include "ui/pages/page.h"
 #include "ui/pages/search_page.h"
 #include "ui/permission_prompt.h"
+#include "ui/settings_dialog.h"
 #include "ui/shortcuts_dialog.h"
 #include "ui/side_rail.h"
 #include "ui/theme_applier.h"
 #include "ui/thumbnail_cache.h"
+#include "ui/toast.h"
 #include "ui/tray_controller.h"
 #include "ui/whats_new_dialog.h"
+#include "web/web_profile.h"
 
 #include <QAction>
 #include <QApplication>
+#include <QClipboard>
 #include <QCloseEvent>
 #include <QFileInfo>
 #include <QHBoxLayout>
@@ -135,7 +140,11 @@ void MainWindow::setupUi()
     layout->addWidget(m_rail);
     layout->addWidget(m_pages, 1);
     setCentralWidget(central);
-    showPage(static_cast<PageId>(std::min(m_settings.lastPage(), static_cast<int>(PageId::Downloads))));
+    m_toasts = new ToastHost(this);
+    // Settings, General: Start page, Search or the page the app was closed on.
+    const int last = std::min(m_settings.lastPage(), static_cast<int>(PageId::Downloads));
+    showPage(m_settings.startPage() == core::StartPage::LastPage ? static_cast<PageId>(last)
+                                                                 : PageId::Search);
 }
 
 void MainWindow::connectActions()
@@ -347,8 +356,60 @@ void MainWindow::toggleVisibility()
 
 void MainWindow::showSettings()
 {
-    MessageSheet::info(this, tr("Settings"),
-                       tr("The settings sheet is not built yet. It comes with the next step."));
+    if (!m_settingsDialog) {
+        m_settingsDialog = new SettingsDialog(
+            m_settings, m_theme, *m_engine, m_browser->profile().interceptor(), m_tray->isAvailable(), this);
+        m_settingsDialog->setAttribute(Qt::WA_DeleteOnClose);
+        connectSettingsDialog(m_settingsDialog);
+    }
+    m_settingsDialog->show();
+    m_settingsDialog->raise();
+    m_settingsDialog->activateWindow();
+}
+
+void MainWindow::connectSettingsDialog(SettingsDialog* dialog)
+{
+    connect(dialog, &SettingsDialog::clearCacheRequested, this, [this] {
+        m_browser->profile().clearHttpCache();
+        toast(tr("Cache cleared"));
+    });
+    connect(dialog, &SettingsDialog::clearSessionRequested, this, &MainWindow::confirmClearSession);
+    connect(dialog, &SettingsDialog::resetPermissionsRequested, this, [this] {
+        m_browser->resetPermissions();
+        toast(tr("Site permissions reset"));
+    });
+    connect(dialog, &SettingsDialog::openLogFolderRequested, this,
+            [] { platform::openDirectory(QFileInfo(core::LogSink::logFilePath()).absolutePath()); });
+    connect(dialog, &SettingsDialog::copyDiagnosticsRequested, this, [this] {
+        QApplication::clipboard()->setText(buildDiagnostics(
+            m_settings, m_browser->userAgent(), SettingsDialog::engineStatusText(m_engine->status())));
+        toast(tr("Diagnostics copied"));
+    });
+    connect(dialog, &SettingsDialog::engineSetupRequested, this, [this] { ensureEngine([] {}); });
+}
+
+void MainWindow::confirmClearSession()
+{
+    QWidget* parent = m_settingsDialog ? static_cast<QWidget*>(m_settingsDialog) : this;
+    if (!MessageSheet::confirm(parent, MessageSheet::Tone::Danger, tr("Sign out and clear the session?"),
+                               tr("Cookies, site data and your YouTube sign-in are removed and the app "
+                                  "restarts. Downloads and settings are kept."),
+                               tr("Sign out and restart"), tr("Keep"))) {
+        return;
+    }
+    m_quitting = true;
+    saveWindowState();
+    m_settings.sync();
+    Q_EMIT clearSessionRequested();
+}
+
+void MainWindow::toast(const QString& text)
+{
+    if (m_toasts != nullptr && isVisible()) {
+        m_toasts->show(text, ToastHost::Kind::Success);
+        return;
+    }
+    MessageSheet::info(this, tr("Done"), text);
 }
 
 void MainWindow::showShortcuts()
@@ -402,6 +463,9 @@ void MainWindow::debugOpen(const QString& what)
         maybeShowWhatsNew(true);
     } else if (what == u"settings"_s) {
         showSettings();
+    } else if (what.startsWith(u"settings:"_s)) {
+        showSettings();
+        m_settingsDialog->showPage(what.mid(9));
     } else if (what.startsWith(u"browser:"_s)) {
         openUrl(what.mid(8));
     } else if (what == u"browser-fullscreen"_s) {
@@ -456,8 +520,8 @@ void MainWindow::maybeShowGpuFallbackNotice()
 
 void MainWindow::maybeShowWhatsNew(bool force)
 {
-    if (!force &&
-        (m_settings.whatsNewSeenVersion() == m_appVersion || QApplication::activeModalWidget() != nullptr)) {
+    if (!force && (!m_settings.showWhatsNew() || m_settings.whatsNewSeenVersion() == m_appVersion ||
+                   QApplication::activeModalWidget() != nullptr)) {
         return;
     }
     const QString notes = WhatsNewDialog::bundledNotes(m_appVersion);
