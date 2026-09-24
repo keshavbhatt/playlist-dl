@@ -24,14 +24,14 @@ name (ADR-002), the repository licence (ADR-005).
 | S3 | Single instance; second launch forwards a URL and commands | RunGuard, no forwarding | KEEP | done (`app::SingleInstance`) |
 | S4 | System tray: show/hide, downloads, quit; close-to-tray optional (default quit) | none | KEEP | done (`ui::TrayController`, close action setting) |
 | S5 | Full screen for the browser (F11 and page requests), hint overlay, rail hidden | yes (player) | KEEP | done (`BrowserPage`, `MainWindow::setBrowserFullScreen`, `web::FullScreenHint`) |
-| S6 | Native notifications on finish with Open and Show in folder (portal, then freedesktop) | none | KEEP | todo |
+| S6 | Native notifications on finish with Open and Show in folder (portal, then freedesktop) | none | KEEP | done (`core::NotificationService`, `platform::createNotifier`, wired in `DownloadsController`) |
 | S7 | Crash handler, log file, diagnostics copy, Report a bug sheet | Debug Info in About | KEEP | done (`platform::installCrashHandler`, `core::LogSink`, `ui::AboutDialog`, `ui::BugReportDialog`) |
 | S8 | GPU auto-fallback, Wayland to XCB retry | none | KEEP | done (`main.cpp`, `core::graphics_fallback`, `platform::GpuStderrWatch`) |
 | S9 | What's new once per version from the bundled changelog; Online guide | none | KEEP | done (`ui::WhatsNewDialog`, `links::kGuide`) |
 | S10 | CLI: `playlist-dl <url>`, `--download <url>`, `--settings`, `--profile`, `--quit` | none | KEEP | done (`app::CliOptions`) |
 | S11 | Shortcuts sheet (Ctrl+/) listing every action | none | KEEP | done (`ui::ShortcutsDialog`) |
 | S12 | Rate this app nag, Claim offer, Donate button | yes | DROP | the store and the account sheet cover them |
-| S13 | Toast in the bottom left for results the user is not looking at | none | KEEP | todo |
+| S13 | Toast in the bottom left for results the user is not looking at | none | KEEP | done (`ui::ToastHost` on the window) |
 
 ## B. Search (the home page)
 
@@ -77,15 +77,15 @@ name (ADR-002), the repository licence (ADR-005).
 
 | # | Feature | 2.x | Decision | Status / class |
 |---|---|---|---|---|
-| E1 | Self-provisioning engine: standalone binary per CPU, checksum, daily update, bundled JS runtime, ffmpeg from the system with an install hint | `python3 core` from GitHub, dead update check, no ffmpeg | KEEP | todo |
-| E2 | Typed protocol with the engine (progress template and print lines), never text parsing | regex on `[download]` lines | KEEP | todo |
-| E3 | Queue with concurrency (1 to 5), pause, resume, cancel, retry, remove, open, show in folder, clear finished; persisted across restarts; stale state cleaned on start | start/stop per playlist, stale "running" | KEEP | todo |
-| E4 | A playlist is one job with entries; per-entry progress and the aggregate on the card; failed entries retried alone | one process per item, counters in QSettings | KEEP | todo |
-| E5 | Cookies from the app's own YouTube session handed to the engine (setting, on) | none | KEEP | todo |
-| E6 | Notifications on finish (S6); taskbar progress; keep the screen awake while downloading | none | KEEP | todo |
+| E1 | Self-provisioning engine: standalone binary per CPU, checksum, daily update, bundled JS runtime, ffmpeg from the system with an install hint | `python3 core` from GitHub, dead update check, no ffmpeg | KEEP | done (`services::EngineManager`, `ui::EngineSetupDialog`; verified live: engine 2026.08.19 provisioned headless) |
+| E2 | Typed protocol with the engine (progress template and print lines), never text parsing | regex on `[download]` lines | KEEP | done (`core::ytdlp_output`, `core::DownloadRunner`) |
+| E3 | Queue with concurrency (1 to 5), pause, resume, cancel, retry, remove, open, show in folder, clear finished; persisted across restarts; stale state cleaned on start | start/stop per playlist, stale "running" | KEEP | done (`ui::DownloadsController`, `core::DownloadQueue`, `ui::DownloadsPage`; stale states become Paused on load) |
+| E4 | A playlist is one job with entries; per-entry progress and the aggregate on the card; failed entries retried alone | one process per item, counters in QSettings | KEEP | done (one job per playlist, `DownloadJob::detailLine` "3 of 12") |
+| E5 | Cookies from the app's own YouTube session handed to the engine (setting, on) | none | KEEP | done (`web::CookieExporter::writeTempFile` through the controller's cookies provider) |
+| E6 | Notifications on finish (S6); taskbar progress; keep the screen awake while downloading | none | KEEP | done (notifications with Open / Show in folder / Retry, `platform::TaskbarProgress`, `platform::ScreenInhibitor`) |
 | E7 | Import 2.x download records (`download_records/*.json`) as finished or queued jobs | n/a | LATER | the record shape is documented in the analysis |
-| E8 | Speed limit | none | KEEP | todo |
-| E9 | Engine chip with version and update actions on the Downloads page and in Settings | Settings status line | KEEP | todo |
+| E8 | Speed limit | none | KEEP | done (`Settings::speedLimitKbps` applied at admission) |
+| E9 | Engine chip with version and update actions on the Downloads page and in Settings | Settings status line | KEEP | done (`DownloadsPage` engine chip; the Settings card lands with G1) |
 
 ## F. Browser (the player)
 
@@ -118,5 +118,5 @@ Target 30 options at most. Restart required: interface scale, hardware accelerat
 |---|---|---|---|---|
 | L1 | Shared AccountAndLicense module, app code PLDL, 10-day evaluation | own module, 30 days, http | KEEP | done (`services::LicenseService`, app code PLDL, 10 days) |
 | L2 | 2.x account id migrated on first start from `org.keshavnrj.ubuntu/Playlist DL.conf` (`accountId`) or `~/Downloads/.Playlist DL.id` | n/a | KEEP | done (`core::legacyAccountId`, tst_legacy_account; the 2.x download folder too, ADR-002) |
-| L3 | Gate: assumed Red's model, a daily allowance of free downloads (5 a day), everything visible; the owner may prefer 2.x's quality gate | quality above "Poor" | KEEP (assumption) | todo |
-| L4 | Plans sheet listing what is free and what Pro adds | none | KEEP | todo |
+| L3 | Gate: assumed Red's model, a daily allowance of free downloads (5 a day), everything visible; the owner may prefer 2.x's quality gate | quality above "Poor" | KEEP (assumption) | done as assumed (`DownloadsController::admit`, `LicenseService::canDownload`, 5 a day; the gate sheet offers View plans) |
+| L4 | Plans sheet listing what is free and what Pro adds | none | KEEP | done (`ui::PlansDialog`, wording still generic: to reword once the owner decides the gate) |

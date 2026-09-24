@@ -80,6 +80,10 @@ MainWindow::MainWindow(core::Settings& settings, core::ThemeService& theme, cons
 
 MainWindow::~MainWindow()
 {
+    // The pages use the controller's thumbnail cache and the browser's
+    // profile; take them down before the objects they lean on.
+    delete m_pages;
+    m_pages = nullptr;
     qCInfo(lcUi) << "main window gone";
 }
 
@@ -115,8 +119,12 @@ void MainWindow::setupUi()
     });
 
     m_pages = new QStackedWidget(this);
-    m_thumbnails = new ThumbnailCache(this);
-    m_search = new SearchPage(m_settings, m_theme, *m_thumbnails, this);
+    // The browser first (its session cookies feed the downloads), then the
+    // controller, whose thumbnail cache every page shares.
+    m_browser = new BrowserPage(m_settings, m_theme, m_appVersion, this);
+    m_downloadsController = new DownloadsController(m_settings, m_theme, *m_engine, *m_probe, *m_license,
+                                                    m_browser->profile().cookies(), this, this);
+    m_search = new SearchPage(m_settings, m_theme, m_downloadsController->thumbnails(), this);
     connect(m_search, &SearchPage::playlistRequested, this, &MainWindow::openPlaylist);
     connect(m_search, &SearchPage::videoRequested, this,
             [this](const QUrl& url) { openUrl(url.toString()); });
@@ -129,9 +137,6 @@ void MainWindow::setupUi()
     connect(m_engine, &services::EngineManager::ready, m_search, &SearchPage::setEnginePaths);
     m_playlist = new Page(tr("Playlist"), m_theme, this);
     m_playlist->setPlaceholder(tr("A playlist's entries, ready to play or download. Coming soon."));
-    m_browser = new BrowserPage(m_settings, m_theme, m_appVersion, this);
-    m_downloadsController = new DownloadsController(m_settings, m_theme, *m_engine, *m_probe, *m_license,
-                                                    m_browser->profile().cookies(), this, this);
     m_downloads = new DownloadsPage(*m_downloadsController, m_settings, m_theme, this);
     for (QWidget* page : {static_cast<QWidget*>(m_search), static_cast<QWidget*>(m_playlist),
                           static_cast<QWidget*>(m_browser), static_cast<QWidget*>(m_downloads)}) {

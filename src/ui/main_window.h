@@ -138,7 +138,6 @@ private:
     Actions* m_actions = nullptr;
     SideRail* m_rail = nullptr;
     QStackedWidget* m_pages = nullptr;
-    ThumbnailCache* m_thumbnails = nullptr;
     SearchPage* m_search = nullptr;
     Page* m_playlist = nullptr;
     BrowserPage* m_browser = nullptr;

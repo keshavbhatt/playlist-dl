@@ -7,7 +7,7 @@
 | M0 Analysis and contract | done |
 | M1 Skeleton | done |
 | M2 Engine and search | done (search); the Playlist page follows with M3 |
-| M3 Downloads | wip |
+| M3 Downloads | wip (queue and page done; Playlist page and options sheet next) |
 | M4 Player and browser shell | todo |
 | M5 Desktop integration | todo |
 | M6 Polish and text | todo |
@@ -47,6 +47,11 @@
   later run, timed out after 8 s with the fallback engaging (the log shows the engine being
   waited for). 36 tests pass. Known polish: the card grid leaves room for a fifth column at
   1280 px; only dark grabs so far.
+- Downloads merged: `DownloadsController` (engine, cookies, persistence, notifications,
+  taskbar, screen inhibit, the daily-allowance gate), `DownloadsPage` with the card
+  delegate and filters. Verified live headless: `PLDL_DEBUG_DOWNLOAD` provisioned the
+  engine and downloaded "Me at the zoo" (av1+aac, thumbnail embedded) in 151 s, exit 0.
+  39 tests pass. Grabs of the demo queue in dark and light looked at.
 - Verified: grabs of the Search placeholder, the Browser page and the About sheet, looked
   at; `PLDL_DEBUG_OPEN`, `PLDL_DEBUG_GRAB`, `PLDL_DEBUG_WINDOW_SIZE` work offscreen with
   isolated XDG directories.
