@@ -53,6 +53,8 @@ public:
     void moveSelected(int delta);
     void sortByName();
     void sortByPlaylistOrder();
+    /// A random order (a shuffled listen); Original brings the playlist's order back.
+    void shuffle();
     [[nodiscard]] QListWidget* list() const { return m_list; }
     [[nodiscard]] QPushButton* playAllButton() const { return m_playAll; }
     [[nodiscard]] QCheckBox* selectAllBox() const { return m_selectAll; }
@@ -83,6 +85,7 @@ private:
     QPushButton* m_down = nullptr;
     QPushButton* m_sortName = nullptr;
     QPushButton* m_sortPlaylist = nullptr;
+    QPushButton* m_shuffle = nullptr;
     QPushButton* m_save = nullptr;
     QPushButton* m_playAll = nullptr;
 };

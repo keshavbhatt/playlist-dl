@@ -12,6 +12,7 @@
 #include <QLabel>
 #include <QListWidget>
 #include <QPushButton>
+#include <QRandomGenerator>
 #include <QVBoxLayout>
 
 #include <algorithm>
@@ -127,7 +128,11 @@ void PlaylistItemsSheet::setupUi()
     m_sortName->setToolTip(tr("Sort the items by title"));
     m_sortName->setObjectName(u"sortNameButton"_s);
     connect(m_sortName, &QPushButton::clicked, this, &PlaylistItemsSheet::sortByName);
-    for (QPushButton* button : {m_play, m_reveal, m_up, m_down, m_sortPlaylist, m_sortName}) {
+    m_shuffle = flat(tr("Shuffle"), u"shuffle"_s);
+    m_shuffle->setObjectName(u"shuffleButton"_s);
+    m_shuffle->setToolTip(tr("Put the items in a random order"));
+    connect(m_shuffle, &QPushButton::clicked, this, &PlaylistItemsSheet::shuffle);
+    for (QPushButton* button : {m_play, m_reveal, m_up, m_down, m_sortPlaylist, m_sortName, m_shuffle}) {
         tools->addWidget(button);
     }
     tools->addStretch(1);
@@ -317,6 +322,24 @@ void PlaylistItemsSheet::sortByName()
     std::stable_sort(m_entries.begin(), m_entries.end(), [](const core::PlaylistEntry& a, const core::PlaylistEntry& b) {
         return QString::localeAwareCompare(a.title, b.title) < 0;
     });
+    rebuildList();
+}
+
+void PlaylistItemsSheet::shuffle()
+{
+    if (m_entries.size() < 2) {
+        return;
+    }
+    // Every shuffle gives a new order, and never the one already shown.
+    const QList<core::PlaylistEntry> before = m_entries;
+    auto* rng = QRandomGenerator::global();
+    do {
+        for (qsizetype i = m_entries.size() - 1; i > 0; --i) {
+            const qsizetype j = static_cast<qsizetype>(rng->bounded(static_cast<quint32>(i + 1)));
+            m_entries.swapItemsAt(i, j);
+        }
+    } while (std::equal(m_entries.cbegin(), m_entries.cend(), before.cbegin(),
+                        [](const core::PlaylistEntry& a, const core::PlaylistEntry& b) { return a.file == b.file && a.id == b.id; }));
     rebuildList();
 }
 

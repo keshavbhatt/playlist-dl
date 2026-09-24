@@ -28,6 +28,9 @@
 
 ### 2026-09-24, M6
 
+- Owner request: Shuffle on the playlist items sheet puts the items in a random order (never
+  the one shown); Original restores the playlist's order; unticked items stay unticked.
+
 - No `QMessageBox` anywhere; every question is a sheet. The About, Plans and Account text is
   this app's; the engine's ffmpeg hint no longer names Red.
 - The engine setup sheet the app opens on its own closes itself once the engine is ready;

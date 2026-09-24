@@ -164,7 +164,7 @@ The 2.x download widget rebuilt as a page:
   shows the **Playlist items** sheet (owner, 2026-09-24): every entry with its state
   (downloaded, not downloaded, file missing) and a check box to leave it out (Select all
   above the list), Play for one, Show in folder, Move up and down, sort by name or playlist
-  order, Save playlist file, and **Play all** ("Play 3 of 5" when some are unticked), which
+  order, Shuffle (a random order, owner request), Save playlist file, and **Play all** ("Play 3 of 5" when some are unticked), which
   writes the `.m3u8` next to the videos with the checked items in the order shown and opens it in the media player. The file
   is also written when the playlist finishes (Settings, Downloads: Write a playlist file).
 - Filters: All, Active, Finished, Failed. Empty state: "Downloads you start will show up

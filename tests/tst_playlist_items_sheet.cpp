@@ -128,6 +128,39 @@ private Q_SLOTS:
         QVERIFY(!sheet.isChecked(2));
     }
 
+    void shuffleGivesANewOrderAndOriginalRestoresIt()
+    {
+        PlaylistItemsSheet sheet(m_job, *m_theme);
+        const QList<PlaylistEntry> original = sheet.entries();
+        QStringList seen;
+        for (int round = 0; round < 6; ++round) {
+            sheet.shuffle();
+            QCOMPARE(sheet.entries().size(), original.size());
+            QStringList ids;
+            for (const PlaylistEntry& e : sheet.entries()) {
+                ids << e.id;
+            }
+            seen << ids.join(u',');
+            // Every entry is still there, exactly once.
+            QStringList sorted = ids;
+            sorted.sort();
+            QStringList originalIds;
+            for (const PlaylistEntry& e : original) {
+                originalIds << e.id;
+            }
+            originalIds.sort();
+            QCOMPARE(sorted, originalIds);
+        }
+        QVERIFY(seen.size() > 1); // three items: six shuffles cannot all be the same
+        sheet.sortByPlaylistOrder();
+        QCOMPARE(sheet.entries().at(0).id, original.at(0).id);
+        QCOMPARE(sheet.entries().at(2).id, original.at(2).id);
+        // Unticked items stay unticked through a shuffle.
+        sheet.setChecked(0, false);
+        sheet.shuffle();
+        QCOMPARE(sheet.orderedFiles().size(), 1);
+    }
+
     void nothingDownloadedDisablesPlayAll()
     {
         DownloadJob empty = m_job;
