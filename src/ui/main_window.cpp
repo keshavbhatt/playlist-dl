@@ -686,6 +686,8 @@ void MainWindow::debugOpen(const QString& what)
     } else if (what == u"downloads-demo"_s) {
         m_downloadsController->queue().setJobs(demoDownloads());
         showPage(PageId::Downloads);
+        // After the page shows: showing it refreshes the chip from the licence.
+        m_downloads->setAllowance(3, services::LicenseService::kFreeDownloadsPerDay); // the free tier's chip
     } else {
         qCWarning(lcUi) << "debugOpen: unknown target" << what;
     }

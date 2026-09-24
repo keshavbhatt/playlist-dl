@@ -52,6 +52,9 @@
   delegate and filters. Verified live headless: `PLDL_DEBUG_DOWNLOAD` provisioned the
   engine and downloaded "Me at the zoo" (av1+aac, thumbnail embedded) in 151 s, exit 0.
   39 tests pass. Grabs of the demo queue in dark and light looked at.
+- Owner request: the Downloads page shows the free tier's remaining downloads for today as
+  a chip next to the title (hidden on Pro and during the evaluation), refreshed when a
+  download is admitted and when the page is shown again.
 - Owner request: the Account and Plans sheets now state the real model (UMD's files,
   torrents and 8K presets were still in the text): Free is 5 downloads a day with every
   quality, a playlist counts each picked video, Pro has no daily limit; the evaluation shows

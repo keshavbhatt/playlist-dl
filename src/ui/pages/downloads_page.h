@@ -48,12 +48,18 @@ public:
     /// The engine chip follows the engine's status; wired to the manager's
     /// statusChanged, callable directly (the tests).
     void setEngineStatus(const services::EngineManager::Status& status);
+    /// The free tier's remaining downloads for today: `remaining` of `limit`.
+    /// A negative `remaining` means no limit (Pro, the evaluation): the chip hides.
+    void setAllowance(int remaining, int limit);
+    /// Reads the allowance from the licence service and shows it.
+    void refreshAllowance();
     /// Removes the finished, the failed and cancelled, or both.
     void clearFinished();
     void clearFailed();
     void clearAllFinished();
 
     [[nodiscard]] BadgeLabel* engineChip() const { return m_engineChip; }
+    [[nodiscard]] BadgeLabel* allowanceChip() const { return m_allowanceChip; }
     [[nodiscard]] QListView* list() const { return m_list; }
     [[nodiscard]] QToolButton* clearButton() const { return m_clear; }
     [[nodiscard]] QMenu* clearMenu() const { return m_clearMenu; }
@@ -69,6 +75,7 @@ Q_SIGNALS:
 
 protected:
     bool eventFilter(QObject* watched, QEvent* event) override;
+    void showEvent(QShowEvent* event) override;
 
 private:
     void setupHeader();
@@ -87,6 +94,7 @@ private:
     DownloadsFilterProxy* m_proxy = nullptr;
     DownloadCardDelegate* m_delegate = nullptr;
     BadgeLabel* m_engineChip = nullptr;
+    BadgeLabel* m_allowanceChip = nullptr;
     QPushButton* m_pauseAll = nullptr;
     QPushButton* m_resumeAll = nullptr;
     QToolButton* m_clear = nullptr;

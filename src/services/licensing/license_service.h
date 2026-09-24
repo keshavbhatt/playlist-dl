@@ -77,6 +77,8 @@ Q_SIGNALS:
     void upgradeRequested(const QString& feature);
     /// The free tier asked for more than today allows.
     void downloadLimitReached(int requested, int remaining);
+    /// Today's free downloads were spent: whatever shows the remaining count refreshes.
+    void allowanceChanged();
 
 private:
     core::Settings& m_settings;

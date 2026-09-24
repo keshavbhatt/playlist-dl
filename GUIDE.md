@@ -57,6 +57,7 @@ that shows which video it is on. Hover a card for pause or resume, cancel, retry
 show in folder and remove. The filters show active, finished or failed downloads; the
 Clear menu removes finished or failed ones; Open folder opens your download folder.
 
+On the free version a chip next to the page title counts today's remaining downloads.
 You get a notification when a download finishes, with Open and Show in folder. The
 download engine sets itself up on first use and keeps itself up to date; the chip next to
 the page title shows its state.

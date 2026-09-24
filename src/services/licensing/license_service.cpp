@@ -122,6 +122,7 @@ void LicenseService::spendDownloads(int items)
         return; // unlimited: nothing to count
     }
     m_settings.setFreeDownloads(m_settings.freeDownloads().spent(items, QDate::currentDate()));
+    Q_EMIT allowanceChanged();
 }
 
 QString LicenseService::checkoutUrl() const

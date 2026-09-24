@@ -146,6 +146,22 @@ private Q_SLOTS:
         QCOMPARE(m_page->countText(), u"2 active, 1 paused"_s);
     }
 
+    void allowanceChipCountsTheDay()
+    {
+        pldl::ui::BadgeLabel* chip = m_page->allowanceChip();
+        QVERIFY(chip != nullptr);
+        m_page->setAllowance(3, 5);
+        QVERIFY(chip->isVisibleTo(m_page.get()));
+        QCOMPARE(chip->text(), u"3 of 5 downloads left today"_s);
+        m_page->setAllowance(1, 5);
+        QCOMPARE(chip->text(), u"1 of 5 downloads left today"_s);
+        m_page->setAllowance(0, 5);
+        QCOMPARE(chip->text(), u"No downloads left today"_s);
+        QVERIFY(chip->toolTip().contains(u"tomorrow"_s));
+        m_page->setAllowance(-1, 5); // Pro or the evaluation: no limit, no chip
+        QVERIFY(!chip->isVisibleTo(m_page.get()));
+    }
+
     void engineChipFollowsTheStatus()
     {
         using Status = pldl::services::EngineManager::Status;

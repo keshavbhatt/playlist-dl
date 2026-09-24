@@ -3,6 +3,7 @@
 #include "core/downloads/download_queue.h"
 #include "core/settings/settings.h"
 #include "core/theme/theme_service.h"
+#include "services/licensing/license_service.h"
 #include "ui/badge_label.h"
 #include "ui/download_card_delegate.h"
 #include "ui/downloads_controller.h"
@@ -22,6 +23,7 @@
 #include <QMouseEvent>
 #include <QPushButton>
 #include <QStackedWidget>
+#include <QShowEvent>
 #include <QToolButton>
 #include <QVBoxLayout>
 
@@ -50,6 +52,11 @@ DownloadsPage::DownloadsPage(DownloadsController& controller, core::Settings& se
 
     connect(&m_controller.engine(), &services::EngineManager::statusChanged, this, &DownloadsPage::setEngineStatus);
     setEngineStatus(m_controller.engine().status());
+    connect(&m_controller.license(), &services::LicenseService::statusChanged, this,
+            &DownloadsPage::refreshAllowance);
+    connect(&m_controller.license(), &services::LicenseService::allowanceChanged, this,
+            &DownloadsPage::refreshAllowance);
+    refreshAllowance();
 
     // The counts read the queue itself; the proxy (connected to the queue
     // first) has already caught up when these run. The proxy does not emit
@@ -66,6 +73,41 @@ DownloadsPage::DownloadsPage(DownloadsController& controller, core::Settings& se
     updateCounts();
 }
 
+void DownloadsPage::refreshAllowance()
+{
+    setAllowance(m_controller.license().downloadsRemainingToday(), services::LicenseService::kFreeDownloadsPerDay);
+}
+
+void DownloadsPage::setAllowance(int remaining, int limit)
+{
+    if (remaining < 0) {
+        m_allowanceChip->hide(); // no limit: Pro or the evaluation
+        return;
+    }
+    // Plurals written by hand: "%n" rendered literally once (LESSONS).
+    QString text;
+    if (remaining == 0) {
+        text = tr("No downloads left today");
+    } else if (remaining == 1) {
+        text = tr("1 of %1 downloads left today").arg(limit);
+    } else {
+        text = tr("%1 of %2 downloads left today").arg(remaining).arg(limit);
+    }
+    m_allowanceChip->setText(text);
+    m_allowanceChip->setTone(remaining <= 1 ? BadgeLabel::Tone::Warning : BadgeLabel::Tone::Accent);
+    m_allowanceChip->setToolTip(tr("The free version downloads up to %1 videos a day; a playlist counts each video "
+                                   "you pick. The count starts again tomorrow. Pro has no daily limit.")
+                                    .arg(limit));
+    m_allowanceChip->setAccessibleName(text);
+    m_allowanceChip->show();
+}
+
+void DownloadsPage::showEvent(QShowEvent* event)
+{
+    Page::showEvent(event);
+    refreshAllowance(); // a new day may have started since the page was last seen
+}
+
 void DownloadsPage::setupHeader()
 {
     m_engineChip = new BadgeLabel(theme(), this);
@@ -74,6 +116,13 @@ void DownloadsPage::setupHeader()
     m_engineChip->setAccessibleName(tr("Download engine status; opens the engine setup"));
     m_engineChip->installEventFilter(this);
     headerLayout()->insertWidget(1, m_engineChip); // right after the title
+
+    // The free tier's count for today, next to the engine chip (FEATURES L3).
+    m_allowanceChip = new BadgeLabel(theme(), this);
+    m_allowanceChip->setObjectName(u"allowanceChip"_s);
+    m_allowanceChip->setGlyph(u"downloads"_s);
+    m_allowanceChip->hide();
+    headerLayout()->insertWidget(2, m_allowanceChip);
 
     m_pauseAll = new QPushButton(tr("Pause all"), this);
     m_pauseAll->setObjectName(u"pauseAllButton"_s);

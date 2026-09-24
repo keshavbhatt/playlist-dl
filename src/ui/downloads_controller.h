@@ -92,6 +92,7 @@ public:
     [[nodiscard]] core::DownloadQueue& queue() { return *m_queue; }
     [[nodiscard]] ThumbnailCache& thumbnails() { return *m_thumbnails; }
     [[nodiscard]] services::EngineManager& engine() { return m_engine; }
+    [[nodiscard]] services::LicenseService& license() { return m_license; }
     [[nodiscard]] core::NotificationService& notifications() { return *m_notifications; }
     [[nodiscard]] QString persistencePath() const { return m_persistencePath; }
     /// Where the list is saved; the default is DownloadQueue::defaultFilePath().
