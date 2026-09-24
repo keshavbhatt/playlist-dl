@@ -1,0 +1,148 @@
+# Built by GitHub Actions only (.github/workflows/snap.yml); never locally.
+# Shape: kde-neon-6 on core24, the ffmpeg-2404 content snap for the media
+# converter, Deno as the download engine's JavaScript runtime, version read
+# from the CMake project. The description mirrors the store listing, which is
+# edited by hand on snapcraft.io.
+name: playlist-dl
+adopt-info: playlist-dl
+grade: stable
+confinement: strict
+base: core24
+compression: lzo
+
+title: Playlist Downloader
+summary: Search, play and download YouTube playlists
+description: |
+  Playlist Downloader finds YouTube playlists, plays them in a built-in player and saves
+  whole playlists offline as video or audio.
+
+  **Find a playlist**
+
+  * Search YouTube playlists by keyword, with suggestions as you type, or paste a playlist
+    or video link.
+  * Browse the playlist: every video with its thumbnail and length, pick the ones you want,
+    select a range, filter and sort.
+
+  **Play**
+
+  * A built-in browser page for YouTube: sign in once, watch without ads, open videos and
+    playlists in tabs, go full screen.
+
+  **Download**
+
+  * Save the selected videos as MP4, MKV or WebM up to 4K, or audio only as MP3, M4A, Opus,
+    FLAC or WAV, with subtitles, thumbnails and metadata embedded on request.
+  * A queue that pauses, resumes and retries, files sorted into a folder per playlist and
+    numbered in playlist order, notifications with Show in folder.
+  * The download engine sets itself up on first use and keeps itself updated. Your sign-in
+    is reused, so age-restricted videos download too.
+
+  **Made for the desktop**
+
+  * Light and dark themes, a tray icon, taskbar progress, native Wayland and X11.
+  * Single instance: `playlist-dl <link>` opens the link, `playlist-dl --download <link>`
+    queues it.
+
+  Guide and help: https://github.com/keshavbhatt/p-pldl/blob/main/GUIDE.md
+  Bugs and requests: https://github.com/keshavbhatt/p-pldl/issues
+
+  YouTube is a trademark of Google LLC; Playlist Downloader is an independent app and is not
+  affiliated with YouTube or Google.
+website: https://github.com/keshavbhatt/p-pldl
+issues: https://github.com/keshavbhatt/p-pldl/issues
+license: Proprietary
+icon: snap/gui/icon.svg
+
+platforms:
+  amd64:
+  arm64:
+
+apps:
+  playlist-dl:
+    command: usr/bin/playlist-dl
+    desktop: usr/share/applications/com.ktechpit.playlist-dl.desktop
+    common-id: com.ktechpit.playlist-dl
+    extensions:
+      - kde-neon-6
+    environment:
+      PATH: $SNAP/ffmpeg-platform/usr/bin:$PATH
+      LD_LIBRARY_PATH: $SNAP/ffmpeg-platform/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:$LD_LIBRARY_PATH
+    plugs:
+      - ffmpeg-2404 # media converter from the content snap, never downloaded
+      - home # the download folder
+      - removable-media # download to external drives
+      - desktop
+      - desktop-legacy
+      - opengl
+      - x11
+      - wayland
+      - network
+      - network-status
+      - unity7 # taskbar progress through the launcher entry
+      - browser-support # the built-in browser page
+      - audio-playback # the player
+      - screen-inhibit-control # keep the system awake while downloads run
+
+plugs:
+  ffmpeg-2404:
+    interface: content
+    target: $SNAP/ffmpeg-platform
+    default-provider: ffmpeg-2404
+
+parts:
+  # JavaScript runtime for the download engine
+  deno:
+    plugin: nil
+    build-packages:
+      - curl
+      - unzip
+    override-pull: |
+      case "${CRAFT_ARCH_BUILD_FOR}" in
+        amd64) asset=deno-x86_64-unknown-linux-gnu.zip
+               sum=0cd918870657ccc3d96ac682290e894dda374e2a742424aae9118b258a6cf7a3 ;;
+        arm64) asset=deno-aarch64-unknown-linux-gnu.zip
+               sum=e654ef4b41d8f1369dfe7d69374c8f226660153d077e0ac25353d454e03ef798 ;;
+        *) echo "no deno build for ${CRAFT_ARCH_BUILD_FOR}" >&2; exit 1 ;;
+      esac
+      curl -fsSL -o deno.zip "https://github.com/denoland/deno/releases/download/v2.7.7/${asset}"
+      echo "${sum}  deno.zip" | sha256sum -c -
+      unzip -o deno.zip deno
+    override-build: |
+      install -Dm755 "${CRAFT_PART_SRC}/deno" "${CRAFT_PART_INSTALL}/usr/bin/deno"
+    prime:
+      - usr/bin/deno
+
+  playlist-dl:
+    plugin: cmake
+    source: .
+    parse-info:
+      - usr/share/metainfo/com.ktechpit.playlist-dl.metainfo.xml
+    build-snaps:
+      - cmake/latest/stable
+    build-packages:
+      - libxkbcommon-dev
+      - libdrm-dev
+    stage-packages:
+      - libdrm2
+      - libxcb-shape0 # libqxcb needs it
+      - fonts-noto-core
+    cmake-parameters:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DCMAKE_INSTALL_PREFIX=/usr
+      - -DPLDL_BUILD_TESTS=OFF
+    override-build: |
+      craftctl default
+      # version from the CMake project
+      VER=$(grep -m1 '^CMAKE_PROJECT_VERSION:STATIC=' "${CRAFT_PART_BUILD}/CMakeCache.txt" | cut -d= -f2)
+      craftctl set version="${VER}"
+      # store icon
+      mkdir -p "${CRAFT_PART_INSTALL}/meta/gui"
+      cp "${CRAFT_PART_INSTALL}/usr/share/icons/hicolor/512x512/apps/com.ktechpit.playlist-dl.png" \
+         "${CRAFT_PART_INSTALL}/meta/gui/icon.png"
+    prime:
+      - -usr/include
+      - -usr/lib/*/cmake
+      - -usr/share/ECM
+      - -usr/share/man
+      - -usr/share/doc
+      - -usr/share/lintian

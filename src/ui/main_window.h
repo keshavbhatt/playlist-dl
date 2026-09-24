@@ -31,8 +31,10 @@ class DownloadsPage;
 class EngineSetupDialog;
 class Page;
 class PlansDialog;
+class SearchPage;
 class SideRail;
 class ThemeApplier;
+class ThumbnailCache;
 class ToastHost;
 class TrayController;
 
@@ -83,6 +85,9 @@ public Q_SLOTS:
     void showPage(PageId page);
     /// A link from the CLI or another instance: opens on the Browser page.
     void openUrl(const QString& url);
+    /// A playlist from the Search page (a card or a pasted link): the
+    /// Playlist page shows it.
+    void openPlaylist(const QUrl& url);
     /// A link to download right away (the CLI's --download, another
     /// instance): the engine is set up if needed, the link probed and queued
     /// with the default options, the Downloads page shown.
@@ -97,9 +102,12 @@ public Q_SLOTS:
     void showAccount();
     /// Headless verification aid: opens a screen by name: "about",
     /// "shortcuts", "account", "plans", "bug", "whatsnew", "settings",
-    /// "browser:<url>" (a tab on that page), "browser-fullscreen", or a page
-    /// name ("search", "playlist", "browser", "downloads"), or
-    /// "downloads-demo" (the Downloads page with one canned job per state).
+    /// "browser:<url>" (a tab on that page), "browser-fullscreen",
+    /// "search:<query>" (types and searches), "search-engine:<query>" (the
+    /// same with the engine forced), "search-typing:<text>" (typed, with
+    /// the suggestions), "search-demo" (canned results), "downloads-demo"
+    /// (the Downloads page with one canned job per state), or a page name
+    /// ("search", "playlist", "browser", "downloads").
     void debugOpen(const QString& what);
     void quit();
 
@@ -130,7 +138,8 @@ private:
     Actions* m_actions = nullptr;
     SideRail* m_rail = nullptr;
     QStackedWidget* m_pages = nullptr;
-    Page* m_search = nullptr;
+    ThumbnailCache* m_thumbnails = nullptr;
+    SearchPage* m_search = nullptr;
     Page* m_playlist = nullptr;
     BrowserPage* m_browser = nullptr;
     DownloadsPage* m_downloads = nullptr;

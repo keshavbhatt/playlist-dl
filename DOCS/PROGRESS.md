@@ -5,9 +5,9 @@
 | Milestone | Status |
 |---|---|
 | M0 Analysis and contract | done |
-| M1 Skeleton | wip |
-| M2 Engine and search | todo |
-| M3 Downloads | todo |
+| M1 Skeleton | done |
+| M2 Engine and search | done (search); the Playlist page follows with M3 |
+| M3 Downloads | wip |
 | M4 Player and browser shell | todo |
 | M5 Desktop integration | todo |
 | M6 Polish and text | todo |
@@ -36,5 +36,18 @@
   queue) and UMD 7 (web layer, BrowserPage, Page, SideRail, Actions, sheets, SearchService),
   identity `pldl` / `com.ktechpit.playlist-dl`, the new icon set under
   `src/resources/icons`.
-- Verified: nothing live yet; the skeleton's build and tests are reported below when done.
+- M1 done: 32 tests pass, the build is warning-free with `-Werror` against the KDE Qt 6.11
+  snap SDK; the window shows the rail, the placeholder pages and the real Browser page with
+  YouTube loaded; the brand tokens are applied (`tst_style_contrast`); the About sheet,
+  the snap recipe and the CI workflow carry the new identity. The engine manager and the
+  probe are owned by the window (`ensureEngine`).
+- M2 and M3 started in parallel: the search stack (ktechpit service, engine fallback,
+  suggestions, Search page) and the download stack (controller, Downloads page, cards).
+- Search merged: the service answered live from this machine with 20 playlists and, on a
+  later run, timed out after 8 s with the fallback engaging (the log shows the engine being
+  waited for). 36 tests pass. Known polish: the card grid leaves room for a fifth column at
+  1280 px; only dark grabs so far.
+- Verified: grabs of the Search placeholder, the Browser page and the About sheet, looked
+  at; `PLDL_DEBUG_OPEN`, `PLDL_DEBUG_GRAB`, `PLDL_DEBUG_WINDOW_SIZE` work offscreen with
+  isolated XDG directories.
 - Open: the three questions above.

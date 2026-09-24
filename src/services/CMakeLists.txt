@@ -5,6 +5,8 @@
 qt_add_library(pldl_services STATIC
     engine_manager.cpp
     engine_manager.h
+    ktechpit_search.cpp
+    ktechpit_search.h
     licensing/license_config.h
     licensing/license_service.cpp
     licensing/license_service.h
@@ -14,8 +16,12 @@ qt_add_library(pldl_services STATIC
     media_probe.h
     netscape_cookies.cpp
     netscape_cookies.h
+    playlist_search.cpp
+    playlist_search.h
     search_service.cpp
     search_service.h
+    search_suggestions.cpp
+    search_suggestions.h
 )
 pldl_set_warnings(pldl_services)
 

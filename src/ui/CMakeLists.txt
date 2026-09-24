@@ -49,6 +49,8 @@ qt_add_library(pldl_ui STATIC
     pages/downloads_page.h
     pages/page.cpp
     pages/page.h
+    pages/search_page.cpp
+    pages/search_page.h
     permission_prompt.cpp
     permission_prompt.h
     plans_dialog.cpp
@@ -57,6 +59,8 @@ qt_add_library(pldl_ui STATIC
     pldl_style.h
     range_slider.cpp
     range_slider.h
+    search_card_delegate.cpp
+    search_card_delegate.h
     shortcuts_dialog.cpp
     shortcuts_dialog.h
     side_rail.cpp
