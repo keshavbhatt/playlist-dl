@@ -105,7 +105,7 @@ private Q_SLOTS:
         QCOMPARE(m_page->selectedCount(), 10); // two unavailable
         QCOMPARE(m_page->downloadButton()->text(), u"Download 10 videos"_s);
         QVERIFY(m_page->downloadButton()->isEnabled());
-        QCOMPARE(m_page->footerLabel()->text(), u"10 of 12 selected"_s);
+        QVERIFY(m_page->footerLabel()->text().startsWith(u"10 of 12 selected, "_s)); // with the total duration
         QCOMPARE(m_page->selectAllBox()->checkState(), Qt::Checked);
         QCOMPARE(m_page->fromSpin()->value(), 1);
         QCOMPARE(m_page->toSpin()->value(), 12);

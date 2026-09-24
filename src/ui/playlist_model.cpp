@@ -138,6 +138,17 @@ QList<int> PlaylistModel::selectedIndexes() const
     return out;
 }
 
+double PlaylistModel::selectedDuration() const
+{
+    double total = 0;
+    for (int row = 0; row < rowCount(); ++row) {
+        if (isChecked(row)) {
+            total += std::max(0.0, m_entries.at(row).duration);
+        }
+    }
+    return total;
+}
+
 int PlaylistModel::selectedCount() const
 {
     int count = 0;

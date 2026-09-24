@@ -126,6 +126,7 @@ void SideRail::setActiveDownloads(int count)
         return;
     }
     m_badge->setText(count > 99 ? u"99+"_s : QString::number(count));
+    m_badge->setAccessibleName(count == 1 ? tr("1 active download") : tr("%1 active downloads").arg(count));
     m_badge->adjustSize();
     m_badge->move(40 - m_badge->width() - 1, 1);
     m_badge->show();

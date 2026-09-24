@@ -33,6 +33,8 @@ public:
     [[nodiscard]] int downloadedCount() const;
     /// The sum of the known durations, in seconds.
     [[nodiscard]] double totalDuration() const;
+    /// The duration of the checked entries alone.
+    [[nodiscard]] double selectedDuration() const;
 
     /// The checked entries' 1-based playlist indexes, ascending.
     [[nodiscard]] QList<int> selectedIndexes() const;

@@ -130,6 +130,8 @@ public:
 
 Q_SIGNALS:
     void backRequested();
+    /// The header title changed (the window title follows it).
+    void titleChanged(const QString& title);
     /// Play all, or a row's play button: the Browser page opens `url`.
     void playRequested(const QUrl& url);
     /// The Download button: the selection's 1-based playlist indexes.

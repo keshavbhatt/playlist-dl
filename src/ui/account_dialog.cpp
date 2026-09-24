@@ -279,7 +279,7 @@ void AccountDialog::refresh()
             // evaluation is not known: no number is better than a wrong one.
             const bool known = st.evaluationEndTimestamp > 0 || days > 0;
             badge = tr("Evaluation");
-            status = tr("No daily download limit during the evaluation, %1").arg(verified);
+            status = tr("Evaluation, %1").arg(verified); // the banner below carries the days and the limit
             expiryKey = tr("Evaluation ends");
             expiry = !known                       ? tr("Checking…")
                      : st.evaluationEndTimestamp > 0 ? tr("%1, %2").arg(dateText(st.evaluationEndTimestamp), daysLeft(days))

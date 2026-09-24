@@ -44,6 +44,9 @@
 #include <QAction>
 #include <QApplication>
 #include <QClipboard>
+#include <QMimeData>
+#include <QDropEvent>
+#include <QDragEnterEvent>
 #include <QCloseEvent>
 #include <QDir>
 #include <QFile>
@@ -102,6 +105,7 @@ MainWindow::~MainWindow()
 void MainWindow::setupUi()
 {
     setWindowTitle(u"Playlist Downloader"_s);
+    setAcceptDrops(true); // a link dropped anywhere on the window opens as if pasted
     setWindowIcon(icons::brand());
     resize(kDefaultSize);
     setMinimumSize(kMinimumSize);
@@ -178,6 +182,7 @@ void MainWindow::setupUi()
     connect(m_engine, &services::EngineManager::statusChanged, m_search, &SearchPage::setEngineStatus);
     m_playlist = new PlaylistPage(m_settings, m_theme, *m_probe, m_downloadsController->thumbnails(), this);
     connect(m_playlist, &PlaylistPage::backRequested, this, [this] { showPage(PageId::Search); });
+    connect(m_playlist, &PlaylistPage::titleChanged, this, &MainWindow::updateWindowTitle);
     connect(m_playlist, &PlaylistPage::playRequested, this, [this](const QUrl& url) { openUrl(url.toString()); });
     connect(m_playlist, &PlaylistPage::toast, this, &MainWindow::toast);
     connect(m_playlist, &PlaylistPage::hasPlaylistChanged, m_actions->playlist, &QAction::setEnabled);
@@ -307,6 +312,13 @@ void MainWindow::connectActions()
     });
     connect(m_downloadsController, &DownloadsController::toast, this, &MainWindow::toast);
     connect(m_downloadsController, &DownloadsController::plansRequested, this, &MainWindow::showPlans);
+    connect(m_downloadsController, &DownloadsController::queued, this, [this](const QString& text) {
+        if (m_toasts != nullptr && isVisible() && m_pages->currentWidget() != m_downloads) {
+            m_toasts->show(text, ToastHost::Kind::Success, tr("View"), [this] { showPage(PageId::Downloads); });
+        } else {
+            toast(text);
+        }
+    });
     connect(m_downloadsController, &DownloadsController::playlistItemsRequested, this,
             &MainWindow::showPlaylistItems);
     connect(m_downloads, &DownloadsPage::engineSetupRequested, this, &MainWindow::showEngineSetup);
@@ -388,6 +400,20 @@ void MainWindow::showPage(PageId page)
     m_settings.setLastPage(index);
     QAction* actions[] = {m_actions->home, m_actions->playlist, m_actions->browser, m_actions->downloads};
     actions[index]->setChecked(true);
+    updateWindowTitle();
+}
+
+void MainWindow::updateWindowTitle()
+{
+    const QString app = u"Playlist Downloader"_s;
+    if (m_pages->currentWidget() == m_playlist && m_playlist->state() == PlaylistPage::State::Ready) {
+        const QString title = m_playlist->titleLabel()->toolTip();
+        if (!title.isEmpty()) {
+            setWindowTitle(u"%1, %2"_s.arg(title, app));
+            return;
+        }
+    }
+    setWindowTitle(app);
 }
 
 void MainWindow::openUrl(const QString& url)
@@ -556,6 +582,28 @@ void MainWindow::showPlaylistItems(quint64 jobId)
     auto* sheet = new PlaylistItemsSheet(*job, m_theme, this);
     sheet->setAttribute(Qt::WA_DeleteOnClose);
     connect(sheet, &PlaylistItemsSheet::toast, this, &MainWindow::toast);
+    connect(sheet, &PlaylistItemsSheet::downloadMissingRequested, this,
+            [this](const core::DownloadJob& source, const QList<int>& positions) {
+                // A fresh job for the same playlist, limited to the missing positions.
+                core::DownloadJob fresh;
+                fresh.url = source.url;
+                fresh.title = source.title;
+                fresh.uploader = source.uploader;
+                fresh.thumbnail = source.thumbnail;
+                fresh.options = source.options;
+                fresh.options.playlistItems = DownloadOptionsSheet::itemSpec(positions);
+                fresh.itemCount = static_cast<int>(positions.size());
+                for (const int position : positions) {
+                    if (position >= 1 && position <= source.entries.size()) {
+                        core::PlaylistEntry entry = source.entries.at(position - 1);
+                        entry.file.clear();
+                        fresh.entries << entry;
+                    }
+                }
+                if (m_downloadsController->enqueue(fresh) != 0) {
+                    showPage(PageId::Downloads);
+                }
+            });
     sheet->open();
 }
 
@@ -599,6 +647,76 @@ void MainWindow::saveWindowState()
 {
     m_settings.setWindowGeometry(saveGeometry());
     m_settings.setWindowState(saveState());
+}
+
+QUrl MainWindow::linkIn(const QMimeData* mime)
+{
+    if (mime == nullptr) {
+        return {};
+    }
+    if (mime->hasUrls()) {
+        for (const QUrl& url : mime->urls()) {
+            if (core::isDownloadable(url)) {
+                return url;
+            }
+        }
+    }
+    if (mime->hasText()) {
+        const QString text = mime->text().trimmed();
+        if (!text.contains(u'\n') && text.size() < 2048) {
+            const QUrl url = QUrl::fromUserInput(text);
+            if ((text.startsWith(u"http://"_s) || text.startsWith(u"https://"_s) || text.startsWith(u"www."_s)) &&
+                core::isDownloadable(url)) {
+                return url;
+            }
+        }
+    }
+    return {};
+}
+
+void MainWindow::dragEnterEvent(QDragEnterEvent* event)
+{
+    if (linkIn(event->mimeData()).isValid()) {
+        event->acceptProposedAction();
+    }
+}
+
+void MainWindow::dropEvent(QDropEvent* event)
+{
+    const QUrl url = linkIn(event->mimeData());
+    if (!url.isValid()) {
+        return;
+    }
+    event->acceptProposedAction();
+    qCInfo(lcUi) << "link dropped:" << url;
+    downloadUrl(url.toString());
+}
+
+void MainWindow::changeEvent(QEvent* event)
+{
+    QMainWindow::changeEvent(event);
+    if (event->type() == QEvent::ActivationChange && isActiveWindow()) {
+        offerClipboardLink();
+    }
+}
+
+void MainWindow::offerClipboardLink()
+{
+    if (m_toasts == nullptr || !isVisible() || QApplication::activeModalWidget() != nullptr) {
+        return;
+    }
+    const QUrl url = linkIn(QApplication::clipboard()->mimeData());
+    if (!url.isValid()) {
+        return;
+    }
+    const QString text = url.toString();
+    if (text == m_lastClipboardOffer || url == m_playlist->currentUrl() || url == m_browser->currentUrl()) {
+        return; // offered already, or the link on show (Copy link puts it there)
+    }
+    m_lastClipboardOffer = text;
+    qCInfo(lcUi) << "clipboard link offered:" << url;
+    m_toasts->show(tr("Link in the clipboard: %1").arg(url.host()), ToastHost::Kind::Info, tr("Open"),
+                   [this, text] { downloadUrl(text); });
 }
 
 void MainWindow::closeEvent(QCloseEvent* event)

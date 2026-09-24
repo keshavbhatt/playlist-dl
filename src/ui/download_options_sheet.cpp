@@ -161,6 +161,7 @@ void DownloadOptionsSheet::buildVideoGroup()
     form->addRow(fieldLabel(tr("Subtitles"), group), subtitlesRow);
     connect(m_subtitles, &QComboBox::currentIndexChanged, this,
             [this](int index) { m_embedSubtitles->setEnabled(index > 0); });
+    m_embedSubtitles->setEnabled(m_subtitles->currentIndex() > 0);
 
     m_embedThumbnail = new QCheckBox(tr("Embed thumbnail"), group);
     m_embedThumbnail->setObjectName(u"embedThumbnailBox"_s);
@@ -254,6 +255,10 @@ void DownloadOptionsSheet::buildFolder()
     m_preview->setProperty("pldlMuted", true);
     m_preview->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
     dynamic_cast<QVBoxLayout*>(layout())->addWidget(m_preview);
+    auto* remembered = new QLabel(tr("These choices become the defaults for next time (Settings, Downloads)."), this);
+    remembered->setObjectName(u"rememberedNote"_s);
+    remembered->setProperty("pldlMuted", true);
+    dynamic_cast<QVBoxLayout*>(layout())->addWidget(remembered);
 }
 
 void DownloadOptionsSheet::buildFooter()
@@ -362,7 +367,9 @@ void DownloadOptionsSheet::updateKind()
     m_groups->setCurrentIndex(audio ? 1 : 0);
     if (m_playlist) {
         const int count = static_cast<int>(m_indexes.size());
-        m_download->setText(count == 1 ? tr("Download 1 video") : tr("Download %1 videos").arg(count));
+        const bool youtube = core::isYouTubeHost(m_url.host());
+        m_download->setText(count == 1 ? (youtube ? tr("Download 1 video") : tr("Download 1 item"))
+                                       : (youtube ? tr("Download %1 videos") : tr("Download %1 items")).arg(count));
         m_download->setEnabled(count > 0);
     } else {
         m_download->setText(audio ? tr("Download audio") : tr("Download video"));

@@ -62,7 +62,7 @@ void AboutDialog::setupUi()
     auto* name = new QLabel(u"Playlist Downloader"_s, this);
     name->setProperty("pldlHeading", true);
     identity->addWidget(name);
-    auto* tagline = new QLabel(tr("Save whole playlists offline."), this);
+    auto* tagline = new QLabel(tr("Save whole playlists offline, from YouTube and any site."), this);
     identity->addWidget(tagline);
     auto* versionRow = new QHBoxLayout;
     versionRow->setSpacing(6);

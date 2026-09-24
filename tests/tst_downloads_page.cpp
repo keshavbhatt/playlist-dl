@@ -90,7 +90,7 @@ private Q_SLOTS:
         QVERIFY(m_page->countText().isEmpty());
         QCOMPARE(m_page->findChild<QLabel*>(u"emptyTitle"_s)->text(), u"Downloads you start will show up here"_s);
         QCOMPARE(m_page->findChild<QLabel*>(u"emptyBody"_s)->text(),
-                 u"Pick videos on a playlist page and press Download"_s);
+                 u"Pick items on a playlist page and press Download"_s);
         QVERIFY(!m_page->pauseAllButton()->isEnabled());
         QVERIFY(!m_page->resumeAllButton()->isEnabled());
         QVERIFY(!m_page->clearButton()->isEnabled());

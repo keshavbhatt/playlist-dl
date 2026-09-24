@@ -171,6 +171,7 @@ private:
     QStandardItemModel* m_model = nullptr;
     SearchCardDelegate* m_delegate = nullptr;
     QPushButton* m_loadMore = nullptr;
+    QLabel* m_resultsCount = nullptr;
     QWidget* m_emptyPane = nullptr;
     QLabel* m_brandMark = nullptr;
     QList<QAbstractButton*> m_exampleChips;

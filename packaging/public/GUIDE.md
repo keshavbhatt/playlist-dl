@@ -9,7 +9,7 @@ four pages of the window and the settings that matter.
 
 A rail on the left holds the pages: **Search** (Ctrl+1), **Playlist** (Ctrl+2), **Browser**
 (Ctrl+3) and **Downloads** (Ctrl+4), with **Settings** (Ctrl+,), your account and **About**
-at the bottom. Every action has a keyboard shortcut; press Ctrl+/ for the list.
+at the bottom. Every action has a keyboard shortcut; press F1 or Ctrl+/ for the list.
 
 ## Search
 
@@ -21,12 +21,15 @@ Recent searches come back as chips under the field (Settings, General, Keep sear
 A playlist link from any other site (a SoundCloud set, for example) opens on the Playlist page
 too; a link to a single track or video opens the download options.
 
-You can also paste a link: a playlist link opens the Playlist page, a video link offers to
-download that video.
+You can also paste a link: a playlist link opens the Playlist page, a link to a single
+video or track opens the download options. A link dropped anywhere on the window does the
+same, and when you copy a link elsewhere and come back to the app, a small note offers to
+open it.
 
 Searches run through the download engine, so the first search on a fresh install sets it
-up (a sheet shows the progress). "Load more" at the end of the results brings the next
-page; Settings, Search sets how many come at a time.
+up; the page shows the progress in place. "Load more" at the end of the results brings the
+next page, and a line under the results says how many there are; Settings, Search sets how
+many come at a time.
 
 ## Playlist
 
@@ -59,14 +62,17 @@ detected" button appears in the bottom right corner.
 
 Every download is a card with its progress, speed and time left. A playlist is one card
 that shows which video it is on. **Open** on a playlist lists its videos with their state:
-play one, show it in the folder, untick the ones to leave out, arrange or shuffle the order, and
-**Play all** writes a playlist file
-(.m3u8) next to the videos and opens it in your media player. When the folder already has one, a
-notice says so with **Play as is** to open it untouched. The file is also written when
-the playlist finishes downloading (Settings, Downloads, Write a playlist file). Hover a card for pause or resume, cancel, retry, open,
-show in folder and remove. Removing a download that has files asks whether to keep them or
-delete them too. The filters show active, finished or failed downloads; the
-Clear menu removes finished or failed ones; Open folder opens your download folder.
+play one, show it in the folder, untick the ones to leave out, arrange or shuffle the order
+from the **Arrange** menu, and **Play all** writes a playlist file (.m3u8) next to the files
+and opens it in your media player. When the folder already has one, a notice says so with
+**Play as is** to open it untouched. Items that never landed can be queued again with
+**Download the missing items**. The file is also written when the playlist finishes
+downloading (Settings, Downloads, Write a playlist file). Hover a card, or right-click it,
+for pause or resume, cancel, retry, open, show in folder and remove; a failed card shows
+why it failed, and **Retry failed** in the header starts every failed download again.
+Removing a download that has files asks whether to keep them or delete them too. The
+filters show active, finished or failed downloads; the Clear menu removes finished or
+failed ones; Open folder opens your download folder.
 
 On the free version a chip next to the page title counts today's remaining downloads.
 You get a notification when a download finishes, with Open and Show in folder. The

@@ -46,6 +46,8 @@ public:
     void setChecked(int row, bool checked);
     void setAllChecked(bool checked);
     [[nodiscard]] int downloadedCount() const;
+    /// 1-based playlist positions of the entries that have no file on disk.
+    [[nodiscard]] QList<int> missingPositions() const;
     /// Where the playlist file goes (the job's folder).
     [[nodiscard]] QString playlistFilePath() const;
     /// Whether a playlist file is already in the folder (the banner says so).
@@ -65,6 +67,8 @@ public:
 
 Q_SIGNALS:
     void toast(const QString& text);
+    /// The user wants the items without a file: `positions` are 1-based playlist positions.
+    void downloadMissingRequested(const pldl::core::DownloadJob& job, const QList<int>& positions);
 
 private:
     void setupUi();
@@ -93,6 +97,8 @@ private:
     QPushButton* m_sortName = nullptr;
     QPushButton* m_sortPlaylist = nullptr;
     QPushButton* m_shuffle = nullptr;
+    QPushButton* m_arrange = nullptr;      ///< Up, Down, Original, By name, Shuffle as a menu
+    QPushButton* m_downloadMissing = nullptr;
     QPushButton* m_save = nullptr;
     QPushButton* m_playAll = nullptr;
 };

@@ -26,6 +26,28 @@
 
 ## Sessions (newest first)
 
+### 2026-09-25, review rounds
+
+- Owner asked for a full flow and UI/UX review, then "do how you proposed". Three rounds:
+  1. One paste outcome (a single item opens the options sheet everywhere); Ctrl+W only
+     closes a tab, the shortcuts sheet on F1 and Ctrl+/; failed cards show their reason and
+     the header gains Retry failed; the first search or playlist read sets the engine up
+     in place (`ensureEngine(then, quiet)`, `SearchPage::State::SettingUp`, the sheet only
+     on failure) and the Downloads chip invites instead of warning; right-click menus on
+     the download cards and the playlist rows.
+  2. The items sheet gets Download the missing items (a fresh job limited to the missing
+     positions) and an Arrange menu; the Playlist footer adds the selection's duration; the
+     Search empty state says where other sites come in and the results carry a count; the
+     Downloads header shows one of Pause all or Resume all and the combined speed; the
+     options sheet disables Embed without a subtitle language and says the choices become
+     the defaults; Account, Plans and About copy; a Close button on Settings.
+  3. Items wording on the Downloads page and the gate; the window title follows the
+     playlist; toasts take an action (Added to queue offers View); the rail badge and the
+     range slider announce themselves; links by drag and drop; a clipboard link offered
+     once as a toast when the window comes to the front.
+- Left as listed: the Browser empty tab invitation, the Playlist toolbar at narrow widths,
+  merging Appearance into General, a screen-reader pass, and the three owner questions.
+
 ### 2026-09-24, M6
 
 - Store SEO pass (owner: "figure out our niche and make our meta compete"): niche is

@@ -202,6 +202,10 @@ void SearchPage::buildStage()
     connect(m_list, &QListView::clicked, this, [this](const QModelIndex& index) { chooseRow(index.row()); });
     connect(m_delegate, &SearchCardDelegate::stateChanged, this, [this] { m_list->viewport()->update(); });
     resultsLayout->addWidget(m_list, 1);
+    m_resultsCount = new QLabel(m_resultsPane);
+    m_resultsCount->setObjectName(u"resultsCount"_s);
+    m_resultsCount->setProperty("pldlMuted", true);
+    resultsLayout->addWidget(m_resultsCount);
     auto* moreRow = new QHBoxLayout;
     moreRow->addStretch(1);
     m_loadMore = new QPushButton(tr("Load more"), m_resultsPane);
@@ -232,6 +236,14 @@ void SearchPage::buildStage()
     invitation->setProperty("pldlTitle", true);
     invitation->setAlignment(Qt::AlignCenter);
     emptyLayout->addWidget(invitation);
+    auto* scope = new QLabel(tr("Search finds YouTube playlists. For SoundCloud, Bandcamp, Vimeo and other sites, "
+                                "paste the playlist's link."),
+                             m_emptyPane);
+    scope->setObjectName(u"scopeNote"_s);
+    scope->setProperty("pldlMuted", true);
+    scope->setAlignment(Qt::AlignCenter);
+    scope->setWordWrap(true);
+    emptyLayout->addWidget(scope);
     auto* examples = new QWidget(m_emptyPane);
     examples->setObjectName(u"exampleChips"_s);
     auto* exampleLayout = new QHBoxLayout(examples);
@@ -359,6 +371,12 @@ void SearchPage::setState(State state)
         break;
     }
     m_loadMore->setVisible(state == State::Results && m_hasMore);
+    if (state == State::Results) {
+        const int count = static_cast<int>(m_results.size());
+        m_resultsCount->setText(m_hasMore ? tr("%1 playlists so far for %2").arg(count).arg(m_query)
+                                          : (count == 1 ? tr("1 playlist for %1").arg(m_query)
+                                                        : tr("%1 playlists for %2").arg(count).arg(m_query)));
+    }
 }
 
 // ---- searching -------------------------------------------------------------

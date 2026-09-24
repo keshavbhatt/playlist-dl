@@ -179,9 +179,13 @@ SettingsDialog::SettingsDialog(core::Settings& settings, core::ThemeService& the
 
 void SettingsDialog::setupUi()
 {
-    auto* root = new QHBoxLayout(this);
+    auto* outer = new QVBoxLayout(this);
+    outer->setContentsMargins(0, 0, 0, 0);
+    outer->setSpacing(0);
+    auto* root = new QHBoxLayout;
     root->setContentsMargins(0, 0, 0, 0);
     root->setSpacing(0);
+    outer->addLayout(root, 1);
 
     m_nav = new QListWidget(this);
     m_nav->setObjectName(u"settingsNav"_s);
@@ -211,6 +215,18 @@ void SettingsDialog::setupUi()
     m_pages->addWidget(buildAdvanced());
     Q_ASSERT(m_pages->count() == kPageCount);
     root->addWidget(m_pages, 1);
+    // A way out that is not the window control (review 2026-09-24); Esc works too.
+    auto* footer = new QHBoxLayout;
+    footer->setContentsMargins(24, 10, 24, 14);
+    footer->addStretch(1);
+    auto* close = new QPushButton(tr("Close"), this);
+    close->setObjectName(u"closeButton"_s);
+    close->setProperty("pldlPrimary", true);
+    close->setCursor(Qt::PointingHandCursor);
+    close->setAutoDefault(false);
+    connect(close, &QPushButton::clicked, this, &QDialog::accept);
+    footer->addWidget(close);
+    outer->addLayout(footer);
     connect(m_nav, &QListWidget::currentRowChanged, this, [this](int row) {
         m_pages->setCurrentIndex(row);
         if (row == Browser) {

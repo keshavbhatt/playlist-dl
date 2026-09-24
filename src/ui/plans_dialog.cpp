@@ -70,7 +70,8 @@ QFrame* planCard(const QString& name, const QString& badge, const QString& price
 
 QStringList accountFreeItems()
 {
-    return {QObject::tr("Search YouTube playlists"), QObject::tr("Play in the built-in browser, signed in"),
+    return {QObject::tr("Playlists from YouTube, SoundCloud and any site by link"),
+            QObject::tr("Play in the built-in browser, signed in"),
             QObject::tr("Up to %1 downloads a day").arg(services::LicenseService::kFreeDownloadsPerDay),
             QObject::tr("Every quality up to 4K and lossless audio"),
             QObject::tr("Subtitles and thumbnails embedded")};
@@ -80,7 +81,7 @@ QStringList accountProItems()
 {
     return {QObject::tr("Everything in Free"), QObject::tr("No daily limit: unlimited downloads"),
             QObject::tr("Whole playlists in one go, however long"),
-            QObject::tr("Keeps the app maintained")};
+            QObject::tr("One purchase, every future version")};
 }
 
 PlansDialog::PlansDialog(services::LicenseService& license, const core::ThemeService& theme, QWidget* parent)

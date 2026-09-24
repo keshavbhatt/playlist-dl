@@ -1,6 +1,7 @@
 #include "ui/pages/downloads_page.h"
 
 #include "core/downloads/download_queue.h"
+#include "core/downloads/media_info.h"
 #include "core/settings/settings.h"
 #include "core/theme/theme_service.h"
 #include "services/licensing/license_service.h"
@@ -95,7 +96,7 @@ void DownloadsPage::setAllowance(int remaining, int limit)
     }
     m_allowanceChip->setText(text);
     m_allowanceChip->setTone(remaining <= 1 ? BadgeLabel::Tone::Warning : BadgeLabel::Tone::Accent);
-    m_allowanceChip->setToolTip(tr("The free version downloads up to %1 videos a day; a playlist counts each video "
+    m_allowanceChip->setToolTip(tr("The free version downloads up to %1 items a day; a playlist counts each item "
                                    "you pick. The count starts again tomorrow. Pro has no daily limit.")
                                     .arg(limit));
     m_allowanceChip->setAccessibleName(text);
@@ -269,7 +270,7 @@ void DownloadsPage::setupList()
     m_emptyTitle->setAlignment(Qt::AlignCenter);
     m_emptyTitle->setWordWrap(true);
     emptyLayout->addWidget(m_emptyTitle);
-    m_emptyBody = new QLabel(tr("Pick videos on a playlist page and press Download"), empty);
+    m_emptyBody = new QLabel(tr("Pick items on a playlist page and press Download"), empty);
     m_emptyBody->setObjectName(u"emptyBody"_s);
     m_emptyBody->setProperty("pldlMuted", true);
     m_emptyBody->setAlignment(Qt::AlignCenter);
@@ -396,9 +397,21 @@ void DownloadsPage::updateCounts()
     m_count->setText(parts.join(u", "_s));
     m_count->setVisible(!parts.isEmpty());
 
+    // The button that applies shows; both when both apply (review 2026-09-24).
+    m_pauseAll->setVisible(active > 0 || paused == 0);
     m_pauseAll->setEnabled(active > 0);
+    m_resumeAll->setVisible(paused > 0);
     m_resumeAll->setEnabled(paused > 0);
     m_retryFailed->setVisible(failed > 0);
+    double bytesPerSecond = 0;
+    for (int row = 0; row < m_queue.rowCount(); ++row) {
+        if (const auto job = m_queue.job(m_queue.index(row, 0).data(core::DownloadQueue::IdRole).toULongLong())) {
+            bytesPerSecond += job->bytesPerSecond;
+        }
+    }
+    if (bytesPerSecond > 0) {
+        parts << tr("%1/s").arg(core::formatBytes(static_cast<qint64>(bytesPerSecond)));
+    }
     m_clearFinished->setEnabled(finished > 0);
     m_clearFailed->setEnabled(failed > 0);
     m_clearAll->setEnabled(finished + failed > 0);
@@ -409,7 +422,7 @@ void DownloadsPage::updateCounts()
     if (empty) {
         const bool nothingAtAll = m_queue.rowCount() == 0;
         m_emptyTitle->setText(nothingAtAll ? tr("Downloads you start will show up here") : tr("Nothing here"));
-        m_emptyBody->setText(nothingAtAll ? tr("Pick videos on a playlist page and press Download")
+        m_emptyBody->setText(nothingAtAll ? tr("Pick items on a playlist page and press Download")
                                           : tr("No downloads match this filter"));
     }
 }

@@ -4,6 +4,8 @@
 #include <QPointer>
 #include <QWidget>
 
+#include <functional>
+
 class QFrame;
 class QLabel;
 class QTimer;
@@ -34,6 +36,8 @@ public:
     ~ToastHost() override;
 
     void show(const QString& text, Kind kind = Kind::Info);
+    /// The same with one flat action button; the toast closes when it is clicked.
+    void show(const QString& text, Kind kind, const QString& actionText, std::function<void()> onAction);
     [[nodiscard]] int visibleCount() const { return static_cast<int>(m_toasts.size()); }
     /// Re-anchors to the parent's bottom left; the owner calls this on resize.
     void reposition();

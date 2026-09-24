@@ -204,6 +204,7 @@ void PlaylistPage::buildToolbar()
     m_from->setFixedWidth(kSpinWidth);
     layout->addWidget(m_from);
     m_range = new RangeSlider(theme(), row);
+    m_range->setAccessibleName(tr("Item range"));
     m_range->setObjectName(u"rangeSlider"_s);
     m_range->setFixedWidth(kSliderWidth);
     layout->addWidget(m_range);
@@ -525,6 +526,7 @@ void PlaylistPage::elideTitle()
 {
     const int width = std::max(80, m_title->width());
     m_title->setText(QFontMetrics(m_title->font()).elidedText(m_titleText, Qt::ElideRight, width));
+    Q_EMIT titleChanged(m_titleText);
     m_title->setToolTip(m_titleText);
 }
 
@@ -713,7 +715,10 @@ void PlaylistPage::updateSelectionUi()
 {
     const int selected = selectedCount();
     const int total = m_model->rowCount();
-    m_footer->setText(tr("%1 of %2 selected").arg(selected).arg(total));
+    const double duration = m_model->selectedDuration();
+    m_footer->setText(selected > 0 && duration > 0
+                          ? tr("%1 of %2 selected, %3").arg(selected).arg(total).arg(core::formatDuration(duration))
+                          : tr("%1 of %2 selected").arg(selected).arg(total));
     m_download->setText(selected > 0 ? tr("Download %1").arg(itemWord(selected)) : tr("Download"));
     if (!busy::isBusy(m_download)) {
         m_download->setEnabled(m_state == State::Ready && selected > 0);

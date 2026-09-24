@@ -16,6 +16,12 @@
 class QStackedWidget;
 class QWebEnginePermission;
 
+class QMimeData;
+
+class QDragEnterEvent;
+
+class QDropEvent;
+
 namespace pldl::core {
 class ThemeService;
 }
@@ -137,6 +143,9 @@ Q_SIGNALS:
 
 protected:
     void closeEvent(QCloseEvent* event) override;
+    void changeEvent(QEvent* event) override;
+    void dragEnterEvent(QDragEnterEvent* event) override;
+    void dropEvent(QDropEvent* event) override;
     void showEvent(QShowEvent* event) override;
     void hideEvent(QHideEvent* event) override;
     void resizeEvent(QResizeEvent* event) override;
@@ -166,6 +175,12 @@ private:
     /// A link on any site: probed flat; a playlist opens the Playlist page, a
     /// single item the options sheet (FEATURES B4, W3).
     void openAnyLink(const QUrl& url);
+    /// "<playlist>, Playlist Downloader" on the Playlist page, the app name elsewhere.
+    void updateWindowTitle();
+    /// A web link in the clipboard when the window comes to the front: offered
+    /// once as a toast with Open (review 2026-09-24). Never the link on show.
+    void offerClipboardLink();
+    [[nodiscard]] static QUrl linkIn(const QMimeData* mime);
     void presentVideoOptions(const QUrl& probed, const core::MediaInfo& info);
     void showOptionsSheet(DownloadOptionsSheet* sheet);
 
@@ -192,7 +207,8 @@ private:
     services::MediaProbe* m_probe = nullptr;
     QPointer<EngineSetupDialog> m_engineSetup;
     bool m_engineSetupAuto = false;
-    bool m_engineQuiet = false; ///< a page waits inline; the sheet only on failure
+    bool m_engineQuiet = false;
+    QString m_lastClipboardOffer; ///< the link last offered, so it is offered once ///< a page waits inline; the sheet only on failure
     bool m_debugWatching = false; ///< the sheet was opened by ensureEngine: it closes itself once ready
     QList<std::function<void()>> m_awaitingEngine;
     QPointer<AccountDialog> m_accountDialog;

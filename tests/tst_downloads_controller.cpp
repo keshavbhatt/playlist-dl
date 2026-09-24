@@ -201,7 +201,7 @@ private Q_SLOTS:
     {
         auto controller = makeController();
         QSignalSpy plans(controller.get(), &pldl::ui::DownloadsController::plansRequested);
-        QSignalSpy toasts(controller.get(), &pldl::ui::DownloadsController::toast);
+        QSignalSpy toasts(controller.get(), &pldl::ui::DownloadsController::queued);
         QCOMPARE(m_license->downloadsRemainingToday(), pldl::services::LicenseService::kFreeDownloadsPerDay);
 
         QList<quint64> ids;

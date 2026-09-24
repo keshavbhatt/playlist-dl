@@ -11,6 +11,7 @@
 #include <QFrame>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QMenu>
 #include <QListWidget>
 #include <QPushButton>
 #include <QRandomGenerator>
@@ -163,10 +164,33 @@ void PlaylistItemsSheet::setupUi()
     m_shuffle->setObjectName(u"shuffleButton"_s);
     m_shuffle->setToolTip(tr("Put the items in a random order"));
     connect(m_shuffle, &QPushButton::clicked, this, &PlaylistItemsSheet::shuffle);
-    for (QPushButton* button : {m_play, m_reveal, m_up, m_down, m_sortPlaylist, m_sortName, m_shuffle}) {
+    // Play and Folder stay as buttons; the five arranging actions go under one
+    // menu (review 2026-09-24: nine controls in the footer was too many).
+    m_arrange = flat(tr("Arrange"), u"sliders"_s);
+    m_arrange->setObjectName(u"arrangeButton"_s);
+    m_arrange->setToolTip(tr("Move, sort or shuffle the items"));
+    auto* arrangeMenu = new QMenu(m_arrange);
+    for (QPushButton* button : {m_up, m_down, m_sortPlaylist, m_sortName, m_shuffle}) {
+        button->hide(); // kept for the tests and the shortcuts; the menu drives them
+        QAction* action = arrangeMenu->addAction(button->icon(), button->text(), button, &QPushButton::click);
+        action->setToolTip(button->toolTip());
+        connect(button, &QPushButton::clicked, action, [action, button] { action->setEnabled(button->isEnabled()); });
+    }
+    m_arrange->setMenu(arrangeMenu);
+    for (QPushButton* button : {m_play, m_reveal, m_arrange}) {
         tools->addWidget(button);
     }
     tools->addStretch(1);
+    m_downloadMissing = flat(tr("Download the missing items"), u"download"_s);
+    m_downloadMissing->setObjectName(u"downloadMissingButton"_s);
+    m_downloadMissing->setToolTip(tr("Queue the items that have no file yet, with this playlist's options"));
+    connect(m_downloadMissing, &QPushButton::clicked, this, [this] {
+        const QList<int> positions = missingPositions();
+        if (!positions.isEmpty()) {
+            Q_EMIT downloadMissingRequested(m_job, positions);
+        }
+    });
+    tools->addWidget(m_downloadMissing);
     root->addLayout(tools);
 
     auto* footer = new QHBoxLayout;
@@ -193,7 +217,7 @@ void PlaylistItemsSheet::setupUi()
     m_playAll->setIcon(icons::themed(u"play"_s, t.accentText));
     m_playAll->setCursor(Qt::PointingHandCursor);
     m_playAll->setDefault(true);
-    m_playAll->setToolTip(tr("Saves the playlist file in the order shown and opens it in your media player"));
+    m_playAll->setToolTip(tr("Writes the playlist file with the checked items in the order shown, then opens it in your media player"));
     connect(m_playAll, &QPushButton::clicked, this, &PlaylistItemsSheet::playAll);
     footer->addWidget(m_playAll);
     root->addLayout(footer);
@@ -238,11 +262,24 @@ void PlaylistItemsSheet::rebuildList()
     QString summary = have == total ? tr("%1 of %2 downloaded, all there.").arg(have).arg(total)
                                     : tr("%1 of %2 downloaded.").arg(have).arg(total);
     if (!hasPlaylistFile()) {
-        summary += u' ' + tr("Play all writes a playlist file next to the videos with the checked items in the order shown.");
+        summary += u' ' + tr("Play all writes a playlist file next to the files.");
     }
     m_summary->setText(summary);
+    m_downloadMissing->setVisible(have < total);
     refreshBanner();
     refreshButtons();
+}
+
+QList<int> PlaylistItemsSheet::missingPositions() const
+{
+    QList<int> positions;
+    for (int i = 0; i < m_original.size(); ++i) {
+        const core::PlaylistEntry& entry = m_original.at(i);
+        if (entry.file.isEmpty() || !QFileInfo::exists(entry.file)) {
+            positions << i + 1; // the playlist's own order, as the engine counts
+        }
+    }
+    return positions;
 }
 
 bool PlaylistItemsSheet::hasPlaylistFile() const

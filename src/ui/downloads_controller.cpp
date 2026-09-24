@@ -263,7 +263,7 @@ void DownloadsController::showLimitSheet(int requested, int remaining, QWidget* 
         return;
     }
     const int limit = services::LicenseService::kFreeDownloadsPerDay;
-    QString body = tr("The free version downloads up to %n video(s) a day.", nullptr, limit);
+    QString body = tr("The free version downloads up to %n item(s) a day.", nullptr, limit);
     if (remaining > 0) {
         body += u' ' + tr("%n more today, and this needs %1.", nullptr, remaining).arg(requested);
     } else {
@@ -299,7 +299,7 @@ quint64 DownloadsController::enqueue(core::DownloadJob job)
     applySpeedLimit(job);
     const quint64 id = m_queue->add(job);
     qCInfo(lcUi) << "queued download" << id << job.url;
-    Q_EMIT toast(tr("Added to queue"));
+    Q_EMIT queued(tr("Added to queue"));
     return id;
 }
 
@@ -321,7 +321,7 @@ QList<quint64> DownloadsController::enqueueAll(QList<core::DownloadJob> jobs)
     }
     if (!ids.isEmpty()) {
         qCInfo(lcUi) << "queued" << ids.size() << "downloads";
-        Q_EMIT toast(ids.size() == 1 ? tr("Added to queue") : tr("Added %n videos to the queue", nullptr, items));
+        Q_EMIT queued(ids.size() == 1 ? tr("Added to queue") : tr("Added %n items to the queue", nullptr, items));
     }
     return ids;
 }

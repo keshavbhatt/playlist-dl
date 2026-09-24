@@ -121,6 +121,8 @@ Q_SIGNALS:
     /// releases its busy button on this).
     void requestSettled(const QUrl& url, bool queued);
     void toast(const QString& text);
+    /// Something landed in the queue: a toast with a View action.
+    void queued(const QString& text);
 
 private:
     void wireEngine();

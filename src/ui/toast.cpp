@@ -8,6 +8,7 @@
 #include <QFrame>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QPushButton>
 #include <QTimer>
 
 using namespace Qt::StringLiterals;
@@ -39,6 +40,11 @@ ToastHost::~ToastHost() = default;
 
 void ToastHost::show(const QString& text, Kind kind)
 {
+    show(text, kind, QString(), {});
+}
+
+void ToastHost::show(const QString& text, Kind kind, const QString& actionText, std::function<void()> onAction)
+{
     while (m_toasts.size() >= kMaxVisible) {
         dismiss(m_toasts.first().frame);
     }
@@ -68,6 +74,21 @@ void ToastHost::show(const QString& text, Kind kind)
     auto* label = new QLabel(text, frame);
     label->setWordWrap(true);
     layout->addWidget(label, 1);
+    if (!actionText.isEmpty()) {
+        auto* action = new QPushButton(actionText, frame);
+        action->setObjectName(u"toastAction"_s);
+        action->setProperty("pldlFlat", true);
+        action->setProperty("pldlLink", true);
+        action->setCursor(Qt::PointingHandCursor);
+        action->setAccessibleName(actionText);
+        connect(action, &QPushButton::clicked, this, [this, frame, onAction = std::move(onAction)] {
+            if (onAction) {
+                onAction();
+            }
+            dismiss(frame);
+        });
+        layout->addWidget(action);
+    }
     frame->adjustSize();
     frame->show();
 
