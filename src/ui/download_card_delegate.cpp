@@ -183,6 +183,57 @@ std::optional<DownloadCardDelegate::Action> DownloadCardDelegate::actionAt(const
     return std::nullopt;
 }
 
+void DownloadCardDelegate::paintProgress(QPainter* painter, const QRect& track, core::DownloadState state,
+                                        double progress, const QColor& chunk, const QColor& trackColor) const
+{
+    // An accent chunk on the border track while something is in flight.
+    QPainterPath trackPath;
+    trackPath.addRoundedRect(track, 2, 2);
+    painter->fillPath(trackPath, trackColor);
+    const bool indeterminate = state == core::DownloadState::Probing || state == core::DownloadState::Processing ||
+                               (state == core::DownloadState::Downloading && progress < 0);
+    if (!indeterminate) {
+        if (progress > 0) {
+            QRect fill = track;
+            fill.setWidth(std::max(4, static_cast<int>(track.width() * std::min(1.0, progress))));
+            QPainterPath fillPath;
+            fillPath.addRoundedRect(fill, 2, 2);
+            painter->fillPath(fillPath, chunk);
+        }
+        return;
+    }
+    // A short segment travelling along the track; the pulse timer keeps the
+    // view repainting while one is on screen.
+    m_animationPainted = true;
+    if (!m_pulse->isActive()) {
+        m_pulse->start();
+    }
+    const int span = track.width() / 4;
+    const int offset = static_cast<int>((QDateTime::currentMSecsSinceEpoch() / 10) % (track.width() + span)) - span;
+    const QRect seg(track.left() + std::max(0, offset), track.top(), std::min(span, track.width() - std::max(0, offset)),
+                    track.height());
+    if (seg.width() > 0) {
+        QPainterPath segPath;
+        segPath.addRoundedRect(seg, 2, 2);
+        painter->fillPath(segPath, chunk);
+    }
+}
+
+void DownloadCardDelegate::paintButtons(QPainter* painter, const QList<HitButton>& buttons, const Tokens& t,
+                                       qreal dpr) const
+{
+    for (const HitButton& b : buttons) {
+        const bool over = b.rect.contains(m_hoverPos);
+        QPainterPath bp;
+        bp.addRoundedRect(b.rect, 8, 8);
+        painter->fillPath(bp, over ? t.hover : t.panel);
+        painter->setPen(QPen(over ? t.accent : t.border, 1));
+        painter->drawPath(bp);
+        const QPixmap icon = icons::pixmap(b.icon, over ? t.text : t.muted, 16, dpr);
+        painter->drawPixmap(b.rect.center().x() - 8, b.rect.center().y() - 8, icon);
+    }
+}
+
 void DownloadCardDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option,
                                  const QModelIndex& index) const
 {
@@ -210,8 +261,10 @@ void DownloadCardDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
     const QString thumbUrl = index.data(core::DownloadQueue::ThumbnailRole).toString();
     const QPixmap thumb = thumbUrl.isEmpty() ? QPixmap() : m_thumbnails.get(thumbUrl);
     const bool playlist = index.data(core::DownloadQueue::IsPlaylistRole).toBool();
-    thumbs::paintThumbnail(painter, thumbRect, thumb, {t.accentStrong, playlist ? u"playlist"_s : u"film"_s, 22},
-                           dpr, 8);
+    // A neutral tile behind a missing picture, shaded away from the muted
+    // token so every state's bar (muted, accent, warning, ...) reads on it.
+    const QColor tile = dark ? t.muted.darker(175) : t.muted.lighter(130);
+    thumbs::paintThumbnail(painter, thumbRect, thumb, {tile, playlist ? u"playlist"_s : u"film"_s, 22}, dpr, 8);
     {
         QPainterPath clip;
         clip.addRoundedRect(thumbRect, 8, 8);
@@ -264,42 +317,9 @@ void DownloadCardDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
                       smallMetrics.elidedText(index.data(core::DownloadQueue::DetailLineRole).toString(),
                                               Qt::ElideRight, detailRow.width()));
 
-    // Progress: an accent chunk on the border track while something is in flight.
     if (showsBar(state)) {
-        const QRect track(textLeft, card.top() + 48, textWidth, 4);
-        QPainterPath trackPath;
-        trackPath.addRoundedRect(track, 2, 2);
-        painter->fillPath(trackPath, t.border);
-        const double progress = index.data(core::DownloadQueue::ProgressRole).toDouble();
-        const bool indeterminate = state == core::DownloadState::Probing ||
-                                   state == core::DownloadState::Processing ||
-                                   (state == core::DownloadState::Downloading && progress < 0);
-        if (!indeterminate) {
-            if (progress > 0) {
-                QRect fill = track;
-                fill.setWidth(std::max(4, static_cast<int>(track.width() * std::min(1.0, progress))));
-                QPainterPath fillPath;
-                fillPath.addRoundedRect(fill, 2, 2);
-                painter->fillPath(fillPath, bar);
-            }
-        } else {
-            // A short segment travelling along the track; the pulse timer
-            // keeps the view repainting while one is on screen.
-            m_animationPainted = true;
-            if (!m_pulse->isActive()) {
-                m_pulse->start();
-            }
-            const int span = track.width() / 4;
-            const int offset =
-                static_cast<int>((QDateTime::currentMSecsSinceEpoch() / 10) % (track.width() + span)) - span;
-            const QRect seg(track.left() + std::max(0, offset), track.top(),
-                            std::min(span, track.width() - std::max(0, offset)), track.height());
-            if (seg.width() > 0) {
-                QPainterPath segPath;
-                segPath.addRoundedRect(seg, 2, 2);
-                painter->fillPath(segPath, bar);
-            }
-        }
+        paintProgress(painter, QRect(textLeft, card.top() + 48, textWidth, 4), state,
+                      index.data(core::DownloadQueue::ProgressRole).toDouble(), bar, t.border);
     }
 
     // Status line.
@@ -317,18 +337,8 @@ void DownloadCardDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
                       smallMetrics.elidedText(index.data(core::DownloadQueue::StatusLineRole).toString(),
                                               Qt::ElideRight, statusRow.width()));
 
-    // Hover actions.
     if (hovered) {
-        for (const HitButton& b : buttons) {
-            const bool over = b.rect.contains(m_hoverPos);
-            QPainterPath bp;
-            bp.addRoundedRect(b.rect, 8, 8);
-            painter->fillPath(bp, over ? t.hover : t.panel);
-            painter->setPen(QPen(over ? t.accent : t.border, 1));
-            painter->drawPath(bp);
-            const QPixmap icon = icons::pixmap(b.icon, over ? t.text : t.muted, 16, dpr);
-            painter->drawPixmap(b.rect.center().x() - 8, b.rect.center().y() - 8, icon);
-        }
+        paintButtons(painter, buttons, t, dpr);
     }
 
     // Keyboard focus: a 2 px accent ring around the card.

@@ -10,6 +10,8 @@
 #include <QPointer>
 #include <QUrl>
 
+#include <optional>
+
 class QTimer;
 class QWidget;
 
@@ -110,6 +112,7 @@ private:
     void wireEngine();
     void wireQueue();
     void wireNotifications();
+    [[nodiscard]] std::optional<core::DownloadJob> notifiedJob(quint64 notificationId) const;
     void handleJobFinished(quint64 id, core::DownloadState state);
     void keepThumbnail(quint64 id);
     void schedulePersist();

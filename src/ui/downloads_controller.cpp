@@ -150,23 +150,21 @@ void DownloadsController::wireQueue()
     });
 }
 
+std::optional<core::DownloadJob> DownloadsController::notifiedJob(quint64 notificationId) const
+{
+    const auto it = m_notificationJobs.constFind(notificationId);
+    return it == m_notificationJobs.constEnd() ? std::nullopt : m_queue->job(it.value());
+}
+
 void DownloadsController::wireNotifications()
 {
     connect(m_notifications, &core::NotificationService::activated, this, [this](quint64 id) {
-        const auto it = m_notificationJobs.constFind(id);
-        if (it == m_notificationJobs.constEnd()) {
-            return;
-        }
-        if (const auto job = m_queue->job(it.value()); job && !job->primaryFile().isEmpty()) {
+        if (const auto job = notifiedJob(id); job && !job->primaryFile().isEmpty()) {
             platform::openFile(job->primaryFile());
         }
     });
     connect(m_notifications, &core::NotificationService::actionInvoked, this, [this](quint64 id, const QString& key) {
-        const auto it = m_notificationJobs.constFind(id);
-        if (it == m_notificationJobs.constEnd()) {
-            return;
-        }
-        const auto job = m_queue->job(it.value());
+        const auto job = notifiedJob(id);
         if (!job) {
             return;
         }

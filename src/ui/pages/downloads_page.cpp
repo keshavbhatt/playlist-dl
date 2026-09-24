@@ -285,12 +285,23 @@ void DownloadsPage::setFilter(Filter filter)
 
 void DownloadsPage::updateCounts()
 {
-    const int active = DownloadsFilterProxy::countFor(m_queue, Filter::Active);
+    // "Active" here is the rail badge's number (queued and running); paused
+    // entries are listed apart so the two never disagree.
+    const int active = m_queue.activeCount();
     const int finished = DownloadsFilterProxy::countFor(m_queue, Filter::Finished);
     const int failed = DownloadsFilterProxy::countFor(m_queue, Filter::Failed);
+    int paused = 0;
+    for (const core::DownloadJob& job : m_queue.jobs()) {
+        if (job.state == core::DownloadState::Paused) {
+            ++paused;
+        }
+    }
     QStringList parts;
     if (active > 0) {
         parts << tr("%n active", nullptr, active);
+    }
+    if (paused > 0) {
+        parts << tr("%n paused", nullptr, paused);
     }
     if (finished > 0) {
         parts << tr("%n finished", nullptr, finished);
@@ -301,13 +312,7 @@ void DownloadsPage::updateCounts()
     m_count->setText(parts.join(u", "_s));
     m_count->setVisible(!parts.isEmpty());
 
-    int paused = 0;
-    for (const core::DownloadJob& job : m_queue.jobs()) {
-        if (job.state == core::DownloadState::Paused) {
-            ++paused;
-        }
-    }
-    m_pauseAll->setEnabled(m_queue.activeCount() > 0);
+    m_pauseAll->setEnabled(active > 0);
     m_resumeAll->setEnabled(paused > 0);
     m_clearFinished->setEnabled(finished > 0);
     m_clearFailed->setEnabled(failed > 0);

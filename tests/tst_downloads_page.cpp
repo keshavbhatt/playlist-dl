@@ -102,7 +102,7 @@ private Q_SLOTS:
         QVERIFY(!m_page->isEmptyStateVisible());
         QCOMPARE(m_page->filter(), Filter::All);
         QCOMPARE(m_page->visibleCount(), 6);
-        QCOMPARE(m_page->countText(), u"3 active, 1 finished, 2 failed"_s);
+        QCOMPARE(m_page->countText(), u"2 active, 1 paused, 1 finished, 2 failed"_s);
         m_page->setFilter(Filter::Active);
         QCOMPARE(m_page->visibleCount(), 3);
         m_page->setFilter(Filter::Finished);
@@ -124,7 +124,7 @@ private Q_SLOTS:
         QCOMPARE(m_page->findChild<QLabel*>(u"emptyTitle"_s)->text(), u"Nothing here"_s);
         chips.at(0)->click();
         QCOMPARE(m_page->visibleCount(), 5);
-        QCOMPARE(m_page->countText(), u"3 active, 2 failed"_s);
+        QCOMPARE(m_page->countText(), u"2 active, 1 paused, 2 failed"_s);
     }
 
     void clearMenuRemovesWhatItSays()
@@ -143,7 +143,7 @@ private Q_SLOTS:
         fillQueue();
         m_page->clearMenu()->actions().at(2)->trigger();
         QCOMPARE(m_controller->queue().rowCount(), 3);
-        QCOMPARE(m_page->countText(), u"3 active"_s);
+        QCOMPARE(m_page->countText(), u"2 active, 1 paused"_s);
     }
 
     void engineChipFollowsTheStatus()

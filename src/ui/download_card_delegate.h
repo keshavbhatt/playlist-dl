@@ -19,6 +19,7 @@ class ThemeService;
 namespace pldl::ui {
 
 class ThumbnailCache;
+struct Tokens;
 
 /// Paints one download as an 88 px card (DESIGN.md section 3, Downloads):
 /// the thumbnail with a state bar, the title with the quality and format at
@@ -83,6 +84,9 @@ private:
     };
     [[nodiscard]] QList<HitButton> buttonsFor(const QRect& card, core::DownloadState state, bool hasFile) const;
     [[nodiscard]] static QRect cardRect(const QRect& rect);
+    void paintProgress(QPainter* painter, const QRect& track, core::DownloadState state, double progress,
+                       const QColor& chunk, const QColor& trackColor) const;
+    void paintButtons(QPainter* painter, const QList<HitButton>& buttons, const Tokens& tokens, qreal dpr) const;
     void pulse();
 
     ThumbnailCache& m_thumbnails;
