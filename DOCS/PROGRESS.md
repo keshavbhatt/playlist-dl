@@ -52,6 +52,10 @@
   delegate and filters. Verified live headless: `PLDL_DEBUG_DOWNLOAD` provisioned the
   engine and downloaded "Me at the zoo" (av1+aac, thumbnail embedded) in 151 s, exit 0.
   39 tests pass. Grabs of the demo queue in dark and light looked at.
+- Owner report: the rail's bottom buttons missed clicks. Cause: the empty toast host (a
+  transparent child widget at its default size) sat in the bottom-left corner over them and
+  took the mouse. It now starts hidden and lives over the page area; tst_smoke checks that
+  every rail button is what lies under its centre.
 - Owner request: About reachable from the rail's bottom (info glyph under Account); the
   About sheet itself already matched Red's shape.
 - Owner request: a new browser tab opens empty by default; Settings, Browser offers Empty

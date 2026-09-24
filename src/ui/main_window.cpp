@@ -197,8 +197,10 @@ void MainWindow::setupUi()
     layout->addWidget(m_rail);
     layout->addWidget(m_pages, 1);
     setCentralWidget(central);
-    // Inside the central widget so the toast sits in the window (and its grabs).
-    m_toasts = new ToastHost(central);
+    // Over the page area, never the rail: the bottom-left corner of the pages
+    // is where toasts belong (DESIGN.md section 1) and the rail's bottom
+    // buttons stay clickable.
+    m_toasts = new ToastHost(m_pages);
     // Settings, General: Start page, Search or the page the app was closed on.
     const int last = std::min(m_settings.lastPage(), static_cast<int>(PageId::Downloads));
     showPage(m_settings.startPage() == core::StartPage::LastPage ? static_cast<PageId>(last)

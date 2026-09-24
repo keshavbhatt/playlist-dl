@@ -7,6 +7,7 @@
 
 #include <QApplication>
 #include <QStackedWidget>
+#include <QToolButton>
 #include <QStandardPaths>
 #include <QTemporaryDir>
 #include <QTest>
@@ -39,6 +40,19 @@ private Q_SLOTS:
         settings.setTheme(pldl::core::Theme::Light);
         settings.setBlockAds(false);
         settings.setBlockAds(true);
+        // The rail's bottom buttons take the click (an invisible toast host
+        // used to sit over them): whatever is under each button's centre is
+        // the button itself.
+        for (QToolButton* button : window.findChildren<QToolButton*>()) {
+            if (!button->property("pldlRailButton").toBool() || !button->isVisible()) {
+                continue;
+            }
+            const QPoint centre = button->mapTo(&window, button->rect().center());
+            QCOMPARE(window.childAt(centre), static_cast<QWidget*>(button));
+        }
+        auto* toasts = window.findChild<QWidget*>(u"toastHost"_s);
+        QVERIFY(toasts != nullptr);
+        QVERIFY(!toasts->isVisible());
         window.openUrl(u"https://example.com/video"_s);
         QTest::qWait(100);
         QCOMPARE(window.findChild<QStackedWidget*>()->currentIndex(), static_cast<int>(PageId::Browser));

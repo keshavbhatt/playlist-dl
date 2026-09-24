@@ -29,6 +29,9 @@ ToastHost::ToastHost(QWidget* parent)
     if (parent != nullptr) {
         parent->installEventFilter(this);
     }
+    // Hidden until the first toast: an empty host still takes the mouse for
+    // its rectangle, and it sits where the rail's bottom buttons are.
+    hide();
     reposition();
 }
 
