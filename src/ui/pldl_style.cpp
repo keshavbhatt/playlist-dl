@@ -111,6 +111,7 @@ QLabel[pldlHeading="true"] { font-size: 20px; font-weight: 600; }
    titles and descriptions (owner request). */
 QLabel[pldlSection="true"] { font-size: 12px; font-weight: 600; color: {{accent}}; text-transform: uppercase; letter-spacing: 1px; }
 QLabel[pldlLink="true"] { color: {{link}}; }
+QPushButton[pldlLink="true"] { color: {{link}}; }
 
 /* Cards */
 QFrame[pldlCard="true"] {

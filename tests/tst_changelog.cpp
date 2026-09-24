@@ -18,6 +18,18 @@ class TestChangelog : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
+    void releasesListEveryHeadingWithItsDate()
+    {
+        const QList<ChangelogRelease> releases = changelogReleases(kDoc);
+        QCOMPARE(releases.size(), 2);
+        QCOMPARE(releases.at(0).version, u"10.1.0"_s);
+        QVERIFY(releases.at(0).date.isEmpty()); // unreleased
+        QCOMPARE(releases.at(1).version, u"10.0.0"_s);
+        QCOMPARE(releases.at(1).date, u"2026-09-20"_s);
+        QCOMPARE(changelogReleases(u"## [v2.0.0] - 2025-01-02\r\nbody\r\n"_s).first().version, u"2.0.0"_s);
+        QVERIFY(changelogReleases(QString()).isEmpty());
+    }
+
     void sectionWithSuffixStopsAtNextHeading()
     {
         QCOMPARE(changelogSection(kDoc, u"10.1.0"_s), u"New stuff.\n\n### Added\n- **A**: one"_s);

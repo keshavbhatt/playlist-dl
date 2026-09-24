@@ -33,7 +33,8 @@ to `rewrite-kit/reference/red-docs/DECISIONS.md`) and the UMD 7 refinements of t
   (R-ADR-010).
 - Accounts through the shared AccountAndLicense module with a per-app config; gate decided by
   the owner; nothing about it in user-facing release text (R-ADR-011).
-- What's new once per version from the bundled changelog (R-ADR-012).
+- What's new once per version from the bundled changelog; a Version picker shows earlier
+  releases and About links to it (R-ADR-012, kit update of 2026-09-24).
 - Every dialog is the app's own sheet, including the ones raised by pop-up windows.
 - UMD's interaction and accessibility standard for every control (DESIGN.md section 1).
 

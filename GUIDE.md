@@ -93,5 +93,8 @@ playlist-dl --quit              quit the running instance
 
 ## Something wrong?
 
+**What's new** beside the version in About shows this release's notes; the Version picker
+reads earlier releases once there are some.
+
 Settings, Advanced, **Copy diagnostics** puts the versions, paths and recent log lines on
 the clipboard; About has a **Report a bug** button that opens an issue with them attached.

@@ -30,3 +30,7 @@ are not repeated. Below: what 2.x adds, from `reference/analysis-playlist-dl-v2.
 - Ask the owner the product questions early; make the routine calls yourself.
 - Probe the live page over CDP before writing a selector.
 - Script the screenshots; verify headlessly before asking the owner to look.
+- A word-wrapped `QLabel` gives a layout a width-dependent height Qt leaves out of a
+  window's minimum size: give it a full-width row and pin its minimum height.
+- Five pill buttons fit one row at about 680 px; a sixth does not. Secondary entries go
+  as a flat link beside the line they belong to (What's new beside the version in About).

@@ -4,6 +4,7 @@
 
 class QLabel;
 class QPlainTextEdit;
+class QPushButton;
 
 namespace pldl::core {
 class Settings;
@@ -29,12 +30,14 @@ private:
     void setupUi();
     void copyDiagnostics();
     void reportBug();
+    void showWhatsNew();
 
     const core::Settings& m_settings;
     core::ThemeService& m_theme;
     QString m_userAgent;
     QString m_engineSummary;
     QPlainTextEdit* m_debugText = nullptr;
+    QPushButton* m_whatsNew = nullptr;
 };
 
 } // namespace pldl::ui

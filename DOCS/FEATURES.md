@@ -27,7 +27,7 @@ name (ADR-002), the repository licence (ADR-005).
 | S6 | Native notifications on finish with Open and Show in folder (portal, then freedesktop) | none | KEEP | done (`core::NotificationService`, `platform::createNotifier`, wired in `DownloadsController`) |
 | S7 | Crash handler, log file, diagnostics copy, Report a bug sheet | Debug Info in About | KEEP | done (`platform::installCrashHandler`, `core::LogSink`, `ui::AboutDialog`, `ui::BugReportDialog`) |
 | S8 | GPU auto-fallback, Wayland to XCB retry | none | KEEP | done (`main.cpp`, `core::graphics_fallback`, `platform::GpuStderrWatch`) |
-| S9 | What's new once per version from the bundled changelog; Online guide | none | KEEP | done (`ui::WhatsNewDialog`, `links::kGuide`) |
+| S9 | What's new once per version from the bundled changelog, with a Version picker for earlier releases and a What's new link in About; Online guide | none | KEEP | done (`ui::WhatsNewDialog`, `core::changelogReleases`, `AboutDialog::showWhatsNew`; tst_whats_new_dialog) |
 | S10 | CLI: `playlist-dl <url>`, `--download <url>`, `--settings`, `--profile`, `--quit` | none | KEEP | done (`app::CliOptions`) |
 | S11 | Shortcuts sheet (Ctrl+/) listing every action | none | KEEP | done (`ui::ShortcutsDialog`) |
 | S12 | Rate this app nag, Claim offer, Donate button | yes | DROP | the store and the account sheet cover them |

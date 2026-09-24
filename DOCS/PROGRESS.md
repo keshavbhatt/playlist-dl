@@ -28,6 +28,10 @@
 
 ### 2026-09-24, M6
 
+- Kit update ported (owner request): the What's new sheet takes the whole changelog, opens
+  on the running version and carries a Version picker once there are two releases; About
+  shows a flat What's new link beside the version; `whatsnew:<version>` and
+  `PLDL_DEBUG_CHANGELOG=<path>` hooks; `core::changelogReleases`.
 - Owner request: Remove on a download that is running or has files asks Keep, Remove from
   list or Delete the files too (`core::job_files`, the controller's one sheet; the page's
   own confirm is gone).

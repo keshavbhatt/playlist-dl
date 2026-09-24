@@ -709,8 +709,11 @@ void MainWindow::debugOpen(const QString& what)
         auto* dialog = new BugReportDialog(m_settings, m_theme, m_browser->userAgent(), QString(), this);
         dialog->setAttribute(Qt::WA_DeleteOnClose);
         dialog->show();
-    } else if (what == u"whatsnew"_s) {
+    } else if (what == u"whatsnew"_s || what.startsWith(u"whatsnew:"_s)) {
         maybeShowWhatsNew(true);
+        if (auto* dialog = findChild<WhatsNewDialog*>(); dialog != nullptr && what.contains(u':')) {
+            dialog->showVersion(what.section(u':', 1)); // whatsnew:<version> opens on an older release
+        }
     } else if (what == u"settings"_s) {
         showSettings();
     } else if (what.startsWith(u"settings:"_s)) {
@@ -992,7 +995,7 @@ void MainWindow::maybeShowWhatsNew(bool force)
         return;
     }
     m_settings.setWhatsNewSeenVersion(m_appVersion); // marked when shown: a crash must not loop it
-    auto* dialog = new WhatsNewDialog(m_appVersion, notes, this);
+    auto* dialog = new WhatsNewDialog(m_appVersion, WhatsNewDialog::bundledChangelog(), this);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
 }

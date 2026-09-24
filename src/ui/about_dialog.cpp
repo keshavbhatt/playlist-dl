@@ -10,6 +10,7 @@
 #include "ui/icons.h"
 #include "ui/links.h"
 #include "ui/pldl_style.h"
+#include "ui/whats_new_dialog.h"
 
 #include <QApplication>
 #include <QClipboard>
@@ -63,9 +64,25 @@ void AboutDialog::setupUi()
     identity->addWidget(name);
     auto* tagline = new QLabel(tr("Save whole playlists offline."), this);
     identity->addWidget(tagline);
-    auto* version = new QLabel(tr("Version %1").arg(QApplication::applicationVersion()), this);
+    auto* versionRow = new QHBoxLayout;
+    versionRow->setSpacing(6);
+    const QString appVersion = QApplication::applicationVersion();
+    auto* version = new QLabel(tr("Version %1").arg(appVersion), this);
     version->setProperty("pldlMuted", true);
-    identity->addWidget(version);
+    version->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    versionRow->addWidget(version);
+    // The release notes, one click from the version they describe.
+    m_whatsNew = new QPushButton(tr("What's new"), this);
+    m_whatsNew->setObjectName(u"whatsNew"_s);
+    m_whatsNew->setProperty("pldlFlat", true);
+    m_whatsNew->setProperty("pldlLink", true);
+    m_whatsNew->setCursor(Qt::PointingHandCursor);
+    m_whatsNew->setToolTip(tr("Release notes for this version and earlier ones"));
+    m_whatsNew->setVisible(!WhatsNewDialog::bundledNotes(appVersion).isEmpty());
+    connect(m_whatsNew, &QPushButton::clicked, this, &AboutDialog::showWhatsNew);
+    versionRow->addWidget(m_whatsNew);
+    versionRow->addStretch(1);
+    identity->addLayout(versionRow);
     identity->addSpacing(6);
     auto* author = new QLabel(
         tr("Designed and developed by Keshav Bhatt, <a href=\"%1\">ktechpit.com</a>").arg(kWebsiteUrl),
@@ -127,9 +144,18 @@ void AboutDialog::setupUi()
     buttons->addStretch(1);
     auto* close = new QPushButton(tr("Close"), this);
     close->setProperty("pldlPrimary", true);
+    close->setDefault(true);
     connect(close, &QPushButton::clicked, this, &QDialog::accept);
     buttons->addWidget(close);
     root->addLayout(buttons);
+    close->setFocus(); // Enter closes; the What's new link keeps its ring for keyboard users only
+}
+
+void AboutDialog::showWhatsNew()
+{
+    auto* dialog = new WhatsNewDialog(QApplication::applicationVersion(), WhatsNewDialog::bundledChangelog(), this);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->show();
 }
 
 void AboutDialog::reportBug()
