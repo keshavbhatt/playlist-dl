@@ -37,9 +37,9 @@ name (ADR-002), the repository licence (ADR-005).
 
 | # | Feature | 2.x | Decision | Status / class |
 |---|---|---|---|---|
-| B1 | Keyword search for playlists through the ktechpit service (`api.php?query=`), results as playlist cards with thumbnail, title, channel, video count | list rows with a preview of videos | KEEP | done (`services::KtechpitSearch`, `ui::SearchPage`, `ui::SearchCardDelegate`; verified live) |
+| B1 | Keyword search for playlists through the download engine, results as playlist cards with thumbnail, title, channel, video count | list rows from the ktechpit service, with a preview of videos | KEEP | done (`services::PlaylistSearch` over `services::SearchService`, `ui::SearchPage`, `ui::SearchCardDelegate`; the ktechpit service was dropped by the owner on 2026-09-24) |
 | B2 | Engine-based search as the fallback: when the service times out (8 s), errors, or answers with anything but a non-empty array, the same query runs through the engine's playlist search; an "Engine search" chip appears in the header (ADR-003) | none: an outage looked like "no results" | KEEP | done (`services::PlaylistSearch`, `services::SearchService`; tst_playlist_search) |
-| B3 | Setting "Search service: Automatic / Engine only" and "Results per page" | none | KEEP | done (`Settings::searchMode`, `searchResultsPerPage`; the Settings page lands with G1) |
+| B3 | Setting "Results per page" | none | KEEP | done (`Settings::searchResultsPerPage`, Settings, Search) |
 | B4 | Paste a playlist or video link in the field: a playlist resolves to the Playlist page, a video opens the Download options sheet for it | "Process Playlist" button | KEEP | done (`SearchPage::linkOf`, `MainWindow::openVideoOptions`) |
 | B5 | Search suggestions while typing (https, encoded query, JSON client) | plain http, JSONP breaks silently | KEEP | done (`services::SearchSuggestions`, https JSON client, two hosts with a retry; verified live) |
 | B6 | Recent queries as chips (setting, on); Load more | none | KEEP | done (`Settings::recentQueries`, Load more) |

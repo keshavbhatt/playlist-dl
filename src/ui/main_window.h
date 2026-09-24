@@ -111,8 +111,7 @@ public Q_SLOTS:
     /// Headless verification aid: opens a screen by name: "about",
     /// "shortcuts", "account", "plans", "bug", "whatsnew", "settings",
     /// "browser:<url>" (a tab on that page), "browser-fullscreen",
-    /// "search:<query>" (types and searches), "search-engine:<query>" (the
-    /// same with the engine forced), "search-typing:<text>" (typed, with
+    /// "search:<query>" (types and searches), "search-typing:<text>" (typed, with
     /// the suggestions), "search-demo" (canned results), "downloads-demo"
     /// (the Downloads page with one canned job per state), "playlist:<url>"
     /// (opens and reads that playlist), "playlist-demo" (a canned playlist,

@@ -40,7 +40,6 @@ constexpr int kDefaultSpeedLimit = 0;
 constexpr bool kDefaultUseSessionCookies = true;
 constexpr bool kDefaultEmbedThumbnail = true;
 constexpr bool kDefaultEmbedMetadata = true;
-constexpr SearchMode kDefaultSearchMode = SearchMode::Automatic;
 constexpr int kDefaultSearchResultsPerPage = 20;
 constexpr bool kDefaultKeepSearchHistory = true;
 constexpr bool kDefaultSearchGridView = true;
@@ -592,19 +591,6 @@ void Settings::setSubtitleLanguages(const QStringList& languages)
 }
 
 // ---- search/ ---------------------------------------------------------------
-
-SearchMode Settings::searchMode() const
-{
-    return enumFromInt(intValue(keys::kSearchServiceMode, static_cast<int>(kDefaultSearchMode)),
-                       kDefaultSearchMode, 2);
-}
-
-void Settings::setSearchMode(SearchMode mode)
-{
-    if (storeInt(keys::kSearchServiceMode, static_cast<int>(kDefaultSearchMode), static_cast<int>(mode))) {
-        Q_EMIT searchChanged();
-    }
-}
 
 int Settings::searchResultsPerPage() const
 {

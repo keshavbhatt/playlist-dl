@@ -650,17 +650,13 @@ void MainWindow::debugOpen(const QString& what)
     } else if (what.startsWith(u"search:"_s)) {
         showPage(PageId::Search);
         m_search->search(what.mid(7));
-    } else if (what.startsWith(u"search-engine:"_s)) {
-        showPage(PageId::Search);
-        m_search->setEngineOnly(true);
-        m_search->search(what.mid(14));
     } else if (what.startsWith(u"search-typing:"_s)) {
         showPage(PageId::Search);
         m_search->typeQuery(what.mid(14));
     } else if (what == u"search-demo"_s) {
         showPage(PageId::Search);
         m_search->queryField()->setText(u"lofi"_s);
-        m_search->showResults(SearchPage::demoResults(), true, services::PlaylistSearch::Source::Service);
+        m_search->showResults(SearchPage::demoResults(), true);
     } else if (what == u"playlist"_s) {
         showPage(PageId::Playlist);
     } else if (what.startsWith(u"playlist:"_s)) {

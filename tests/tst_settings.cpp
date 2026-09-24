@@ -183,7 +183,6 @@ private Q_SLOTS:
 
     void searchKeys()
     {
-        QCOMPARE(m_settings->searchMode(), SearchMode::Automatic);
         QCOMPARE(m_settings->searchResultsPerPage(), 20);
         QVERIFY(m_settings->keepSearchHistory());
         QVERIFY(m_settings->searchGridView());
@@ -196,23 +195,20 @@ private Q_SLOTS:
         QCOMPARE(changed.count(), 1);
         m_settings->setSearchGridView(true);
         changed.clear();
-        m_settings->setSearchMode(SearchMode::EngineOnly);
-        m_settings->setSearchMode(SearchMode::EngineOnly);
-        QCOMPARE(m_settings->searchMode(), SearchMode::EngineOnly);
-        QCOMPARE(changed.count(), 1);
         m_settings->setSearchResultsPerPage(5);
         QCOMPARE(m_settings->searchResultsPerPage(), Settings::kMinSearchResultsPerPage);
+        QCOMPARE(changed.count(), 1);
         m_settings->setSearchResultsPerPage(99);
         QCOMPARE(m_settings->searchResultsPerPage(), Settings::kMaxSearchResultsPerPage);
-        QCOMPARE(changed.count(), 3);
+        QCOMPARE(changed.count(), 2);
         m_settings->setKeepSearchHistory(false);
         QVERIFY(!m_settings->keepSearchHistory());
-        QCOMPARE(changed.count(), 4);
+        QCOMPARE(changed.count(), 3);
 
         // Recent queries: most recent first, no duplicates, at most eight,
         // blanks ignored.
         m_settings->addRecentQuery(u"  "_s);
-        QCOMPARE(changed.count(), 4);
+        QCOMPARE(changed.count(), 3);
         for (int i = 1; i <= 9; ++i) {
             m_settings->addRecentQuery(u"query %1"_s.arg(i));
         }
@@ -226,7 +222,7 @@ private Q_SLOTS:
         m_settings->sync();
         Settings again(m_dir->filePath(u"pldl.ini"_s));
         QCOMPARE(again.recentQueries(), m_settings->recentQueries());
-        QCOMPARE(again.searchMode(), SearchMode::EngineOnly);
+        QCOMPARE(again.searchResultsPerPage(), m_settings->searchResultsPerPage());
         const qsizetype before = changed.count();
         m_settings->clearRecentQueries();
         QVERIFY(m_settings->recentQueries().isEmpty());

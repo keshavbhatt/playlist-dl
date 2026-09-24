@@ -548,20 +548,12 @@ QWidget* SettingsDialog::buildIdentityPicker()
 QWidget* SettingsDialog::buildSearch()
 {
     using namespace settings_form;
-    m_searchMode = makeCombo(this, m_loading,
-                             {{tr("Automatic"), static_cast<int>(core::SearchMode::Automatic)},
-                              {tr("Engine only"), static_cast<int>(core::SearchMode::EngineOnly)}},
-                             [this](int v) { m_settings.setSearchMode(static_cast<core::SearchMode>(v)); });
-    m_searchMode->setObjectName(u"searchModeCombo"_s);
     m_resultsPerPage = makeSpin(this, m_loading, core::Settings::kMinSearchResultsPerPage,
                                 core::Settings::kMaxSearchResultsPerPage, 10,
                                 [this](int v) { m_settings.setSearchResultsPerPage(v); });
-    QWidget* search = card(tr("Search"),
-                           {row(tr("Search service"), m_searchMode,
-                                tr("Automatic tries the search service first, then the download engine.")),
-                            row(tr("Results per page"), m_resultsPerPage)},
-                           this);
-    return page(tr("Search"), tr("Where searches go and how many results come back."), {search}, this);
+    m_resultsPerPage->setObjectName(u"resultsPerPageSpin"_s);
+    QWidget* search = card(tr("Search"), {row(tr("Results per page"), m_resultsPerPage)}, this);
+    return page(tr("Search"), tr("How many results a search brings back at a time."), {search}, this);
 }
 
 QWidget* SettingsDialog::buildAdvanced()
@@ -644,7 +636,6 @@ void SettingsDialog::loadValues()
     m_scale->setValue(qRound(m_settings.interfaceScale() * 100));
     loadDownloadValues();
     loadBrowserValues();
-    selectData(m_searchMode, static_cast<int>(m_settings.searchMode()));
     m_resultsPerPage->setValue(m_settings.searchResultsPerPage());
     selectData(m_hardware, static_cast<int>(m_settings.hardwareAcceleration()));
     m_loading = false;

@@ -19,9 +19,8 @@ log (PROGRESS). The rewrite follows `/home/commander/DCode/rewrite-kit/PLAYBOOK.
   "media converter". Real names only in install hints, the advanced system-engine option, and
   Diagnostics.
 - ffmpeg is never downloaded; it comes from the system or the snap and Flatpak runtimes.
-- Search goes to the ktechpit search service first and falls back to the download engine's
-  own search when the service fails or returns nothing usable (ADR-003). Neither name reaches
-  the user; the UI says "search".
+- Search runs through the download engine only (ADR-003 as revised on 2026-09-24); the
+  ktechpit search service is gone. No tool name reaches the user; the UI says "search".
 - The theme is the app's own (DESIGN.md): brand tokens derived from the app icon, a light and
   a dark scheme, the `{{token}}` sheet. No YouTube red, no system-theme styling.
 - The application flow stays the one users know from 2.x: search or paste a playlist, browse

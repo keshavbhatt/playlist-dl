@@ -125,3 +125,10 @@ endpoint with an encoded query, silently off when it fails.
 **Consequences.** The first screen keeps working when the service is down, at the cost of a
 first-time engine setup on that path. The service stays first because it answers with the
 video preview the cards show; the engine's playlist search carries less per item.
+
+**Revised (owner, 2026-09-24): the engine is the single source.** The ktechpit service is
+dropped: `services::KtechpitSearch` and the fallback logic are deleted, `PlaylistSearch` is
+a thin owner of `SearchService` (engine paths, lazy provisioning, paging), the source chip
+and the "Search service" setting are gone. Consequence: the first search on a fresh install
+provisions the engine (the setup sheet shows progress) and every search pages with "Load
+more". The suggestion endpoint stays as it was.

@@ -155,7 +155,6 @@ private:
     QComboBox* m_identity = nullptr;
     QLineEdit* m_identityText = nullptr;
     // search
-    QComboBox* m_searchMode = nullptr;
     QSpinBox* m_resultsPerPage = nullptr;
     // advanced
     QComboBox* m_hardware = nullptr;

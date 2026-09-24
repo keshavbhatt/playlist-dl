@@ -71,14 +71,12 @@ SearchPage::SearchPage(core::Settings& settings, core::ThemeService& theme, Thum
 
     connect(m_search, &services::PlaylistSearch::finished, this, &SearchPage::handleFinished);
     connect(m_search, &services::PlaylistSearch::failed, this, &SearchPage::handleFailed);
-    connect(m_search, &services::PlaylistSearch::sourceChanged, this, &SearchPage::setSource);
     connect(m_search, &services::PlaylistSearch::engineNeeded, this, &SearchPage::engineNeeded);
     connect(m_suggestions, &services::SearchSuggestions::suggestions, this, &SearchPage::showSuggestions);
     connect(&m_thumbnails, &ThumbnailCache::ready, this,
             [this](const QString&) { m_list->viewport()->update(); });
     connect(&m_settings, &core::Settings::searchChanged, this, &SearchPage::rebuildRecent);
 
-    setSource(services::PlaylistSearch::Source::Service);
     rebuildRecent();
     setState(State::Empty);
     applyViewMode();
@@ -123,11 +121,6 @@ void SearchPage::buildHeader()
         search(m_field->text());
     });
     headerLayout()->addWidget(m_button);
-
-    m_chip = new BadgeLabel(theme(), this);
-    m_chip->setObjectName(u"sourceChip"_s);
-    m_chip->setGlyph(u"search"_s);
-    headerLayout()->addWidget(m_chip);
 
     // Grid or list (FEATURES B10): two exclusive flat buttons, the choice kept
     // in Settings so it survives a restart and other views can follow it.
@@ -349,18 +342,6 @@ void SearchPage::setState(State state)
     m_loadMore->setVisible(state == State::Results && m_hasMore);
 }
 
-void SearchPage::setSource(services::PlaylistSearch::Source source)
-{
-    const bool engine = source == services::PlaylistSearch::Source::Engine;
-    m_chip->setText(services::PlaylistSearch::describe(source));
-    m_chip->setToolTip(services::PlaylistSearch::tooltip(source));
-    m_chip->setGlyph(u"engine"_s);
-    m_chip->setAccessibleName(m_chip->toolTip());
-    // Hidden while the service answers: a second "Search" next to the button
-    // read as a duplicate (owner, 2026-09-24).
-    m_chip->setVisible(engine);
-}
-
 // ---- searching -------------------------------------------------------------
 
 bool SearchPage::looksLikeLink(const QString& text)
@@ -483,8 +464,7 @@ void SearchPage::cancelSearch()
     }
 }
 
-void SearchPage::handleFinished(quint64 id, const QList<services::SearchResult>& results, bool hasMore,
-                                services::PlaylistSearch::Source source)
+void SearchPage::handleFinished(quint64 id, const QList<services::SearchResult>& results, bool hasMore)
 {
     if (id != m_searchId) {
         return;
@@ -498,7 +478,7 @@ void SearchPage::handleFinished(quint64 id, const QList<services::SearchResult>&
         setState(State::Results);
         return;
     }
-    showResults(results, hasMore, source);
+    showResults(results, hasMore);
 }
 
 void SearchPage::handleFailed(quint64 id, const QString& message)
@@ -520,10 +500,8 @@ void SearchPage::handleFailed(quint64 id, const QString& message)
     setState(State::Error);
 }
 
-void SearchPage::showResults(const QList<services::SearchResult>& results, bool hasMore,
-                             services::PlaylistSearch::Source source)
+void SearchPage::showResults(const QList<services::SearchResult>& results, bool hasMore)
 {
-    setSource(source);
     if (m_query.isEmpty()) {
         m_query = m_field->text().trimmed();
     }
@@ -546,6 +524,12 @@ void SearchPage::appendResults(const QList<services::SearchResult>& results)
 {
     for (const services::SearchResult& result : results) {
         if (!result.isValid()) {
+            continue;
+        }
+        // The service's pages overlap by an item now and then: one card each.
+        const bool seen = std::any_of(m_results.cbegin(), m_results.cend(),
+                                      [&result](const services::SearchResult& r) { return r.url == result.url; });
+        if (seen) {
             continue;
         }
         m_results.append(result);
@@ -618,12 +602,6 @@ void SearchPage::setEnginePaths(const core::EnginePaths& paths)
 void SearchPage::retryPending()
 {
     m_search->retryPending();
-}
-
-void SearchPage::setEngineOnly(bool engineOnly)
-{
-    m_search->setModeOverride(engineOnly ? std::optional(services::PlaylistSearch::Mode::EngineOnly)
-                                         : std::nullopt);
 }
 
 // ---- recent ----------------------------------------------------------------

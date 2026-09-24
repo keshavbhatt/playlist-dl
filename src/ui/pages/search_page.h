@@ -81,10 +81,8 @@ public:
     void setEnginePaths(const core::EnginePaths& paths);
     void retryPending();
     /// Forces the engine for every search of this run (the debug hook).
-    void setEngineOnly(bool engineOnly);
     /// Shows `results` as if a search had answered (the tests, the demo hook).
-    void showResults(const QList<services::SearchResult>& results, bool hasMore,
-                     services::PlaylistSearch::Source source);
+    void showResults(const QList<services::SearchResult>& results, bool hasMore);
     /// A canned result set for PLDL_DEBUG_OPEN=search-demo.
     [[nodiscard]] static QList<services::SearchResult> demoResults();
 
@@ -97,7 +95,6 @@ public:
     [[nodiscard]] services::SearchSuggestions& suggestions() { return *m_suggestions; }
     [[nodiscard]] QLineEdit* queryField() const { return m_field; }
     [[nodiscard]] QPushButton* searchButton() const { return m_button; }
-    [[nodiscard]] BadgeLabel* sourceChip() const { return m_chip; }
     [[nodiscard]] QListView* resultsView() const { return m_list; }
     [[nodiscard]] QToolButton* gridViewButton() const { return m_gridButton; }
     [[nodiscard]] QToolButton* listViewButton() const { return m_listButton; }
@@ -132,10 +129,8 @@ private:
     void applyIcons();
     void setState(State state);
     void startSearch(const QString& query, int page);
-    void handleFinished(quint64 id, const QList<services::SearchResult>& results, bool hasMore,
-                        services::PlaylistSearch::Source source);
+    void handleFinished(quint64 id, const QList<services::SearchResult>& results, bool hasMore);
     void handleFailed(quint64 id, const QString& message);
-    void setSource(services::PlaylistSearch::Source source);
     void appendResults(const QList<services::SearchResult>& results);
     void chooseRow(int row);
     void rebuildRecent();
@@ -154,7 +149,6 @@ private:
     services::SearchSuggestions* m_suggestions;
     QLineEdit* m_field = nullptr;
     QPushButton* m_button = nullptr;
-    BadgeLabel* m_chip = nullptr;
     QToolButton* m_gridButton = nullptr;
     QToolButton* m_listButton = nullptr;
     QWidget* m_recentRow = nullptr;

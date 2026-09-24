@@ -5,8 +5,6 @@
 qt_add_library(pldl_services STATIC
     engine_manager.cpp
     engine_manager.h
-    ktechpit_search.cpp
-    ktechpit_search.h
     licensing/license_config.h
     licensing/license_service.cpp
     licensing/license_service.h

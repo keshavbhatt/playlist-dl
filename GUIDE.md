@@ -20,9 +20,9 @@ Recent searches come back as chips under the field (Settings, General, Keep sear
 You can also paste a link: a playlist link opens the Playlist page, a video link offers to
 download that video.
 
-When the search service does not answer, the download engine searches instead; an "Engine search" chip
-then appears next to the Search button. Settings, Search lets you use the engine
-only.
+Searches run through the download engine, so the first search on a fresh install sets it
+up (a sheet shows the progress). "Load more" at the end of the results brings the next
+page; Settings, Search sets how many come at a time.
 
 ## Playlist
 
@@ -69,7 +69,7 @@ the page title shows its state.
   downloads, concurrent downloads, speed limit, skip already downloaded, use my YouTube
   sign-in, and the download engine card (check for updates, update, auto-update).
 - **Browser**: start page, restore tabs, block ads, Do Not Track, browser identity.
-- **Search**: search service, results per page.
+- **Search**: results per page.
 - **Advanced**: hardware acceleration, clear cache, sign out and clear session, reset
   permissions, open the log folder, copy diagnostics, reset settings.
 

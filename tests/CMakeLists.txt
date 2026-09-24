@@ -63,7 +63,6 @@ pldl_add_test(tst_search_service      tst_search_service.cpp      pldl_services)
 set_tests_properties(tst_search_service PROPERTIES TIMEOUT 180)
 pldl_add_test(tst_engine_manager      tst_engine_manager.cpp      pldl_services)
 set_tests_properties(tst_engine_manager PROPERTIES TIMEOUT 900)
-pldl_add_test(tst_ktechpit_search     tst_ktechpit_search.cpp     pldl_services)
 pldl_add_test(tst_search_suggestions  tst_search_suggestions.cpp  pldl_services)
 pldl_add_test(tst_playlist_search     tst_playlist_search.cpp     pldl_services)
 # platform

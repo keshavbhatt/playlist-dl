@@ -100,15 +100,15 @@ private Q_SLOTS:
         auto dialog = makeDialog(true);
         auto* theme = dialog->findChild<QComboBox*>(u"themeCombo"_s);
         auto* concurrent = dialog->findChild<QSpinBox*>(u"concurrentSpin"_s);
-        auto* mode = dialog->findChild<QComboBox*>(u"searchModeCombo"_s);
-        QVERIFY(theme != nullptr && concurrent != nullptr && mode != nullptr);
+        auto* perPage = dialog->findChild<QSpinBox*>(u"resultsPerPageSpin"_s);
+        QVERIFY(theme != nullptr && concurrent != nullptr && perPage != nullptr);
         QCOMPARE(theme->currentData().toInt(), static_cast<int>(pldl::core::Theme::System));
         theme->setCurrentIndex(theme->findData(static_cast<int>(pldl::core::Theme::Dark)));
         QCOMPARE(m_settings->theme(), pldl::core::Theme::Dark);
         concurrent->setValue(4);
         QCOMPARE(m_settings->concurrentDownloads(), 4);
-        mode->setCurrentIndex(mode->findData(static_cast<int>(pldl::core::SearchMode::EngineOnly)));
-        QCOMPARE(m_settings->searchMode(), pldl::core::SearchMode::EngineOnly);
+        perPage->setValue(30);
+        QCOMPARE(m_settings->searchResultsPerPage(), 30);
 
         // A custom browser identity: the field appears and stores its text.
         dialog->showPage(SettingsDialog::Browser);
@@ -132,15 +132,15 @@ private Q_SLOTS:
         auto dialog = makeDialog(true);
         auto* theme = dialog->findChild<QComboBox*>(u"themeCombo"_s);
         auto* concurrent = dialog->findChild<QSpinBox*>(u"concurrentSpin"_s);
-        auto* mode = dialog->findChild<QComboBox*>(u"searchModeCombo"_s);
+        auto* perPage = dialog->findChild<QSpinBox*>(u"resultsPerPageSpin"_s);
         QSignalSpy themeChanges(m_settings.get(), &pldl::core::Settings::themeChanged);
         m_settings->setTheme(pldl::core::Theme::Light);
         m_settings->setConcurrentDownloads(5);
-        m_settings->setSearchMode(pldl::core::SearchMode::EngineOnly);
+        m_settings->setSearchResultsPerPage(40);
         m_settings->setBlockAds(false);
         QCOMPARE(theme->currentData().toInt(), static_cast<int>(pldl::core::Theme::Light));
         QCOMPARE(concurrent->value(), 5);
-        QCOMPARE(mode->currentData().toInt(), static_cast<int>(pldl::core::SearchMode::EngineOnly));
+        QCOMPARE(perPage->value(), 40);
         QCOMPARE(themeChanges.count(), 1); // loading never echoes back into the settings
         auto* blocked = dialog->findChild<QLabel*>(u"blockedCount"_s);
         QVERIFY(blocked != nullptr);

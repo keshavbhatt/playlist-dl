@@ -11,8 +11,7 @@ a left rail for the Search, Playlist, Browser and Downloads pages.
 
 ### Added
 - Search: playlist search with suggestions as you type, recent queries, a card grid with
-  the video count on every playlist, a list view, and Load more. When the search service
-  does not answer, the download engine searches instead and the page says so.
+  the video count on every playlist, a list view, and Load more for the next page.
 - Paste a playlist or video link into the search field to open it directly.
 - Browser: the full YouTube site in tabs with sign-in, find in page, an ad blocker with a
   blocked-request count, full screen, and a Download button that knows whether the page is

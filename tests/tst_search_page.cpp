@@ -6,7 +6,6 @@
 
 #include "core/settings/settings.h"
 #include "core/theme/theme_service.h"
-#include "services/ktechpit_search.h"
 #include "services/search_suggestions.h"
 #include "ui/badge_label.h"
 #include "ui/busy_button.h"
@@ -80,8 +79,7 @@ private Q_SLOTS:
         m_theme = std::make_unique<ThemeService>(*m_settings);
         m_thumbnails = std::make_unique<ThumbnailCache>();
         m_page = std::make_unique<SearchPage>(*m_settings, *m_theme, *m_thumbnails);
-        // Nothing leaves the machine: the service and the suggestions are dead ends.
-        m_page->playlistSearch().service().setEndpoint(kDeadEndpoint);
+        // Nothing leaves the machine: the suggestions are a dead end and there is no engine.
         m_page->suggestions().setEndpoint(kDeadEndpoint);
         m_page->resize(1000, 640);
         m_page->show();
@@ -106,7 +104,6 @@ private Q_SLOTS:
         QCOMPARE(examples->findChildren<QToolButton*>().size(), 3);
         QVERIFY(!m_page->recentRow()->isVisible());
         QVERIFY(!m_page->suggestionsPopup()->isVisible());
-        QVERIFY(!m_page->sourceChip()->isVisible());
         QVERIFY(!m_page->queryField()->placeholderText().isEmpty());
         QVERIFY(!m_page->searchButton()->text().isEmpty());
         QVERIFY(!busy::isBusy(m_page->searchButton()));
@@ -180,13 +177,10 @@ private Q_SLOTS:
     {
         QSignalSpy chosen(m_page.get(), &SearchPage::playlistChosen);
         QSignalSpy requested(m_page.get(), &SearchPage::playlistRequested);
-        m_page->showResults(canned(5), true, PlaylistSearch::Source::Engine);
+        m_page->showResults(canned(5), true);
         QCOMPARE(m_page->state(), SearchPage::State::Results);
         QCOMPARE(m_page->results().size(), 5);
         QCOMPARE(m_page->resultsView()->model()->rowCount(), 5);
-        QCOMPARE(m_page->sourceChip()->text(), u"Engine search"_s);
-        QVERIFY(m_page->sourceChip()->isVisible());
-        QVERIFY(m_page->sourceChip()->toolTip().contains(u"download engine"_s));
         QVERIFY(m_page->resultsView()->isVisible());
         QVERIFY(m_page->loadMoreButton()->isVisible());
         const QModelIndex first = m_page->resultsView()->model()->index(0, 0);
@@ -207,14 +201,13 @@ private Q_SLOTS:
         QCOMPARE(requested.first().at(0).toUrl().toString(), u"https://www.youtube.com/playlist?list=PL2"_s);
 
         // The service source: no chip, no Load more.
-        m_page->showResults(canned(2), false, PlaylistSearch::Source::Service);
-        QVERIFY(!m_page->sourceChip()->isVisible());
+        m_page->showResults(canned(2), false);
         QCOMPARE(m_page->resultsView()->model()->rowCount(), 2);
         QVERIFY(!m_page->loadMoreButton()->isVisible());
 
         // Nothing: the no-results state names the query.
         m_page->queryField()->setText(u"zzz"_s);
-        m_page->showResults({}, false, PlaylistSearch::Source::Service);
+        m_page->showResults({}, false);
         QCOMPARE(m_page->state(), SearchPage::State::NoResults);
         QVERIFY(m_page->statusLabel()->isVisible());
         QVERIFY(!m_page->retryButton()->isVisible());
@@ -233,7 +226,6 @@ private Q_SLOTS:
         QTRY_COMPARE_WITH_TIMEOUT(needed.size(), 1, 5000);
         QVERIFY(m_page->playlistSearch().hasPending());
         QCOMPARE(m_page->state(), SearchPage::State::Loading);
-        QCOMPARE(m_page->sourceChip()->text(), u"Engine search"_s);
         // Still no engine: the search fails and offers Retry.
         m_page->retryPending();
         QCOMPARE(m_page->state(), SearchPage::State::Error);
@@ -294,7 +286,7 @@ private Q_SLOTS:
             QVERIFY(!result.thumbnailUrl.isEmpty());
             result.thumbnailUrl.clear(); // offline: nothing is fetched while painting
         }
-        m_page->showResults(demo, true, PlaylistSearch::Source::Service);
+        m_page->showResults(demo, true);
         QCOMPARE(m_page->resultsView()->model()->rowCount(), demo.size());
         m_settings->setTheme(Theme::Dark);
         QTest::qWait(50);

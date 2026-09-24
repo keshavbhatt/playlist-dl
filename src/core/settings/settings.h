@@ -104,14 +104,6 @@ enum class FilenamePattern
     ChannelTitle, ///< Channel - Title.ext
 };
 
-/// Where a playlist search goes (ADR-003): the search service first with
-/// the engine as the fallback, or the engine alone.
-enum class SearchMode
-{
-    Automatic,
-    EngineOnly,
-};
-
 /// Typed facade over QSettings. The only place in the code base allowed to
 /// construct a QSettings. Defaults live in one table (settings.cpp), every
 /// setter emits a change signal so the rest of the app reacts instead of
@@ -235,8 +227,6 @@ public:
     void setSubtitleLanguages(const QStringList& languages);
 
     // search/
-    [[nodiscard]] SearchMode searchMode() const;
-    void setSearchMode(SearchMode mode);
     /// Results per page of the engine's search, kMinSearchResultsPerPage to kMaxSearchResultsPerPage.
     [[nodiscard]] int searchResultsPerPage() const;
     void setSearchResultsPerPage(int count);
@@ -334,4 +324,3 @@ Q_DECLARE_METATYPE(pldl::core::Container)
 Q_DECLARE_METATYPE(pldl::core::AudioFormat)
 Q_DECLARE_METATYPE(pldl::core::DownloadKind)
 Q_DECLARE_METATYPE(pldl::core::FilenamePattern)
-Q_DECLARE_METATYPE(pldl::core::SearchMode)
