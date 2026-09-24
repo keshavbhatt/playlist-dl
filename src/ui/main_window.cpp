@@ -17,10 +17,12 @@
 #include "ui/message_sheet.h"
 #include "ui/pages/browser_page.h"
 #include "ui/pages/page.h"
+#include "ui/pages/search_page.h"
 #include "ui/permission_prompt.h"
 #include "ui/shortcuts_dialog.h"
 #include "ui/side_rail.h"
 #include "ui/theme_applier.h"
+#include "ui/thumbnail_cache.h"
 #include "ui/tray_controller.h"
 #include "ui/whats_new_dialog.h"
 
@@ -29,14 +31,14 @@
 #include <QCloseEvent>
 #include <QFileInfo>
 #include <QHBoxLayout>
+#include <QLineEdit>
 #include <QSessionManager>
 #include <QStackedWidget>
 #include <QTimer>
-
-#include <utility>
 #include <QtEnvironmentVariables>
 
 #include <algorithm>
+#include <utility>
 
 using namespace Qt::StringLiterals;
 
@@ -97,11 +99,24 @@ void MainWindow::setupUi()
     connect(m_engine, &services::EngineManager::installFailed, this, [this](const QString& error) {
         qCWarning(lcUi) << "engine setup failed:" << error;
         m_awaitingEngine.clear();
+        if (m_search != nullptr) {
+            m_search->retryPending(); // a search waiting for the engine fails with a message
+        }
     });
 
     m_pages = new QStackedWidget(this);
-    m_search = new Page(tr("Search"), m_theme, this);
-    m_search->setPlaceholder(tr("Search for playlists, videos and channels. Coming soon."));
+    m_thumbnails = new ThumbnailCache(this);
+    m_search = new SearchPage(m_settings, m_theme, *m_thumbnails, this);
+    connect(m_search, &SearchPage::playlistRequested, this, &MainWindow::openPlaylist);
+    connect(m_search, &SearchPage::videoRequested, this,
+            [this](const QUrl& url) { openUrl(url.toString()); });
+    connect(m_search, &SearchPage::engineNeeded, this, [this] {
+        ensureEngine([this] {
+            m_search->setEnginePaths(m_engine->paths());
+            m_search->retryPending();
+        });
+    });
+    connect(m_engine, &services::EngineManager::ready, m_search, &SearchPage::setEnginePaths);
     m_playlist = new Page(tr("Playlist"), m_theme, this);
     m_playlist->setPlaceholder(tr("A playlist's entries, ready to play or download. Coming soon."));
     m_browser = new BrowserPage(m_settings, m_theme, m_appVersion, this);
@@ -232,6 +247,14 @@ void MainWindow::openUrl(const QString& url)
     m_browser->open(QUrl::fromUserInput(url));
 }
 
+void MainWindow::openPlaylist(const QUrl& url)
+{
+    // TODO(playlist page): hand the url to the Playlist page once it lands; the
+    // placeholder page is shown for now.
+    qCInfo(lcUi) << "playlist requested:" << url.toString();
+    showPage(PageId::Playlist);
+}
+
 void MainWindow::downloadUrl(const QString& url)
 {
     if (url.trimmed().isEmpty()) {
@@ -266,7 +289,8 @@ void MainWindow::saveWindowState()
 
 void MainWindow::closeEvent(QCloseEvent* event)
 {
-    if (!m_quitting && m_settings.closeAction() == core::CloseAction::MinimizeToTray && m_tray->isAvailable()) {
+    if (!m_quitting && m_settings.closeAction() == core::CloseAction::MinimizeToTray &&
+        m_tray->isAvailable()) {
         event->ignore();
         hide();
         return;
@@ -323,7 +347,8 @@ void MainWindow::toggleVisibility()
 
 void MainWindow::showSettings()
 {
-    MessageSheet::info(this, tr("Settings"), tr("The settings sheet is not built yet. It comes with the next step."));
+    MessageSheet::info(this, tr("Settings"),
+                       tr("The settings sheet is not built yet. It comes with the next step."));
 }
 
 void MainWindow::showShortcuts()
@@ -384,6 +409,20 @@ void MainWindow::debugOpen(const QString& what)
         m_browser->debugEnterFullScreen();
     } else if (what == u"search"_s) {
         showPage(PageId::Search);
+    } else if (what.startsWith(u"search:"_s)) {
+        showPage(PageId::Search);
+        m_search->search(what.mid(7));
+    } else if (what.startsWith(u"search-engine:"_s)) {
+        showPage(PageId::Search);
+        m_search->setEngineOnly(true);
+        m_search->search(what.mid(14));
+    } else if (what.startsWith(u"search-typing:"_s)) {
+        showPage(PageId::Search);
+        m_search->typeQuery(what.mid(14));
+    } else if (what == u"search-demo"_s) {
+        showPage(PageId::Search);
+        m_search->queryField()->setText(u"lofi"_s);
+        m_search->showResults(SearchPage::demoResults(), true, services::PlaylistSearch::Source::Service);
     } else if (what == u"playlist"_s) {
         showPage(PageId::Playlist);
     } else if (what == u"browser"_s) {
@@ -435,9 +474,10 @@ void MainWindow::maybeShowWhatsNew(bool force)
 void MainWindow::handleRenderProcessGaveUp()
 {
     showAndRaise();
-    MessageSheet::info(this, tr("The browser page keeps crashing"),
-                       tr("The page's render process crashed several times in a row. If this keeps happening, "
-                          "try Settings, Advanced, Hardware acceleration: Off."));
+    MessageSheet::info(
+        this, tr("The browser page keeps crashing"),
+        tr("The page's render process crashed several times in a row. If this keeps happening, "
+           "try Settings, Advanced, Hardware acceleration: Off."));
 }
 
 // ---- browser ---------------------------------------------------------------

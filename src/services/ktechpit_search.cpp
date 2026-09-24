@@ -55,7 +55,8 @@ QUrl KtechpitSearch::requestUrl(const QUrl& endpoint, const QString& query)
     QUrl url = endpoint;
     // Encoded by hand and set strictly: the tolerant parser would turn a "+"
     // or a "&" in the query into a delimiter.
-    url.setQuery(u"query="_s + QString::fromLatin1(QUrl::toPercentEncoding(query.trimmed())), QUrl::StrictMode);
+    url.setQuery(u"query="_s + QString::fromLatin1(QUrl::toPercentEncoding(query.trimmed())),
+                 QUrl::StrictMode);
     return url;
 }
 

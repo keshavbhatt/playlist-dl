@@ -27,8 +27,10 @@ class Actions;
 class BrowserPage;
 class EngineSetupDialog;
 class Page;
+class SearchPage;
 class SideRail;
 class ThemeApplier;
+class ThumbnailCache;
 class TrayController;
 
 /// Top-level window (DESIGN.md section 2): rail | page stack. Owns the pages
@@ -72,6 +74,9 @@ public Q_SLOTS:
     void showPage(PageId page);
     /// A link from the CLI or another instance: opens on the Browser page.
     void openUrl(const QString& url);
+    /// A playlist from the Search page (a card or a pasted link): the
+    /// Playlist page shows it.
+    void openPlaylist(const QUrl& url);
     /// A link to download right away (the Downloads page is not built yet:
     /// the link opens in the browser for now).
     void downloadUrl(const QString& url);
@@ -81,8 +86,11 @@ public Q_SLOTS:
     void showAccount();
     /// Headless verification aid: opens a screen by name: "about",
     /// "shortcuts", "account", "plans", "bug", "whatsnew", "settings",
-    /// "browser:<url>" (a tab on that page), "browser-fullscreen", or a page
-    /// name ("search", "playlist", "browser", "downloads").
+    /// "browser:<url>" (a tab on that page), "browser-fullscreen",
+    /// "search:<query>" (types and searches), "search-engine:<query>" (the
+    /// same with the engine forced), "search-typing:<text>" (typed, with
+    /// the suggestions), "search-demo" (canned results), or a page name
+    /// ("search", "playlist", "browser", "downloads").
     void debugOpen(const QString& what);
     void quit();
 
@@ -110,7 +118,8 @@ private:
     Actions* m_actions = nullptr;
     SideRail* m_rail = nullptr;
     QStackedWidget* m_pages = nullptr;
-    Page* m_search = nullptr;
+    ThumbnailCache* m_thumbnails = nullptr;
+    SearchPage* m_search = nullptr;
     Page* m_playlist = nullptr;
     BrowserPage* m_browser = nullptr;
     Page* m_downloads = nullptr;
