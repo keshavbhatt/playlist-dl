@@ -1,0 +1,122 @@
+# FEATURES: the scope contract
+
+Decision legend: KEEP (in 3.0), LATER (after it), DROP (never).
+Status legend: `todo`, `wip`, `done (class)`, `verified` (exercised live on the owner's desktop).
+
+Sources: `reference/analysis-playlist-dl-v2.md` (the 2.x app), the rewrite kit's Red FEATURES
+and UMD 7's FEATURES for the desktop-shell and browser features that proved themselves.
+
+The owner's brief (2026-09-24): "we want to re-write the application: implement a browser
+shell like ultimate-media-downloader, give engine based search as fallback if the ktechpit
+based search is not working, follow the rewrite kit where needed, make our own theming with
+the brand theme according to the new icon, keep the application flow mostly like it is but
+improve what is broken."
+
+Owner decisions still open (the rows carry the assumption made): L3 the gate, the display
+name (ADR-002), the repository licence (ADR-005).
+
+## A. Shell (window, tray, identity)
+
+| # | Feature | 2.x | Decision | Status / class |
+|---|---|---|---|---|
+| S1 | One window: rail with Search, Playlist, Browser, Downloads; Settings and Account at the bottom (DESIGN.md) | toolbar + sliding pages | KEEP | todo |
+| S2 | Persist window geometry and state; restore last page (setting) | geometry only | KEEP | todo |
+| S3 | Single instance; second launch forwards a URL and commands | RunGuard, no forwarding | KEEP | todo |
+| S4 | System tray: show/hide, downloads, quit; close-to-tray optional (default quit) | none | KEEP | todo |
+| S5 | Full screen for the browser (F11 and page requests), hint overlay, rail hidden | yes (player) | KEEP | todo |
+| S6 | Native notifications on finish with Open and Show in folder (portal, then freedesktop) | none | KEEP | todo |
+| S7 | Crash handler, log file, diagnostics copy, Report a bug sheet | Debug Info in About | KEEP | todo |
+| S8 | GPU auto-fallback, Wayland to XCB retry | none | KEEP | todo |
+| S9 | What's new once per version from the bundled changelog; Online guide | none | KEEP | todo |
+| S10 | CLI: `playlist-dl <url>`, `--download <url>`, `--settings`, `--profile`, `--quit` | none | KEEP | todo |
+| S11 | Shortcuts sheet (Ctrl+/) listing every action | none | KEEP | todo |
+| S12 | Rate this app nag, Claim offer, Donate button | yes | DROP | the store and the account sheet cover them |
+| S13 | Toast in the bottom left for results the user is not looking at | none | KEEP | todo |
+
+## B. Search (the home page)
+
+| # | Feature | 2.x | Decision | Status / class |
+|---|---|---|---|---|
+| B1 | Keyword search for playlists through the ktechpit service (`api.php?query=`), results as playlist cards with thumbnail, title, channel, video count | list rows with a preview of videos | KEEP | todo |
+| B2 | Engine-based search as the fallback: when the service times out (8 s), errors, or answers with anything but a non-empty array, the same query runs through the engine's playlist search; the header chip says "Search (engine)" (ADR-003) | none: an outage looked like "no results" | KEEP | todo |
+| B3 | Setting "Search service: Automatic / Engine only" and "Results per page" | none | KEEP | todo |
+| B4 | Paste a playlist or video link in the field: a playlist resolves to the Playlist page, a video opens the Download options sheet for it | "Process Playlist" button | KEEP | todo |
+| B5 | Search suggestions while typing (https, encoded query, JSON client) | plain http, JSONP breaks silently | KEEP | todo |
+| B6 | Recent queries as chips (setting, on); Load more | none | KEEP | todo |
+| B7 | Bookmark playlist | menu entry without a handler | LATER | a bookmarks page after 3.0 |
+| B8 | Force reload of a cached result | yes | DROP | results are not cached beyond the HTTP cache |
+| B9 | Empty, loading and error states with Retry; Esc cancels | Esc cancels; error dialog | KEEP | todo |
+
+## C. Playlist page
+
+| # | Feature | 2.x | Decision | Status / class |
+|---|---|---|---|---|
+| P1 | Playlist read flat through the engine (`-J --flat-playlist`), typed `MediaInfo`; header with thumbnail, title, channel, count, total duration | `python3 core --dump-single-json`, blocking start | KEEP | todo |
+| P2 | Rows with checkbox, index, thumbnail, title, duration; play on hover; download this one | yes (no per-row download) | KEEP | todo |
+| P3 | Select all, range from/to with the range slider, filter, sort | select all, filter | KEEP | todo |
+| P4 | Unavailable (private, deleted) entries shown muted and unchecked, never downloaded | filtered in one place, inverted in two | KEEP | todo |
+| P5 | Skip videos already in the download folder (setting, on) | none | KEEP | todo |
+| P6 | Play whole playlist, play a video: opens the Browser page on the YouTube page | GitHub Pages player wrapper | KEEP | todo |
+| P7 | Play author uploads | sent the display name as a channel id | DROP | the channel link on the Browser page does it |
+| P8 | Copy playlist URL | yes | KEEP | todo |
+| P9 | Playlist cache on disk that never expires | yes | DROP | the flat read is one request; the HTTP cache covers thumbnails |
+| P10 | Selection footer with count and size estimate | "N items selected" | KEEP | todo |
+
+## D. Download options (sheet)
+
+| # | Feature | 2.x | Decision | Status / class |
+|---|---|---|---|---|
+| O1 | Kind cards Video / Audio only; last kind remembered | radios | KEEP | todo |
+| O2 | Video: quality (Best, 2160p to 360p), container MP4 / MKV / WebM, subtitles, embed thumbnail, embed metadata and chapters | three 0..100 sliders mapped onto the `-F` list, mkv/mp4 | KEEP (the sliders become the quality list) | todo |
+| O3 | Audio: Best / MP3 / M4A / Opus / FLAC / WAV, bitrate Best / 192 / 128, cover art, metadata, "Artist - Song" naming | opus m4a wav mp3 aac flac vorbis, 0..10 quality | KEEP (aac and vorbis map to M4A and Opus) | todo |
+| O4 | Folder: `<download folder>/<playlist title>` with Change; number files in playlist order; sanitised names, `--restrict-filenames` off but `%(playlist_index)s` on | raw title in the path | KEEP | todo |
+| O5 | Every choice becomes the default for next time (Settings, Downloads) | none | KEEP | todo |
+| O6 | Estimated size for the selection when the probe knows it | none | LATER | needs per-entry probes |
+
+## E. Downloads (engine and queue)
+
+| # | Feature | 2.x | Decision | Status / class |
+|---|---|---|---|---|
+| E1 | Self-provisioning engine: standalone binary per CPU, checksum, daily update, bundled JS runtime, ffmpeg from the system with an install hint | `python3 core` from GitHub, dead update check, no ffmpeg | KEEP | todo |
+| E2 | Typed protocol with the engine (progress template and print lines), never text parsing | regex on `[download]` lines | KEEP | todo |
+| E3 | Queue with concurrency (1 to 5), pause, resume, cancel, retry, remove, open, show in folder, clear finished; persisted across restarts; stale state cleaned on start | start/stop per playlist, stale "running" | KEEP | todo |
+| E4 | A playlist is one job with entries; per-entry progress and the aggregate on the card; failed entries retried alone | one process per item, counters in QSettings | KEEP | todo |
+| E5 | Cookies from the app's own YouTube session handed to the engine (setting, on) | none | KEEP | todo |
+| E6 | Notifications on finish (S6); taskbar progress; keep the screen awake while downloading | none | KEEP | todo |
+| E7 | Import 2.x download records (`download_records/*.json`) as finished or queued jobs | n/a | LATER | the record shape is documented in the analysis |
+| E8 | Speed limit | none | KEEP | todo |
+| E9 | Engine chip with version and update actions on the Downloads page and in Settings | Settings status line | KEEP | todo |
+
+## F. Browser (the player)
+
+| # | Feature | 2.x | Decision | Status / class |
+|---|---|---|---|---|
+| W1 | UMD's browser page: tabs on one persistent named profile, toolbar, address bar, find in page, badges, pop-ups as windows, script dialogs as sheets, permission prompts | one view, default (off-the-record in Qt 6) profile | KEEP | todo |
+| W2 | Ad blocking in three layers (interceptor host list, InnerTube response hooks, cosmetic CSS) with the "Ads blocked" badge; trackers blocked | 589-line substring list rebuilt per request, skip clicker, core.css | KEEP | todo |
+| W3 | Download this: a playlist page opens the Playlist page, a video page opens the Download options sheet; page-detected media button | none | KEEP | todo |
+| W4 | Sign-in works (sanitised Chrome UA, Firefox identity on Google sign-in hosts) and is shared with the engine | Firefox 72 UA everywhere | KEEP | todo |
+| W5 | Theme follows the app (page background, PREF cookie for YouTube's scheme) | dark cookie on first run | KEEP | todo |
+| W6 | Desktop or mobile site switch | yes | DROP | the Browser identity presets in Settings cover it |
+| W7 | Keep the player running when leaving the page; session restore | keepPlayer, history restore | KEEP as "Restore tabs" | todo |
+| W8 | Blocked request log window, comment blocking, theatre mode forced | yes | DROP | the badge count replaces the log; YouTube remembers theatre mode |
+| W9 | Age-restricted fallback page (`YtTest` wrapper, plain http) | yes | DROP | sign-in and the engine's cookies cover age gates |
+
+## G. Settings surface
+
+Six pages (DESIGN.md section 3): General, Appearance, Downloads, Browser, Search, Advanced.
+Target 30 options at most. Restart required: interface scale, hardware acceleration.
+
+| # | Feature | 2.x | Decision | Status / class |
+|---|---|---|---|---|
+| G1 | Sidebar and stacked pages writing straight to settings; Reset settings | one dialog with group boxes | KEEP | todo |
+| G2 | 2.x download folder and account id read once on first start | n/a | KEEP | todo |
+| G3 | Cache size and Delete cache that agree with each other | measured one cache, cleared another | KEEP | todo |
+
+## H. Accounts and licensing (never in user-facing release text)
+
+| # | Feature | 2.x | Decision | Status / class |
+|---|---|---|---|---|
+| L1 | Shared AccountAndLicense module, app code PLDL, 10-day evaluation | own module, 30 days, http | KEEP | todo |
+| L2 | 2.x account id migrated on first start from `org.keshavnrj.ubuntu/Playlist DL.conf` (`accountId`) or `~/Downloads/.Playlist DL.id` | n/a | KEEP | todo |
+| L3 | Gate: assumed Red's model, a daily allowance of free downloads (5 a day), everything visible; the owner may prefer 2.x's quality gate | quality above "Poor" | KEEP (assumption) | todo |
+| L4 | Plans sheet listing what is free and what Pro adds | none | KEEP | todo |
