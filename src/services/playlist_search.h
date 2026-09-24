@@ -72,7 +72,7 @@ public:
     /// Whether a service outcome sends the query to the engine (pure): every
     /// one does; the service is only ever a first try.
     [[nodiscard]] static bool fallsBack(KtechpitSearch::Outcome outcome);
-    /// The header chip's text: "Search" or "Search (engine)". Never a tool's name.
+    /// The header chip's text: empty for the service (no chip), "Engine search" for the fallback. Never a tool's name.
     [[nodiscard]] static QString describe(Source source);
     /// The chip's tooltip: why the results came from where they came from.
     [[nodiscard]] static QString tooltip(Source source);

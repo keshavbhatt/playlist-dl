@@ -44,7 +44,9 @@ bool PlaylistSearch::fallsBack(KtechpitSearch::Outcome outcome)
 
 QString PlaylistSearch::describe(Source source)
 {
-    return source == Source::Engine ? tr("Search (engine)") : tr("Search");
+    // The service is the normal case and needs no label next to the Search
+    // button; the chip only appears when the engine stepped in.
+    return source == Source::Engine ? tr("Engine search") : QString();
 }
 
 QString PlaylistSearch::tooltip(Source source)

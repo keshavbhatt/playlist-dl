@@ -90,8 +90,8 @@ private Q_SLOTS:
 
     void describeNeverNamesATool()
     {
-        QCOMPARE(PlaylistSearch::describe(PlaylistSearch::Source::Service), u"Search"_s);
-        QCOMPARE(PlaylistSearch::describe(PlaylistSearch::Source::Engine), u"Search (engine)"_s);
+        QVERIFY(PlaylistSearch::describe(PlaylistSearch::Source::Service).isEmpty());
+        QCOMPARE(PlaylistSearch::describe(PlaylistSearch::Source::Engine), u"Engine search"_s);
         QCOMPARE(PlaylistSearch::tooltip(PlaylistSearch::Source::Engine),
                  u"The search service did not answer, so the download engine searched instead"_s);
         for (const QString& text : {PlaylistSearch::describe(PlaylistSearch::Source::Service),

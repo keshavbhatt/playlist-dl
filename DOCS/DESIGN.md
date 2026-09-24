@@ -91,8 +91,8 @@ The 2.x home: a search field with online suggestions, results as playlist cards.
   at the end. Two flat buttons at the header's right end switch between the grid and a
   list of rows (small picture on the left, title on one line, channel under it); the
   choice is remembered (owner request, 2026-09-24).
-- Source chip in the header's right corner: "Search" normally; when the ktechpit service
-  fails the results come from the engine and the chip reads "Search (engine)" with a
+- Source chip in the header's right corner: hidden normally; when the ktechpit service
+  fails the results come from the engine and an "Engine search" chip appears with a
   tooltip explaining the fallback (ADR-003). Never the tool's name.
 - Empty state: the brand mark, "Search for a playlist or paste a link", three example
   chips. Error state: the reason and Retry.

@@ -106,7 +106,7 @@ private Q_SLOTS:
         QCOMPARE(examples->findChildren<QToolButton*>().size(), 3);
         QVERIFY(!m_page->recentRow()->isVisible());
         QVERIFY(!m_page->suggestionsPopup()->isVisible());
-        QCOMPARE(m_page->sourceChip()->text(), u"Search"_s);
+        QVERIFY(!m_page->sourceChip()->isVisible());
         QVERIFY(!m_page->queryField()->placeholderText().isEmpty());
         QVERIFY(!m_page->searchButton()->text().isEmpty());
         QVERIFY(!busy::isBusy(m_page->searchButton()));
@@ -184,7 +184,8 @@ private Q_SLOTS:
         QCOMPARE(m_page->state(), SearchPage::State::Results);
         QCOMPARE(m_page->results().size(), 5);
         QCOMPARE(m_page->resultsView()->model()->rowCount(), 5);
-        QCOMPARE(m_page->sourceChip()->text(), u"Search (engine)"_s);
+        QCOMPARE(m_page->sourceChip()->text(), u"Engine search"_s);
+        QVERIFY(m_page->sourceChip()->isVisible());
         QVERIFY(m_page->sourceChip()->toolTip().contains(u"download engine"_s));
         QVERIFY(m_page->resultsView()->isVisible());
         QVERIFY(m_page->loadMoreButton()->isVisible());
@@ -205,9 +206,9 @@ private Q_SLOTS:
         QCOMPARE(requested.size(), 1);
         QCOMPARE(requested.first().at(0).toUrl().toString(), u"https://www.youtube.com/playlist?list=PL2"_s);
 
-        // The service source: the plain chip, no Load more.
+        // The service source: no chip, no Load more.
         m_page->showResults(canned(2), false, PlaylistSearch::Source::Service);
-        QCOMPARE(m_page->sourceChip()->text(), u"Search"_s);
+        QVERIFY(!m_page->sourceChip()->isVisible());
         QCOMPARE(m_page->resultsView()->model()->rowCount(), 2);
         QVERIFY(!m_page->loadMoreButton()->isVisible());
 
@@ -232,7 +233,7 @@ private Q_SLOTS:
         QTRY_COMPARE_WITH_TIMEOUT(needed.size(), 1, 5000);
         QVERIFY(m_page->playlistSearch().hasPending());
         QCOMPARE(m_page->state(), SearchPage::State::Loading);
-        QCOMPARE(m_page->sourceChip()->text(), u"Search (engine)"_s);
+        QCOMPARE(m_page->sourceChip()->text(), u"Engine search"_s);
         // Still no engine: the search fails and offers Retry.
         m_page->retryPending();
         QCOMPARE(m_page->state(), SearchPage::State::Error);

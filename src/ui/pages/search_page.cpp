@@ -351,10 +351,14 @@ void SearchPage::setState(State state)
 
 void SearchPage::setSource(services::PlaylistSearch::Source source)
 {
+    const bool engine = source == services::PlaylistSearch::Source::Engine;
     m_chip->setText(services::PlaylistSearch::describe(source));
     m_chip->setToolTip(services::PlaylistSearch::tooltip(source));
-    m_chip->setGlyph(source == services::PlaylistSearch::Source::Engine ? u"engine"_s : u"search"_s);
+    m_chip->setGlyph(u"engine"_s);
     m_chip->setAccessibleName(m_chip->toolTip());
+    // Hidden while the service answers: a second "Search" next to the button
+    // read as a duplicate (owner, 2026-09-24).
+    m_chip->setVisible(engine);
 }
 
 // ---- searching -------------------------------------------------------------

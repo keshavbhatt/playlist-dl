@@ -115,11 +115,11 @@ filtered search page read flat, `countPlaylist` for the sizes).
 **Decision.** `services::PlaylistSearch` runs a query in two stages: (1) the ktechpit service
 over https with an 8 s timeout, parsed into the same `SearchResult` shape as the engine's;
 (2) when the request fails, times out, or the body is not a non-empty JSON array, the same
-query goes to `SearchService` (engine) and the page shows the "Search (engine)" chip with a
+query goes to `SearchService` (engine) and the page shows an "Engine search" chip with a
 tooltip. Results from either source are one list; "Load more" continues with the source
 that answered. Setting "Search service: Automatic (default) / Engine only". The engine is
 provisioned lazily when the fallback is first needed. Nothing user-facing names either
-backend; the chip says "engine". Suggestions use the https JSON client of the suggestion
+backend; the chip says "Engine search" and is hidden while the service answers. Suggestions use the https JSON client of the suggestion
 endpoint with an encoded query, silently off when it fails.
 
 **Consequences.** The first screen keeps working when the service is down, at the cost of a

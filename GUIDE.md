@@ -20,8 +20,8 @@ Recent searches come back as chips under the field (Settings, General, Keep sear
 You can also paste a link: a playlist link opens the Playlist page, a video link offers to
 download that video.
 
-When the search service does not answer, the download engine searches instead; the chip in
-the top right corner then reads "Search (engine)". Settings, Search lets you use the engine
+When the search service does not answer, the download engine searches instead; an "Engine search" chip
+then appears next to the Search button. Settings, Search lets you use the engine
 only.
 
 ## Playlist
