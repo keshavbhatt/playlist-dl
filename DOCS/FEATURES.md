@@ -19,17 +19,17 @@ name (ADR-002), the repository licence (ADR-005).
 
 | # | Feature | 2.x | Decision | Status / class |
 |---|---|---|---|---|
-| S1 | One window: rail with Search, Playlist, Browser, Downloads; Settings and Account at the bottom (DESIGN.md) | toolbar + sliding pages | KEEP | todo |
-| S2 | Persist window geometry and state; restore last page (setting) | geometry only | KEEP | todo |
-| S3 | Single instance; second launch forwards a URL and commands | RunGuard, no forwarding | KEEP | todo |
-| S4 | System tray: show/hide, downloads, quit; close-to-tray optional (default quit) | none | KEEP | todo |
-| S5 | Full screen for the browser (F11 and page requests), hint overlay, rail hidden | yes (player) | KEEP | todo |
+| S1 | One window: rail with Search, Playlist, Browser, Downloads; Settings and Account at the bottom (DESIGN.md) | toolbar + sliding pages | KEEP | done (`ui::MainWindow`, `ui::SideRail`, `ui::Actions`) |
+| S2 | Persist window geometry and state; restore last page (setting) | geometry only | KEEP | done (`MainWindow`, `window/lastPage`) |
+| S3 | Single instance; second launch forwards a URL and commands | RunGuard, no forwarding | KEEP | done (`app::SingleInstance`) |
+| S4 | System tray: show/hide, downloads, quit; close-to-tray optional (default quit) | none | KEEP | done (`ui::TrayController`, close action setting) |
+| S5 | Full screen for the browser (F11 and page requests), hint overlay, rail hidden | yes (player) | KEEP | done (`BrowserPage`, `MainWindow::setBrowserFullScreen`, `web::FullScreenHint`) |
 | S6 | Native notifications on finish with Open and Show in folder (portal, then freedesktop) | none | KEEP | todo |
-| S7 | Crash handler, log file, diagnostics copy, Report a bug sheet | Debug Info in About | KEEP | todo |
-| S8 | GPU auto-fallback, Wayland to XCB retry | none | KEEP | todo |
-| S9 | What's new once per version from the bundled changelog; Online guide | none | KEEP | todo |
-| S10 | CLI: `playlist-dl <url>`, `--download <url>`, `--settings`, `--profile`, `--quit` | none | KEEP | todo |
-| S11 | Shortcuts sheet (Ctrl+/) listing every action | none | KEEP | todo |
+| S7 | Crash handler, log file, diagnostics copy, Report a bug sheet | Debug Info in About | KEEP | done (`platform::installCrashHandler`, `core::LogSink`, `ui::AboutDialog`, `ui::BugReportDialog`) |
+| S8 | GPU auto-fallback, Wayland to XCB retry | none | KEEP | done (`main.cpp`, `core::graphics_fallback`, `platform::GpuStderrWatch`) |
+| S9 | What's new once per version from the bundled changelog; Online guide | none | KEEP | done (`ui::WhatsNewDialog`, `links::kGuide`) |
+| S10 | CLI: `playlist-dl <url>`, `--download <url>`, `--settings`, `--profile`, `--quit` | none | KEEP | done (`app::CliOptions`) |
+| S11 | Shortcuts sheet (Ctrl+/) listing every action | none | KEEP | done (`ui::ShortcutsDialog`) |
 | S12 | Rate this app nag, Claim offer, Donate button | yes | DROP | the store and the account sheet cover them |
 | S13 | Toast in the bottom left for results the user is not looking at | none | KEEP | todo |
 
@@ -91,13 +91,13 @@ name (ADR-002), the repository licence (ADR-005).
 
 | # | Feature | 2.x | Decision | Status / class |
 |---|---|---|---|---|
-| W1 | UMD's browser page: tabs on one persistent named profile, toolbar, address bar, find in page, badges, pop-ups as windows, script dialogs as sheets, permission prompts | one view, default (off-the-record in Qt 6) profile | KEEP | todo |
-| W2 | Ad blocking in three layers (interceptor host list, InnerTube response hooks, cosmetic CSS) with the "Ads blocked" badge; trackers blocked | 589-line substring list rebuilt per request, skip clicker, core.css | KEEP | todo |
+| W1 | UMD's browser page: tabs on one persistent named profile, toolbar, address bar, find in page, badges, pop-ups as windows, script dialogs as sheets, permission prompts | one view, default (off-the-record in Qt 6) profile | KEEP | done (`web::*`, `ui::BrowserPage`, `ui::BrowserTabButton`; tst_browser_page) |
+| W2 | Ad blocking in three layers (interceptor host list, InnerTube response hooks, cosmetic CSS) with the "Ads blocked" badge; trackers blocked | 589-line substring list rebuilt per request, skip clicker, core.css | KEEP | done (`core::BlockList`, `web::RequestInterceptor`, `adblock.js`; badge on the page) |
 | W3 | Download this: a playlist page opens the Playlist page, a video page opens the Download options sheet; page-detected media button | none | KEEP | todo |
-| W4 | Sign-in works (sanitised Chrome UA, Firefox identity on Google sign-in hosts) and is shared with the engine | Firefox 72 UA everywhere | KEEP | todo |
+| W4 | Sign-in works (sanitised Chrome UA, Firefox identity on Google sign-in hosts) and is shared with the engine | Firefox 72 UA everywhere | KEEP | done (`web::user_agent`, `web::CookieExporter`; the engine hand-off lands with E5) |
 | W5 | Theme follows the app (page background, PREF cookie for YouTube's scheme) | dark cookie on first run | KEEP | todo |
 | W6 | Desktop or mobile site switch | yes | DROP | the Browser identity presets in Settings cover it |
-| W7 | Keep the player running when leaving the page; session restore | keepPlayer, history restore | KEEP as "Restore tabs" | todo |
+| W7 | Keep the player running when leaving the page; session restore | keepPlayer, history restore | KEEP as "Restore tabs" | done (`Settings::browserSession`, restore tabs) |
 | W8 | Blocked request log window, comment blocking, theatre mode forced | yes | DROP | the badge count replaces the log; YouTube remembers theatre mode |
 | W9 | Age-restricted fallback page (`YtTest` wrapper, plain http) | yes | DROP | sign-in and the engine's cookies cover age gates |
 
@@ -109,14 +109,14 @@ Target 30 options at most. Restart required: interface scale, hardware accelerat
 | # | Feature | 2.x | Decision | Status / class |
 |---|---|---|---|---|
 | G1 | Sidebar and stacked pages writing straight to settings; Reset settings | one dialog with group boxes | KEEP | todo |
-| G2 | 2.x download folder and account id read once on first start | n/a | KEEP | todo |
+| G2 | 2.x download folder and account id read once on first start | n/a | KEEP | done (`Application` reads the 2.x folder once; `LicenseService` the id) |
 | G3 | Cache size and Delete cache that agree with each other | measured one cache, cleared another | KEEP | todo |
 
 ## H. Accounts and licensing (never in user-facing release text)
 
 | # | Feature | 2.x | Decision | Status / class |
 |---|---|---|---|---|
-| L1 | Shared AccountAndLicense module, app code PLDL, 10-day evaluation | own module, 30 days, http | KEEP | todo |
-| L2 | 2.x account id migrated on first start from `org.keshavnrj.ubuntu/Playlist DL.conf` (`accountId`) or `~/Downloads/.Playlist DL.id` | n/a | KEEP | todo |
+| L1 | Shared AccountAndLicense module, app code PLDL, 10-day evaluation | own module, 30 days, http | KEEP | done (`services::LicenseService`, app code PLDL, 10 days) |
+| L2 | 2.x account id migrated on first start from `org.keshavnrj.ubuntu/Playlist DL.conf` (`accountId`) or `~/Downloads/.Playlist DL.id` | n/a | KEEP | done (`core::legacyAccountId`, tst_legacy_account; the 2.x download folder too, ADR-002) |
 | L3 | Gate: assumed Red's model, a daily allowance of free downloads (5 a day), everything visible; the owner may prefer 2.x's quality gate | quality above "Poor" | KEEP (assumption) | todo |
 | L4 | Plans sheet listing what is free and what Pro adds | none | KEEP | todo |
