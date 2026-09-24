@@ -3,9 +3,9 @@
 </p>
 
 <p align="center">
-  Playlists from any site: search YouTube or paste a link from SoundCloud, Bandcamp,
-  Vimeo and hundreds of others, pick the items, download them as video or audio, and play
-  the whole playlist in your media player. Native, lightweight, built with Qt&nbsp;6.
+  A playlist downloader for Linux: YouTube, SoundCloud, Bandcamp, Vimeo and hundreds of
+  other sites. Search or paste a link, pick the items, download the whole playlist as MP3
+  or video, and play it in your media player. Native, lightweight, built with Qt&nbsp;6.
 </p>
 
 <p align="center">

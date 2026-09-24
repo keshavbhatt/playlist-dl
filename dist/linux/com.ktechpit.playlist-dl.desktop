@@ -1,13 +1,13 @@
 [Desktop Entry]
 Name=Playlist Downloader
-GenericName=YouTube Playlist Downloader
-Comment=Search, browse, play and download YouTube playlists
+GenericName=Playlist Downloader
+Comment=Download YouTube and SoundCloud playlists as MP3 or video
 Icon=com.ktechpit.playlist-dl
 Exec=playlist-dl %U
 Terminal=false
 Type=Application
-Categories=Utility;Video;Qt;
-Keywords=YouTube;Playlist;Download;
+Categories=AudioVideo;Audio;Video;Network;Utility;Qt;
+Keywords=YouTube;SoundCloud;Bandcamp;Playlist;Download;Downloader;MP3;Music;Video;Album;M3U8;
 StartupWMClass=playlist-dl
 StartupNotify=true
 X-GNOME-UsesNotifications=true

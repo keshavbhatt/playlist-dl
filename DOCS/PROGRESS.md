@@ -28,6 +28,12 @@
 
 ### 2026-09-24, M6
 
+- Store SEO pass (owner: "figure out our niche and make our meta compete"): niche is
+  "playlist downloader" (name-level on both words, nobody else has them in a name).
+  Keywords youtube, download, soundcloud (the name already covers playlist and downloader);
+  summary with YouTube, SoundCloud and MP3 adjacent; phrase-rich description; categories
+  AudioVideo, Audio, Video, Network, Utility; desktop Keywords= widened. Research and the
+  query list in ~/DCode/FlathubSEO (docs/playlist-dl-keyword-research.md).
 - Store copy and docs reworded for playlists from any site (owner: "update the readme and
   docs"): public README, metainfo, snap description, repo README, changelog, guide intro.
   The snapcraft.io listing is hand-maintained: paste the new summary and description there.

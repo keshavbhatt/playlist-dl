@@ -9,24 +9,40 @@
   </developer>
 
   <name>Playlist Downloader</name>
-  <summary>Download playlists from any site offline</summary>
+  <summary>YouTube and SoundCloud playlist downloader, MP3 or video</summary>
 
   <description>
     <p>
-      Playlist Downloader saves whole playlists offline as video or audio: search YouTube, or
-      paste a playlist link from SoundCloud, Bandcamp, Vimeo and hundreds of other sites, pick
-      the items and download them. A playlist downloader for the Linux desktop.
+      Playlist Downloader is a playlist downloader for Linux: a YouTube playlist downloader,
+      a SoundCloud playlist downloader and a Bandcamp album downloader in one app. Search
+      YouTube playlists by keyword, or paste a playlist link from YouTube, YouTube Music,
+      SoundCloud, Bandcamp, Vimeo, Mixcloud, Dailymotion, Twitch and hundreds of other
+      sites, pick the items you want and download the whole playlist as video or audio.
+    </p>
+    <p>
+      Playlist to MP3: convert a YouTube playlist to MP3, a SoundCloud set to MP3 or any
+      playlist to M4A, Opus, FLAC or WAV, with cover art and metadata embedded. Or keep the
+      video: MP4, MKV or WebM up to 4K, with subtitles. Playlist Downloader is a music
+      downloader, an album downloader and a 4K video downloader for whole playlists,
+      channels and single tracks.
     </p>
     <ul>
-      <li>Search YouTube playlists by keyword, with suggestions as you type</li>
-      <li>Paste a playlist link from any site the download engine reads, or a link to a single video or track</li>
-      <li>Browse the playlist: every item with its thumbnail and length; pick the ones you want or a range</li>
-      <li>Download as MP4, MKV or WebM up to 4K, or audio only as MP3, M4A, Opus, FLAC or WAV, with subtitles, thumbnails and metadata embedded</li>
-      <li>A queue with pause, resume and retry, files in a folder per playlist, numbered in playlist order, and a notification when the download finishes</li>
-      <li>A playlist file (m3u8) next to the files, so your music player plays the whole playlist in order</li>
-      <li>A built-in browser for any site with a Download button on every page; sign in once and members-only and age-restricted items download too</li>
-      <li>The download engine sets itself up on first use and keeps itself updated</li>
+      <li>Search YouTube playlists by keyword, with suggestions as you type; results show the cover, channel and video count</li>
+      <li>Paste a playlist link from YouTube, SoundCloud, Bandcamp, Vimeo, Mixcloud, Dailymotion, Twitch and more, or a link to a single video or track</li>
+      <li>Browse the playlist before you download: every item with its thumbnail and length, select all, a range or a few, filter and sort</li>
+      <li>Download a whole playlist in one go: a batch download queue with pause, resume, retry and a folder per playlist, files numbered in playlist order</li>
+      <li>YouTube playlist to MP3, playlist to MP3, YouTube to MP3: audio only as MP3, M4A, Opus, FLAC or WAV, or video as MP4, MKV or WebM up to 4K, with subtitles, thumbnails and metadata embedded</li>
+      <li>A playlist file (M3U8) next to the downloaded files, so your music player plays the whole playlist offline in order</li>
+      <li>Skip items you already have, download YouTube channels, and download members-only and age-restricted items after signing in</li>
+      <li>A built-in browser with tabs, an ad blocker and a Download button on every page: find a playlist on any site and save it</li>
+      <li>The download engine sets itself up on first use and keeps itself updated; no command line</li>
     </ul>
+    <p>
+      A native Qt app for the Linux desktop (Ubuntu, Fedora, Debian, Arch, openSUSE, Wayland
+      and X11) with light and dark themes, a tray icon, taskbar progress and keyboard
+      shortcuts. An alternative to 4K Video Downloader, 4K YouTube to MP3, JDownloader and
+      online YouTube playlist to MP3 converters, with no ads and no watermarks.
+    </p>
   </description>
 
   <launchable type="desktop-id">com.ktechpit.playlist-dl.desktop</launchable>
@@ -39,38 +55,64 @@
   <screenshots>
     <screenshot type="default">
       <image>https://raw.githubusercontent.com/keshavbhatt/p-pldl/main/screenshots/00-hero.png</image>
-      <caption>Search YouTube playlists</caption>
+      <caption>Search YouTube playlists, or paste a playlist link from any site</caption>
     </screenshot>
     <screenshot>
       <image>https://raw.githubusercontent.com/keshavbhatt/p-pldl/main/screenshots/01-playlist.png</image>
-      <caption>Pick the items of a playlist</caption>
+      <caption>Browse the playlist and pick the items to download</caption>
     </screenshot>
     <screenshot>
       <image>https://raw.githubusercontent.com/keshavbhatt/p-pldl/main/screenshots/02-options.png</image>
-      <caption>Video or audio, quality and format</caption>
+      <caption>Playlist to MP3, or video up to 4K</caption>
     </screenshot>
     <screenshot>
       <image>https://raw.githubusercontent.com/keshavbhatt/p-pldl/main/screenshots/03-downloads.png</image>
-      <caption>The download queue</caption>
+      <caption>The download queue: a whole playlist in one go</caption>
     </screenshot>
     <screenshot>
       <image>https://raw.githubusercontent.com/keshavbhatt/p-pldl/main/screenshots/04-browser.png</image>
-      <caption>The built-in browser</caption>
+      <caption>The built-in browser: a Download button on every page</caption>
     </screenshot>
     <screenshot>
       <image>https://raw.githubusercontent.com/keshavbhatt/p-pldl/main/screenshots/05-items.png</image>
-      <caption>Play a downloaded playlist as a whole</caption>
+      <caption>Play the downloaded playlist offline from its M3U8 file</caption>
     </screenshot>
   </screenshots>
 
   <keywords>
-    <keyword>playlist</keyword>
     <keyword>youtube</keyword>
-    <keyword>downloader</keyword>
     <keyword>download</keyword>
-    <keyword>video</keyword>
-    <keyword>music</keyword>
+    <keyword>soundcloud</keyword>
     <keyword>mp3</keyword>
+    <keyword>bandcamp</keyword>
+    <keyword>vimeo</keyword>
+    <keyword>mixcloud</keyword>
+    <keyword>m3u8</keyword>
+    <keyword>m3u</keyword>
+    <keyword>4k</keyword>
+    <keyword>flac</keyword>
+    <keyword>opus</keyword>
+    <keyword>playlist downloader</keyword>
+    <keyword>youtube playlist downloader</keyword>
+    <keyword>youtube playlist to mp3</keyword>
+    <keyword>playlist to mp3</keyword>
+    <keyword>youtube to mp3</keyword>
+    <keyword>youtube downloader</keyword>
+    <keyword>youtube music</keyword>
+    <keyword>soundcloud downloader</keyword>
+    <keyword>soundcloud playlist</keyword>
+    <keyword>bandcamp downloader</keyword>
+    <keyword>album downloader</keyword>
+    <keyword>music downloader</keyword>
+    <keyword>mp3 downloader</keyword>
+    <keyword>audio downloader</keyword>
+    <keyword>video downloader</keyword>
+    <keyword>4k video downloader</keyword>
+    <keyword>channel downloader</keyword>
+    <keyword>batch downloader</keyword>
+    <keyword>download playlist</keyword>
+    <keyword>download music</keyword>
+    <keyword>offline music</keyword>
   </keywords>
 
   <url type="homepage">https://github.com/keshavbhatt/p-pldl</url>
@@ -94,8 +136,11 @@
   </supports>
 
   <categories>
-    <category>Utility</category>
+    <category>AudioVideo</category>
+    <category>Audio</category>
     <category>Video</category>
+    <category>Network</category>
+    <category>Utility</category>
   </categories>
 
   <content_rating type="oars-1.1" />
