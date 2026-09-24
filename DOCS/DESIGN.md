@@ -135,7 +135,7 @@ The 2.x playlistdownloadoptions page, as a sheet:
 ### Browser
 
 UMD's browser page, unchanged in shape: tab strip, toolbar (back, forward, reload,
-address, "Ads blocked" badge, "Signed in" badge, **Download this** button), find bar, the
+address, "Ads blocked" badge, **Download this** button), find bar, the
 web view, the floating "Download detected" button. A new tab opens empty by default
 (owner, 2026-09-24); Settings, Browser offers Empty tab, YouTube or a custom address.
 Additions for this app:

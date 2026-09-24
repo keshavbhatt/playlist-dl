@@ -82,7 +82,7 @@ name (ADR-002), the repository licence (ADR-005).
 | E2 | Typed protocol with the engine (progress template and print lines), never text parsing | regex on `[download]` lines | KEEP | done (`core::ytdlp_output`, `core::DownloadRunner`) |
 | E3 | Queue with concurrency (1 to 5), pause, resume, cancel, retry, remove (asking whether to delete the files too), open, show in folder, clear finished; persisted across restarts; stale state cleaned on start | start/stop per playlist, stale "running" | KEEP | done (`ui::DownloadsController`, `core::DownloadQueue`, `core::job_files`, `ui::DownloadsPage`; stale states become Paused on load) |
 | E4 | A playlist is one job with entries; per-entry progress and the aggregate on the card; failed entries retried alone | one process per item, counters in QSettings | KEEP | done (one job per playlist, `DownloadJob::detailLine` "3 of 12") |
-| E5 | Cookies from the app's own YouTube session handed to the engine (setting, on) | none | KEEP | done (`web::CookieExporter::writeTempFile` through the controller's cookies provider) |
+| E5 | Cookies from the app's own browser sessions, any site, handed to the engine (setting, on) | none | KEEP | done (`web::CookieExporter::writeTempFile` through the controller's cookies provider) |
 | E6 | Notifications on finish (S6); taskbar progress; keep the screen awake while downloading | none | KEEP | done (notifications with Open / Show in folder / Retry, `platform::TaskbarProgress`, `platform::ScreenInhibitor`) |
 | E7 | Import 2.x download records (`download_records/*.json`) as finished or queued jobs | n/a | LATER | the record shape is documented in the analysis |
 | E8 | Speed limit | none | KEEP | done (`Settings::speedLimitKbps` applied at admission) |
@@ -93,7 +93,7 @@ name (ADR-002), the repository licence (ADR-005).
 
 | # | Feature | 2.x | Decision | Status / class |
 |---|---|---|---|---|
-| W1 | UMD's browser page (every http and https page stays in it, only mailto, tel and magnet go to the desktop): tabs on one persistent named profile, toolbar, address bar, find in page, badges, pop-ups as windows, script dialogs as sheets, permission prompts | one view, default (off-the-record in Qt 6) profile | KEEP | done (`web::*`, `ui::BrowserPage`, `ui::BrowserTabButton`; tst_browser_page) |
+| W1 | UMD's browser page, general purpose, tied to no site (every http and https page stays in it, only mailto, tel and magnet go to the desktop): tabs on one persistent named profile, toolbar, address bar, find in page, badges, pop-ups as windows, script dialogs as sheets, permission prompts | one view, default (off-the-record in Qt 6) profile | KEEP | done (`web::*`, `ui::BrowserPage`, `ui::BrowserTabButton`; tst_browser_page) |
 | W2 | Ad blocking in three layers (interceptor host list, InnerTube response hooks, cosmetic CSS) with the "Ads blocked" badge; trackers blocked | 589-line substring list rebuilt per request, skip clicker, core.css | KEEP | done (`core::BlockList`, `web::RequestInterceptor`, `adblock.js`; badge on the page) |
 | W3 | Download this: a playlist page opens the Playlist page, a video page opens the Download options sheet; page-detected media button | none | KEEP | done (`BrowserPage` reads "Open playlist" on a playlist page; a video probes and opens the sheet; page-media button) |
 | W4 | Sign-in works (sanitised Chrome UA, Firefox identity on Google sign-in hosts) and is shared with the engine | Firefox 72 UA everywhere | KEEP | done (`web::user_agent`, `web::CookieExporter`; the engine hand-off lands with E5) |

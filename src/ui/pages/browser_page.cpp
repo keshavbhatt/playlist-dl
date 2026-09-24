@@ -75,7 +75,6 @@ BrowserPage::BrowserPage(core::Settings& settings, core::ThemeService& theme, co
     m_badgeTimer = new QTimer(this);
     m_badgeTimer->setInterval(kBadgeRefreshMs);
     connect(m_badgeTimer, &QTimer::timeout, this, &BrowserPage::refreshBadges);
-    connect(&m_profile->cookies(), &web::CookieExporter::signedInChanged, this, [this](bool) { refreshBadges(); });
     connect(&m_settings, &core::Settings::blockAdsChanged, this, [this](bool) { refreshBadges(); });
 
     // Esc stops the load, or leaves full screen; the web view swallows plain
@@ -261,13 +260,8 @@ void BrowserPage::buildToolbar()
     m_adsBadge->setGlyph(u"shield"_s);
     m_adsBadge->setOk(true);
     m_adsBadge->setToolTip(tr("Requests to advertising and tracking hosts blocked on this session."));
-    m_signedInBadge = new BadgeLabel(theme(), this);
-    m_signedInBadge->setObjectName(u"signedInBadge"_s);
-    m_signedInBadge->setGlyph(u"account"_s);
-    m_signedInBadge->setText(tr("Signed in"));
-    m_signedInBadge->setAccessibleName(tr("Signed in"));
-    m_signedInBadge->setToolTip(tr("Signed in to YouTube. The download engine uses this session."));
-    m_signedInBadge->hide();
+    // No Signed in badge: it spoke about the YouTube session on every site
+    // (owner, on SoundCloud's sign-in page). The session still reaches the engine.
 
     m_download = new QPushButton(tr("Download this"), this);
     m_download->setObjectName(u"downloadThisButton"_s);
@@ -282,7 +276,6 @@ void BrowserPage::buildToolbar()
     header->insertWidget(index++, m_reload);
     header->insertWidget(index++, m_address, 1);
     header->insertWidget(index++, m_adsBadge);
-    header->insertWidget(index++, m_signedInBadge);
     header->insertWidget(index++, m_download);
 }
 
@@ -1001,7 +994,6 @@ void BrowserPage::refreshBadges()
         m_adsBadge->setAccessibleName(words);
     }
     m_adsBadge->setVisible(showAds);
-    m_signedInBadge->setVisible(m_profile->cookies().looksSignedIn());
 }
 
 QString BrowserPage::detectedLabel(const QJsonObject& media)

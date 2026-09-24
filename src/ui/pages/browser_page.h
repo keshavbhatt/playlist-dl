@@ -37,8 +37,8 @@ namespace pldl::ui {
 class BrowserTabButton;
 
 /// The Browser page (mocks/browser.html, FEATURES B1, B2, B4): a tab strip
-/// above a toolbar (back, forward, reload, the address, the ads-blocked and
-/// Signed in badges, Download this) over the web view, with the
+/// above a toolbar (back, forward, reload, the address, the ads-blocked
+/// badge, Download this) over the web view, with the
 /// page-detected media offered as a floating button. Owns the one web
 /// profile every tab shares; the sign-in cookies it holds reach the download
 /// engine through the downloads controller.
@@ -103,7 +103,6 @@ public:
     /// Re-reads the blocked count and the sign-in state into the badges.
     void refreshBadges();
     [[nodiscard]] QLabel* adsBadge() const { return m_adsBadge; }
-    [[nodiscard]] QLabel* signedInBadge() const { return m_signedInBadge; }
     [[nodiscard]] QPushButton* detectedButton() const { return m_detected; }
     /// Download this, reading "Open playlist" while the current tab shows a
     /// playlist page (the window lands it on the Playlist page).
@@ -194,7 +193,6 @@ private:
     QToolButton* m_reload = nullptr;
     AddressField* m_address = nullptr;
     BadgeLabel* m_adsBadge = nullptr;
-    BadgeLabel* m_signedInBadge = nullptr;
     QPushButton* m_download = nullptr;
     QFrame* m_findBar = nullptr;
     QLineEdit* m_findField = nullptr;

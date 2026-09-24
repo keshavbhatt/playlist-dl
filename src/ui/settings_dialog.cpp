@@ -376,9 +376,9 @@ QWidget* SettingsDialog::buildDownloads()
     QWidget* transfer = card(tr("Transfer"),
                              {row(tr("Concurrent downloads"), m_concurrent),
                               row(tr("Speed limit"), m_speedLimit, tr("0 = no limit.")),
-                              row(tr("Use my YouTube sign-in"), m_sessionCookies,
-                                  tr("Downloads see what you see in the built-in browser: members-only and "
-                                     "age-restricted videos."))},
+                              row(tr("Use my sign-ins"), m_sessionCookies,
+                                  tr("Downloads see what you see in the built-in browser: sites you signed "
+                                     "in to, members-only and age-restricted videos."))},
                              this);
     return page(tr("Downloads"), tr("Where files go and what a download picks by default."),
                 {files, buildDownloadDefaults(), transfer, buildEngineCard()}, this);
@@ -536,7 +536,7 @@ QWidget* SettingsDialog::buildBrowser()
     QWidget* identity =
         card(tr("Identity"),
              {row(tr("Browser identity"), buildIdentityPicker(),
-                  tr("What sites are told about this browser. The default is fine for YouTube."))},
+                  tr("What sites are told about this browser. The default is fine for most sites."))},
              this);
     return page(tr("Browser"), tr("The built-in browser and the player."), {pages, privacy, identity}, this);
 }

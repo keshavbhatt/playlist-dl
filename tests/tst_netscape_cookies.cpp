@@ -57,19 +57,6 @@ private Q_SLOTS:
         QVERIFY(readChromiumCookieDatabase(dir.filePath(u"missing"_s)).isEmpty());
     }
 
-    void filtersDomains()
-    {
-        QNetworkCookie yt("SID", "v");
-        yt.setDomain(u".youtube.com"_s);
-        QNetworkCookie g("x", "y");
-        g.setDomain(u"accounts.google.com"_s);
-        QNetworkCookie other("a", "b");
-        other.setDomain(u"example.com"_s);
-        QVERIFY(isYouTubeSessionCookie(yt));
-        QVERIFY(isYouTubeSessionCookie(g));
-        QVERIFY(!isYouTubeSessionCookie(other));
-    }
-
     void formatsNetscapeLines()
     {
         QNetworkCookie c("SAPISID", "abc");

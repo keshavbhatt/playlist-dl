@@ -41,9 +41,10 @@ become the defaults for next time.
 
 ## Browser
 
-A new tab opens empty; type an address or a search, or pick YouTube as the start page in
-Settings, Browser. Sign in once and your subscriptions and history work as on
-the website; the sign-in is also used for downloads, so age-restricted videos download too.
+A new tab opens empty; type an address or a search, or pick YouTube or any address as the
+start page in Settings, Browser. The browser works with any website. Sign in to a site once
+and your sign-in is also used for downloads from it (Settings, Downloads, Use my sign-ins),
+so members-only and age-restricted videos download too.
 Ads are blocked; the "Ads blocked" badge counts them. Ctrl+F finds text on the page, F11
 goes full screen, Ctrl+T opens a tab, Ctrl+W closes one.
 

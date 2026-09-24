@@ -12,9 +12,6 @@ class QTemporaryFile;
 // helper that writes a private temp file.
 namespace pldl::services {
 
-/// True for the domains yt-dlp needs to act as the signed-in user.
-[[nodiscard]] bool isYouTubeSessionCookie(const QNetworkCookie& cookie);
-
 /// The Netscape/Mozilla cookies.txt text for the given cookies.
 [[nodiscard]] QString netscapeCookieText(const QList<QNetworkCookie>& cookies);
 

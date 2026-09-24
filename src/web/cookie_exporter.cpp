@@ -1,7 +1,6 @@
 #include "web/cookie_exporter.h"
 
 #include "services/netscape_cookies.h"
-#include "web/logging.h"
 
 #include <QTemporaryFile>
 #include <QWebEngineCookieStore>
@@ -29,41 +28,21 @@ void CookieExporter::reload()
 {
     m_persisted.clear();
     for (const QNetworkCookie& c : services::readChromiumCookieDatabase(m_databasePath)) {
-        if (services::isYouTubeSessionCookie(c)) {
-            m_persisted.insert(keyOf(c), c);
-        }
+        m_persisted.insert(keyOf(c), c);
     }
-    updateSignedIn();
 }
 
 void CookieExporter::handleAdded(const QNetworkCookie& cookie)
 {
-    if (!services::isYouTubeSessionCookie(cookie)) {
-        return;
-    }
     m_cookies.insert(keyOf(cookie), cookie);
     Q_EMIT cookieChanged(cookie);
-    updateSignedIn();
 }
 
 void CookieExporter::handleRemoved(const QNetworkCookie& cookie)
 {
     const QString key = keyOf(cookie);
-    const bool known = m_cookies.remove(key) || m_persisted.remove(key);
-    if (!known) {
-        return;
-    }
-    updateSignedIn();
-}
-
-void CookieExporter::updateSignedIn()
-{
-    const bool signedIn = looksSignedIn();
-    if (signedIn != m_signedIn) {
-        m_signedIn = signedIn;
-        qCInfo(lcWeb) << "youtube session:" << (signedIn ? "signed in" : "signed out");
-        Q_EMIT signedInChanged(signedIn);
-    }
+    m_cookies.remove(key);
+    m_persisted.remove(key);
 }
 
 QString CookieExporter::cookieValue(const QString& domainSuffix, const QByteArray& name) const
@@ -98,19 +77,7 @@ int CookieExporter::deleteCookies(const QString& domainSuffix)
             ++removed;
         }
     }
-    updateSignedIn();
     return removed;
-}
-
-bool CookieExporter::looksSignedIn() const
-{
-    for (const QNetworkCookie& c : sessionCookies()) {
-        const QByteArray name = c.name();
-        if ((name == "SAPISID" || name == "SID") && c.domain().endsWith(u"youtube.com"_s)) {
-            return true;
-        }
-    }
-    return false;
 }
 
 std::unique_ptr<QTemporaryFile> CookieExporter::writeTempFile()

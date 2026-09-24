@@ -28,6 +28,11 @@
 
 ### 2026-09-24, M6
 
+- Owner report: the Signed in badge (a YouTube session) showed on SoundCloud's sign-in page;
+  the owner had it removed, and stated the browser is tied to no site. The cookie mirror now
+  keeps every site's cookies, so a sign-in anywhere reaches the engine; the YouTube-only
+  cookie filter and the signed-in notion are gone; settings and guide text no longer name
+  YouTube for the browser (Use my sign-ins).
 - Owner report: signing in to SoundCloud in the built-in browser sent every link off the
   sign-in page to the system browser. `core::shouldOpenExternally` now keeps all http and
   https in the app (UMD's rule); only mailto, tel and magnet leave, file: never.

@@ -32,6 +32,9 @@ are not repeated. Below: what 2.x adds, from `reference/analysis-playlist-dl-v2.
 - Script the screenshots; verify headlessly before asking the owner to look.
 - A word-wrapped `QLabel` gives a layout a width-dependent height Qt leaves out of a
   window's minimum size: give it a full-width row and pin its minimum height.
+- The browser is general purpose (owner): no site-specific gate in the web layer. The
+  navigation policy, the cookie mirror and the toolbar badges must not assume YouTube; the
+  YouTube extras (playlist detection, start page preset) are additions, not conditions.
 - The kit's navigation policy is a YouTube wrapper's (everything else goes to the system
   browser). A general browser keeps every http and https page in the app and lets only
   mailto, tel and magnet out; a sign-in page's links otherwise leave for the desktop.

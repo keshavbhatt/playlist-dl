@@ -642,7 +642,7 @@ private Q_SLOTS:
         QCOMPARE(BrowserPage::detectedLabel(QJsonObject{{u"kind"_s, u"audio"_s}}), u"Download detected: audio"_s);
     }
 
-    void badgesFollowTheBlockerAndTheSignIn()
+    void badgesFollowTheBlocker()
     {
         pldl::ui::BrowserPage page(*m_settings, *m_theme, u"7.0.0-test"_s);
         page.show();
@@ -658,8 +658,7 @@ private Q_SLOTS:
         QVERIFY(!ads->isVisible());
         m_settings->setBlockAds(true);
         QVERIFY(ads->isVisible());
-        // No YouTube session cookie: no Signed in badge.
-        QVERIFY(!page.signedInBadge()->isVisible());
+        QVERIFY(page.findChild<QLabel*>(u"signedInBadge"_s) == nullptr); // removed (owner)
     }
 
     void tabButtonElidesAndKeepsItsNames()
