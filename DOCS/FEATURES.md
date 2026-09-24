@@ -40,7 +40,7 @@ name (ADR-002), the repository licence (ADR-005).
 | B1 | Keyword search for playlists through the ktechpit service (`api.php?query=`), results as playlist cards with thumbnail, title, channel, video count | list rows with a preview of videos | KEEP | done (`services::KtechpitSearch`, `ui::SearchPage`, `ui::SearchCardDelegate`; verified live) |
 | B2 | Engine-based search as the fallback: when the service times out (8 s), errors, or answers with anything but a non-empty array, the same query runs through the engine's playlist search; the header chip says "Search (engine)" (ADR-003) | none: an outage looked like "no results" | KEEP | done (`services::PlaylistSearch`, `services::SearchService`; tst_playlist_search) |
 | B3 | Setting "Search service: Automatic / Engine only" and "Results per page" | none | KEEP | done (`Settings::searchMode`, `searchResultsPerPage`; the Settings page lands with G1) |
-| B4 | Paste a playlist or video link in the field: a playlist resolves to the Playlist page, a video opens the Download options sheet for it | "Process Playlist" button | KEEP | done (`SearchPage::linkOf`; a video link opens the Browser page until the options sheet exists) |
+| B4 | Paste a playlist or video link in the field: a playlist resolves to the Playlist page, a video opens the Download options sheet for it | "Process Playlist" button | KEEP | done (`SearchPage::linkOf`, `MainWindow::openVideoOptions`) |
 | B5 | Search suggestions while typing (https, encoded query, JSON client) | plain http, JSONP breaks silently | KEEP | done (`services::SearchSuggestions`, https JSON client) |
 | B6 | Recent queries as chips (setting, on); Load more | none | KEEP | done (`Settings::recentQueries`, Load more) |
 | B7 | Bookmark playlist | menu entry without a handler | LATER | a bookmarks page after 3.0 |
@@ -51,26 +51,26 @@ name (ADR-002), the repository licence (ADR-005).
 
 | # | Feature | 2.x | Decision | Status / class |
 |---|---|---|---|---|
-| P1 | Playlist read flat through the engine (`-J --flat-playlist`), typed `MediaInfo`; header with thumbnail, title, channel, count, total duration | `python3 core --dump-single-json`, blocking start | KEEP | todo |
-| P2 | Rows with checkbox, index, thumbnail, title, duration; play on hover; download this one | yes (no per-row download) | KEEP | todo |
-| P3 | Select all, range from/to with the range slider, filter, sort | select all, filter | KEEP | todo |
-| P4 | Unavailable (private, deleted) entries shown muted and unchecked, never downloaded | filtered in one place, inverted in two | KEEP | todo |
-| P5 | Skip videos already in the download folder (setting, on) | none | KEEP | todo |
-| P6 | Play whole playlist, play a video: opens the Browser page on the YouTube page | GitHub Pages player wrapper | KEEP | todo |
+| P1 | Playlist read flat through the engine (`-J --flat-playlist`), typed `MediaInfo`; header with thumbnail, title, channel, count, total duration | `python3 core --dump-single-json`, blocking start | KEEP | done (`ui::PlaylistPage`, `services::MediaProbe` flat; verified live on PLBCF2DAC6FFB574DE) |
+| P2 | Rows with checkbox, index, thumbnail, title, duration; play on hover; download this one | yes (no per-row download) | KEEP | done (`ui::PlaylistEntryDelegate`, `ui::PlaylistModel`) |
+| P3 | Select all, range from/to with the range slider, filter, sort | select all, filter | KEEP | done (select all, From/To with `RangeSlider`, filter, sort; no Newest: flat entries carry no date) |
+| P4 | Unavailable (private, deleted) entries shown muted and unchecked, never downloaded | filtered in one place, inverted in two | KEEP | done (`PlaylistModel`: private, deleted and untitled entries unavailable; tst_playlist_page) |
+| P5 | Skip videos already in the download folder (setting, on) | none | KEEP | done (page-local toggle, Downloaded badge; `Settings::skipExisting` exists for the sheet) |
+| P6 | Play whole playlist, play a video: opens the Browser page on the YouTube page | GitHub Pages player wrapper | KEEP | done (Play all and the row's play glyph open the Browser page) |
 | P7 | Play author uploads | sent the display name as a channel id | DROP | the channel link on the Browser page does it |
-| P8 | Copy playlist URL | yes | KEEP | todo |
+| P8 | Copy playlist URL | yes | KEEP | done (Copy link) |
 | P9 | Playlist cache on disk that never expires | yes | DROP | the flat read is one request; the HTTP cache covers thumbnails |
-| P10 | Selection footer with count and size estimate | "N items selected" | KEEP | todo |
+| P10 | Selection footer with count and size estimate | "N items selected" | KEEP | done ("N of M selected"; no size estimate, O6 is LATER) |
 
 ## D. Download options (sheet)
 
 | # | Feature | 2.x | Decision | Status / class |
 |---|---|---|---|---|
-| O1 | Kind cards Video / Audio only; last kind remembered | radios | KEEP | todo |
-| O2 | Video: quality (Best, 2160p to 360p), container MP4 / MKV / WebM, subtitles, embed thumbnail, embed metadata and chapters | three 0..100 sliders mapped onto the `-F` list, mkv/mp4 | KEEP (the sliders become the quality list) | todo |
-| O3 | Audio: Best / MP3 / M4A / Opus / FLAC / WAV, bitrate Best / 192 / 128, cover art, metadata, "Artist - Song" naming | opus m4a wav mp3 aac flac vorbis, 0..10 quality | KEEP (aac and vorbis map to M4A and Opus) | todo |
-| O4 | Folder: `<download folder>/<playlist title>` with Change; number files in playlist order; sanitised names, `--restrict-filenames` off but `%(playlist_index)s` on | raw title in the path | KEEP | todo |
-| O5 | Every choice becomes the default for next time (Settings, Downloads) | none | KEEP | todo |
+| O1 | Kind cards Video / Audio only; last kind remembered | radios | KEEP | done (`ui::DownloadOptionsSheet`, `KindCard`s, `Settings::lastDownloadKind`) |
+| O2 | Video: quality (Best, 2160p to 360p), container MP4 / MKV / WebM, subtitles, embed thumbnail, embed metadata and chapters | three 0..100 sliders mapped onto the `-F` list, mkv/mp4 | KEEP (the sliders become the quality list) | done (quality list, container, subtitles with Embed, embeds) |
+| O3 | Audio: Best / MP3 / M4A / Opus / FLAC / WAV, bitrate Best / 192 / 128, cover art, metadata, "Artist - Song" naming | opus m4a wav mp3 aac flac vorbis, 0..10 quality | KEEP (aac and vorbis map to M4A and Opus) | done (format, bitrate, cover art, metadata; Artist - Song naming LATER) |
+| O4 | Folder: `<download folder>/<playlist title>` with Change; number files in playlist order; sanitised names, `--restrict-filenames` off but `%(playlist_index)s` on | raw title in the path | KEEP | done (`core::sanitiseFolderName`, `DownloadOptions::playlistSubfolder` and `numberPlaylistItems`) |
+| O5 | Every choice becomes the default for next time (Settings, Downloads) | none | KEEP | done (accept writes the defaults back; the Settings page shows them) |
 | O6 | Estimated size for the selection when the probe knows it | none | LATER | needs per-entry probes |
 
 ## E. Downloads (engine and queue)
@@ -93,9 +93,9 @@ name (ADR-002), the repository licence (ADR-005).
 |---|---|---|---|---|
 | W1 | UMD's browser page: tabs on one persistent named profile, toolbar, address bar, find in page, badges, pop-ups as windows, script dialogs as sheets, permission prompts | one view, default (off-the-record in Qt 6) profile | KEEP | done (`web::*`, `ui::BrowserPage`, `ui::BrowserTabButton`; tst_browser_page) |
 | W2 | Ad blocking in three layers (interceptor host list, InnerTube response hooks, cosmetic CSS) with the "Ads blocked" badge; trackers blocked | 589-line substring list rebuilt per request, skip clicker, core.css | KEEP | done (`core::BlockList`, `web::RequestInterceptor`, `adblock.js`; badge on the page) |
-| W3 | Download this: a playlist page opens the Playlist page, a video page opens the Download options sheet; page-detected media button | none | KEEP | todo |
+| W3 | Download this: a playlist page opens the Playlist page, a video page opens the Download options sheet; page-detected media button | none | KEEP | done (`BrowserPage` reads "Open playlist" on a playlist page; a video probes and opens the sheet; page-media button) |
 | W4 | Sign-in works (sanitised Chrome UA, Firefox identity on Google sign-in hosts) and is shared with the engine | Firefox 72 UA everywhere | KEEP | done (`web::user_agent`, `web::CookieExporter`; the engine hand-off lands with E5) |
-| W5 | Theme follows the app (page background, PREF cookie for YouTube's scheme) | dark cookie on first run | KEEP | todo |
+| W5 | Theme follows the app (page background, PREF cookie for YouTube's scheme) | dark cookie on first run | KEEP | done (page background follows the scheme; YouTube's own dark mode follows the user's YouTube setting) |
 | W6 | Desktop or mobile site switch | yes | DROP | the Browser identity presets in Settings cover it |
 | W7 | Keep the player running when leaving the page; session restore | keepPlayer, history restore | KEEP as "Restore tabs" | done (`Settings::browserSession`, restore tabs) |
 | W8 | Blocked request log window, comment blocking, theatre mode forced | yes | DROP | the badge count replaces the log; YouTube remembers theatre mode |

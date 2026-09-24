@@ -6,12 +6,12 @@
 |---|---|
 | M0 Analysis and contract | done |
 | M1 Skeleton | done |
-| M2 Engine and search | done (search); the Playlist page follows with M3 |
-| M3 Downloads | wip (queue and page done; Playlist page and options sheet next) |
-| M4 Player and browser shell | todo |
-| M5 Desktop integration | todo |
-| M6 Polish and text | todo |
-| M7 Packaging and release | todo |
+| M2 Engine and search | done |
+| M3 Downloads | done |
+| M4 Player and browser shell | done (UMD's browser page; W rows) |
+| M5 Desktop integration | done (tray, notifications, taskbar, screen inhibit, crash handler, GPU fallback) |
+| M6 Polish and text | wip (sheets, shortcuts, About, What's new, guide, changelog done; screenshots, metainfo polish, plans wording open) |
+| M7 Packaging and release | wip (snap recipe and CI written, unbuilt; Flathub manifest and public repo open) |
 
 ## Open questions for the owner
 
@@ -52,10 +52,18 @@
   delegate and filters. Verified live headless: `PLDL_DEBUG_DOWNLOAD` provisioned the
   engine and downloaded "Me at the zoo" (av1+aac, thumbnail embedded) in 151 s, exit 0.
   39 tests pass. Grabs of the demo queue in dark and light looked at.
+- Playlist page and Download options sheet merged: the playlist read flat through the
+  engine, selection tools, unavailable entries, the sheet for a playlist selection and for one
+  video, the browser's Download this routed by link kind. Verified live headless: a public
+  playlist loaded with 13 entries (2 unavailable) in 4 s after a 20 s engine setup. 41 tests
+  pass (the engine provisioning test and the browser page test need the network).
 - Settings merged: six pages writing straight to settings, the engine card, Sign out and
   clear session through a relaunch. 39 tests pass (`tst_browser_page` needs the network and
   now allows 30 s).
 - Verified: grabs of the Search placeholder, the Browser page and the About sheet, looked
   at; `PLDL_DEBUG_OPEN`, `PLDL_DEBUG_GRAB`, `PLDL_DEBUG_WINDOW_SIZE` work offscreen with
   isolated XDG directories.
-- Open: the three questions above.
+- Open: the three questions above; then screenshots for the store, the Flathub manifest
+  and the public repository (M7), the plans sheet wording (after the gate decision), the
+  search grid's spare column at 1280 px, the engine setup sheet staying open once the engine
+  is ready, an end-to-end hook that accepts the options sheet headlessly.
