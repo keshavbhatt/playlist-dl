@@ -79,7 +79,7 @@ public:
 
     /// The flat search output carries no size for a playlist; this asks the
     /// engine for the playlist's own header (one item, cheap) and answers
-    /// with `playlistCounted`. Queued, two at a time; a new search drops the
+    /// with `playlistCounted`. Queued, kCountParallel at a time; a new search drops the
     /// queue. -1 when the engine could not say.
     void countPlaylist(const QString& url);
     void cancelCounts();
@@ -116,7 +116,7 @@ private:
     SearchKind m_runningKind = SearchKind::Videos;
     QStringList m_countQueue;
     QHash<QProcess*, QString> m_counting;
-    static constexpr int kCountParallel = 2;
+    static constexpr int kCountParallel = 6; ///< one engine process each, about 2 s; a page of 20 fills in a few seconds
     static constexpr int kCountTimeoutMs = 30000;
 };
 
