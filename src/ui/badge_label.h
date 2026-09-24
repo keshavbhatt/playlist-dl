@@ -35,7 +35,20 @@ public:
     /// The "good news" variant of the mocks (.badge.ok): the success colour on
     /// a success tint instead of the accent pair.
     void setOk(bool ok);
-    [[nodiscard]] bool isOk() const { return m_ok; }
+    [[nodiscard]] bool isOk() const { return m_tone == Tone::Ok; }
+
+    /// The pill's colour pair: the accent (default), success (setOk), the
+    /// warning or the danger token on its own tint (the engine chip's states).
+    enum class Tone
+    {
+        Accent,
+        Ok,
+        Warning,
+        Danger,
+    };
+    Q_ENUM(Tone)
+    void setTone(Tone tone);
+    [[nodiscard]] Tone tone() const { return m_tone; }
 
     [[nodiscard]] QSize sizeHint() const override;
     [[nodiscard]] QSize minimumSizeHint() const override;
@@ -46,7 +59,7 @@ protected:
 private:
     core::ThemeService& m_theme;
     QString m_glyph;
-    bool m_ok = false;
+    Tone m_tone = Tone::Accent;
 };
 
 } // namespace pldl::ui

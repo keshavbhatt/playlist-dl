@@ -47,8 +47,13 @@ void BadgeLabel::setGlyph(const QString& name)
 
 void BadgeLabel::setOk(bool ok)
 {
-    if (m_ok != ok) {
-        m_ok = ok;
+    setTone(ok ? Tone::Ok : Tone::Accent);
+}
+
+void BadgeLabel::setTone(Tone tone)
+{
+    if (m_tone != tone) {
+        m_tone = tone;
         update();
     }
 }
@@ -72,9 +77,23 @@ QSize BadgeLabel::minimumSizeHint() const
 void BadgeLabel::paintEvent(QPaintEvent* /*event*/)
 {
     const Tokens t = Tokens::forScheme(m_theme.isDark());
-    const QColor ink = m_ok ? t.success : t.accent;
-    QColor fill = m_ok ? t.success : t.accentSoft;
-    if (m_ok) {
+    QColor ink = t.accent;
+    QColor fill = t.accentSoft;
+    switch (m_tone) {
+    case Tone::Accent:
+        break;
+    case Tone::Ok:
+        ink = t.success;
+        break;
+    case Tone::Warning:
+        ink = t.warning;
+        break;
+    case Tone::Danger:
+        ink = t.danger;
+        break;
+    }
+    if (m_tone != Tone::Accent) {
+        fill = ink;
         fill.setAlpha(kSoftAlpha); // the tint the style sheet mixes for .badge.ok
     }
 
