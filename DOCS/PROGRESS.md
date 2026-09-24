@@ -6,7 +6,7 @@
 |---|---|
 | M0 Analysis and contract | done |
 | M1 Skeleton | done |
-| M2 Engine and search | wip |
+| M2 Engine and search | done (search); the Playlist page follows with M3 |
 | M3 Downloads | wip |
 | M4 Player and browser shell | todo |
 | M5 Desktop integration | todo |
@@ -43,6 +43,10 @@
   probe are owned by the window (`ensureEngine`).
 - M2 and M3 started in parallel: the search stack (ktechpit service, engine fallback,
   suggestions, Search page) and the download stack (controller, Downloads page, cards).
+- Search merged: the service answered live from this machine with 20 playlists and, on a
+  later run, timed out after 8 s with the fallback engaging (the log shows the engine being
+  waited for). 36 tests pass. Known polish: the card grid leaves room for a fifth column at
+  1280 px; only dark grabs so far.
 - Verified: grabs of the Search placeholder, the Browser page and the About sheet, looked
   at; `PLDL_DEBUG_OPEN`, `PLDL_DEBUG_GRAB`, `PLDL_DEBUG_WINDOW_SIZE` work offscreen with
   isolated XDG directories.

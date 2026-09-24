@@ -37,15 +37,15 @@ name (ADR-002), the repository licence (ADR-005).
 
 | # | Feature | 2.x | Decision | Status / class |
 |---|---|---|---|---|
-| B1 | Keyword search for playlists through the ktechpit service (`api.php?query=`), results as playlist cards with thumbnail, title, channel, video count | list rows with a preview of videos | KEEP | todo |
-| B2 | Engine-based search as the fallback: when the service times out (8 s), errors, or answers with anything but a non-empty array, the same query runs through the engine's playlist search; the header chip says "Search (engine)" (ADR-003) | none: an outage looked like "no results" | KEEP | todo |
-| B3 | Setting "Search service: Automatic / Engine only" and "Results per page" | none | KEEP | todo |
-| B4 | Paste a playlist or video link in the field: a playlist resolves to the Playlist page, a video opens the Download options sheet for it | "Process Playlist" button | KEEP | todo |
-| B5 | Search suggestions while typing (https, encoded query, JSON client) | plain http, JSONP breaks silently | KEEP | todo |
-| B6 | Recent queries as chips (setting, on); Load more | none | KEEP | todo |
+| B1 | Keyword search for playlists through the ktechpit service (`api.php?query=`), results as playlist cards with thumbnail, title, channel, video count | list rows with a preview of videos | KEEP | done (`services::KtechpitSearch`, `ui::SearchPage`, `ui::SearchCardDelegate`; verified live) |
+| B2 | Engine-based search as the fallback: when the service times out (8 s), errors, or answers with anything but a non-empty array, the same query runs through the engine's playlist search; the header chip says "Search (engine)" (ADR-003) | none: an outage looked like "no results" | KEEP | done (`services::PlaylistSearch`, `services::SearchService`; tst_playlist_search) |
+| B3 | Setting "Search service: Automatic / Engine only" and "Results per page" | none | KEEP | done (`Settings::searchMode`, `searchResultsPerPage`; the Settings page lands with G1) |
+| B4 | Paste a playlist or video link in the field: a playlist resolves to the Playlist page, a video opens the Download options sheet for it | "Process Playlist" button | KEEP | done (`SearchPage::linkOf`; a video link opens the Browser page until the options sheet exists) |
+| B5 | Search suggestions while typing (https, encoded query, JSON client) | plain http, JSONP breaks silently | KEEP | done (`services::SearchSuggestions`, https JSON client) |
+| B6 | Recent queries as chips (setting, on); Load more | none | KEEP | done (`Settings::recentQueries`, Load more) |
 | B7 | Bookmark playlist | menu entry without a handler | LATER | a bookmarks page after 3.0 |
 | B8 | Force reload of a cached result | yes | DROP | results are not cached beyond the HTTP cache |
-| B9 | Empty, loading and error states with Retry; Esc cancels | Esc cancels; error dialog | KEEP | todo |
+| B9 | Empty, loading and error states with Retry; Esc cancels | Esc cancels; error dialog | KEEP | done (`SearchPage` states, Esc cancels) |
 
 ## C. Playlist page
 
