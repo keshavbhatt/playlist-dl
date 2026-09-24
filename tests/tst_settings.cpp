@@ -74,6 +74,9 @@ private Q_SLOTS:
         QCOMPARE(m_settings->startPage(), StartPage::Search);
         QVERIFY(m_settings->showWhatsNew());
         QVERIFY(m_settings->skipExisting());
+        QVERIFY(m_settings->writePlaylistFile());
+        m_settings->setWritePlaylistFile(false);
+        QVERIFY(!m_settings->writePlaylistFile());
     }
 
     void settingsPageKeys()

@@ -140,11 +140,35 @@ QString DownloadJob::formatLine() const
     return {};
 }
 
+QJsonObject PlaylistEntry::toJson() const
+{
+    return {{u"id"_s, id}, {u"title"_s, title}, {u"file"_s, file}};
+}
+
+PlaylistEntry PlaylistEntry::fromJson(const QJsonObject& o)
+{
+    PlaylistEntry e;
+    e.id = o.value(u"id"_s).toString();
+    e.title = o.value(u"title"_s).toString();
+    e.file = o.value(u"file"_s).toString();
+    return e;
+}
+
+int DownloadJob::downloadedEntryCount() const
+{
+    return static_cast<int>(std::count_if(entries.cbegin(), entries.cend(),
+                                          [](const PlaylistEntry& e) { return !e.file.isEmpty(); }));
+}
+
 QJsonObject DownloadJob::toJson() const
 {
     QJsonArray files;
     for (const QString& f : outputFiles) {
         files.append(f);
+    }
+    QJsonArray items;
+    for (const PlaylistEntry& e : entries) {
+        items.append(e.toJson());
     }
     return {
         {u"id"_s, static_cast<qint64>(id)},
@@ -161,6 +185,7 @@ QJsonObject DownloadJob::toJson() const
         {u"itemIndex"_s, itemIndex},
         {u"itemCount"_s, itemCount},
         {u"outputFiles"_s, files},
+        {u"entries"_s, items},
         {u"error"_s, error},
         {u"createdAt"_s, createdAt.toString(Qt::ISODate)},
         {u"finishedAt"_s, finishedAt.toString(Qt::ISODate)},
@@ -186,6 +211,10 @@ DownloadJob DownloadJob::fromJson(const QJsonObject& o)
     const QJsonArray files = o.value(u"outputFiles"_s).toArray();
     for (const auto& f : files) {
         j.outputFiles << f.toString();
+    }
+    const QJsonArray items = o.value(u"entries"_s).toArray();
+    for (const auto& e : items) {
+        j.entries << PlaylistEntry::fromJson(e.toObject());
     }
     j.error = o.value(u"error"_s).toString();
     j.createdAt = QDateTime::fromString(o.value(u"createdAt"_s).toString(), Qt::ISODate);

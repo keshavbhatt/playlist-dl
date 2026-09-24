@@ -353,12 +353,16 @@ QWidget* SettingsDialog::buildDownloads()
     m_playlistFolder = makeCheck(this, m_loading, [this](bool on) { m_settings.setOrganiseDownloads(on); });
     m_numberFiles = makeCheck(this, m_loading, [this](bool on) { m_settings.setNumberPlaylistFiles(on); });
     m_skipExisting = makeCheck(this, m_loading, [this](bool on) { m_settings.setSkipExisting(on); });
+    m_playlistFile = makeCheck(this, m_loading, [this](bool on) { m_settings.setWritePlaylistFile(on); });
+    m_playlistFile->setObjectName(u"playlistFileCheck"_s);
     QWidget* files =
         card(tr("Files"),
              {row(tr("Folder"), folderBox), row(tr("Put each playlist in its own folder"), m_playlistFolder),
               row(tr("Number files in playlist order"), m_numberFiles, tr("\"01 - Title\"")),
               row(tr("Skip already downloaded"), m_skipExisting,
-                  tr("A file that is already in the folder is left alone."))},
+                  tr("A file that is already in the folder is left alone.")),
+              row(tr("Write a playlist file"), m_playlistFile,
+                  tr("An .m3u8 next to the videos of a playlist, so a media player plays them in order."))},
              this);
 
     m_concurrent = makeSpin(this, m_loading, 1, core::Settings::kMaxConcurrentDownloads, 1,
@@ -675,6 +679,7 @@ void SettingsDialog::loadDownloadValues()
     m_playlistFolder->setChecked(m_settings.organiseDownloads());
     m_numberFiles->setChecked(m_settings.numberPlaylistFiles());
     m_skipExisting->setChecked(m_settings.skipExisting());
+    m_playlistFile->setChecked(m_settings.writePlaylistFile());
     selectData(m_kind, static_cast<int>(m_settings.lastDownloadKind()));
     selectData(m_quality, static_cast<int>(m_settings.defaultQuality()));
     selectData(m_container, static_cast<int>(m_settings.defaultContainer()));

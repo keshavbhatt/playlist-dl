@@ -17,6 +17,8 @@ qt_add_library(pldl_core STATIC
     downloads/engine_spec.cpp
     downloads/engine_spec.h
     downloads/media_info.cpp
+    downloads/playlist_file.cpp
+    downloads/playlist_file.h
     downloads/media_info.h
     downloads/ytdlp_output.cpp
     downloads/ytdlp_output.h

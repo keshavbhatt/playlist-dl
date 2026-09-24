@@ -21,6 +21,9 @@ a left rail for the Search, Playlist, Browser and Downloads pages.
   a playlist is one entry that shows which video it is on; filters for active, finished
   and failed; notifications with Open and Show in folder; taskbar progress; the screen
   stays awake while downloads run.
+- A downloaded playlist plays as a whole: a playlist file (.m3u8) is written next to the
+  videos, and Open on the card lists the videos, lets you arrange them and plays them all
+  in your media player.
 - The download engine sets itself up on first use and keeps itself updated; your YouTube
   sign-in is reused for downloads.
 - Light and dark themes drawn from the new icon, a tray icon, single instance with

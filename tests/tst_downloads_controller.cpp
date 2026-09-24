@@ -97,6 +97,33 @@ private Q_SLOTS:
         return controller;
     }
 
+    void writesThePlaylistFileForAFinishedPlaylist()
+    {
+        auto controller = makeController();
+        QTemporaryDir folder;
+        QVERIFY(folder.isValid());
+        pldl::core::DownloadJob job;
+        job.id = 42;
+        job.title = u"Songs"_s;
+        job.options.isPlaylist = true;
+        job.options.outputDirectory = folder.path();
+        const QString first = folder.filePath(u"001 - One.mp4"_s);
+        QFile f(first);
+        QVERIFY(f.open(QIODevice::WriteOnly));
+        f.close();
+        job.outputFiles << first;
+        job.entries << pldl::core::PlaylistEntry{u"one"_s, u"One"_s, first};
+        job.state = pldl::core::DownloadState::Completed;
+        controller->queue().setJobs({job});
+        m_settings->setWritePlaylistFile(false);
+        QVERIFY(!controller->writePlaylistFileFor(42));
+        QVERIFY(!QFile::exists(folder.filePath(u"Songs.m3u8"_s)));
+        m_settings->setWritePlaylistFile(true);
+        QVERIFY(controller->writePlaylistFileFor(42));
+        QVERIFY(QFile::exists(folder.filePath(u"Songs.m3u8"_s)));
+        QVERIFY(!controller->writePlaylistFileFor(43)); // no such job
+    }
+
     void defaultOptionsFollowTheSettings()
     {
         m_settings->setLastDownloadKind(pldl::core::DownloadKind::Audio);

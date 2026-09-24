@@ -88,6 +88,9 @@ public:
     void cancelRequests();
     void openDownloadFolder();
     void handleCardAction(quint64 id, Action action);
+    /// Writes the playlist file (.m3u8) for a playlist job that has files, when
+    /// the setting is on; false when nothing was written. Called as jobs finish.
+    bool writePlaylistFileFor(quint64 id);
 
     [[nodiscard]] core::DownloadQueue& queue() { return *m_queue; }
     [[nodiscard]] ThumbnailCache& thumbnails() { return *m_thumbnails; }
@@ -104,6 +107,9 @@ Q_SIGNALS:
     /// The gate sheet's "View plans".
     void plansRequested();
     void jobCompleted(quint64 id, const QString& title, const QString& path);
+    /// Open on a playlist card (and a playlist's notification without its
+    /// playlist file): the window shows the playlist's items.
+    void playlistItemsRequested(quint64 id);
     /// A requestDownload has either queued a job or given up (the browser
     /// releases its busy button on this).
     void requestSettled(const QUrl& url, bool queued);

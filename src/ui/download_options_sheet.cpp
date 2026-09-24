@@ -464,6 +464,7 @@ core::DownloadJob DownloadOptionsSheet::job() const
             if (index >= 1 && index <= m_info.entries.size()) {
                 const core::MediaEntry& entry = m_info.entries.at(index - 1);
                 job.duration += std::max(0.0, entry.duration);
+                job.entries.append(core::PlaylistEntry{entry.id, entry.title, {}});
                 if (job.thumbnail.isEmpty()) {
                     job.thumbnail = entry.thumbnail.isEmpty() ? core::thumbnailUrl(entry.id).toString()
                                                               : entry.thumbnail;

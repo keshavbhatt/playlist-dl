@@ -51,6 +51,7 @@ inline constexpr QLatin1StringView kLastDownloadKind{"downloads/lastKind"};
 inline constexpr QLatin1StringView kConcurrentDownloads{"downloads/concurrent"};
 inline constexpr QLatin1StringView kSpeedLimitKbps{"downloads/speedLimitKbps"};
 inline constexpr QLatin1StringView kSkipExisting{"downloads/skipExisting"}; ///< leave files already there alone
+inline constexpr QLatin1StringView kWritePlaylistFile{"downloads/writePlaylistFile"}; ///< an .m3u8 next to a downloaded playlist
 inline constexpr QLatin1StringView kUseSessionCookies{"downloads/useSessionCookies"};
 inline constexpr QLatin1StringView kEmbedThumbnail{"downloads/embedThumbnail"};
 inline constexpr QLatin1StringView kEmbedMetadata{"downloads/embedMetadata"};

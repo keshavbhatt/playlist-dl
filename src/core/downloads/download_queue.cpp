@@ -15,6 +15,8 @@
 #include <QStandardPaths>
 #include <QTemporaryFile>
 
+#include <algorithm>
+
 using namespace Qt::StringLiterals;
 
 namespace pldl::core {
@@ -440,6 +442,16 @@ void DownloadQueue::handleItem(quint64 id, const ItemEvent& e)
             j->itemCount = e.count;
             j->itemIndex = e.index;
         }
+        // The entry the engine is on: known from the sheet, or learnt now
+        // (a playlist queued from a link has no entries yet).
+        j->currentItemId = e.id;
+        auto known = std::find_if(j->entries.begin(), j->entries.end(),
+                                  [&e](const PlaylistEntry& entry) { return entry.id == e.id; });
+        if (known == j->entries.end() && !e.id.isEmpty()) {
+            j->entries.append(PlaylistEntry{e.id, e.title, {}});
+        } else if (known != j->entries.end() && known->title.isEmpty()) {
+            known->title = e.title;
+        }
     } else {
         // Fill in what the dialog did not know (e.g. a pasted URL).
         if (j->title.isEmpty()) {
@@ -474,6 +486,13 @@ void DownloadQueue::handleFile(quint64 id, const QString& path)
     }
     if (!j->outputFiles.contains(path)) {
         j->outputFiles << path;
+    }
+    if (j->isPlaylist() && !j->currentItemId.isEmpty()) {
+        auto entry = std::find_if(j->entries.begin(), j->entries.end(),
+                                  [j](const PlaylistEntry& e) { return e.id == j->currentItemId; });
+        if (entry != j->entries.end() && entry->file.isEmpty()) {
+            entry->file = path;
+        }
     }
 }
 

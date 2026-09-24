@@ -53,7 +53,10 @@ detected" button appears in the bottom right corner.
 ## Downloads
 
 Every download is a card with its progress, speed and time left. A playlist is one card
-that shows which video it is on. Hover a card for pause or resume, cancel, retry, open,
+that shows which video it is on. **Open** on a playlist lists its videos with their state:
+play one, show it in the folder, arrange the order, and **Play all** writes a playlist file
+(.m3u8) next to the videos and opens it in your media player. The file is also written when
+the playlist finishes downloading (Settings, Downloads, Write a playlist file). Hover a card for pause or resume, cancel, retry, open,
 show in folder and remove. The filters show active, finished or failed downloads; the
 Clear menu removes finished or failed ones; Open folder opens your download folder.
 

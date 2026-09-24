@@ -160,8 +160,12 @@ The 2.x download widget rebuilt as a page:
   (`accent` chunk on `border` track) with "12.4 MB of 118 MB, 3.2 MB/s, 00:32" or
   "Merging", "Finished, 118 MB", "Failed, reason". Hover actions: pause or resume, cancel,
   open, show in folder, retry, remove. Double click opens the file.
-- A playlist is one card that expands to its entries (chevron), with the aggregate progress
-  on the parent.
+- A playlist is one card with the aggregate progress and the current entry. Open on it
+  shows the **Playlist items** sheet (owner, 2026-09-24): every entry with its state
+  (downloaded, not downloaded, file missing), Play for one, Show in folder, Move up and down,
+  sort by name or playlist order, Save playlist file, and **Play all**, which writes the
+  `.m3u8` next to the videos in the order shown and opens it in the media player. The file
+  is also written when the playlist finishes (Settings, Downloads: Write a playlist file).
 - Filters: All, Active, Finished, Failed. Empty state: "Downloads you start will show up
   here".
 - Notifications on finish with Open and Show in folder (portal, then freedesktop).

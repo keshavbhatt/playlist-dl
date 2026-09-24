@@ -218,6 +218,9 @@ public:
     /// Files already in the download folder are left alone.
     [[nodiscard]] bool skipExisting() const;
     void setSkipExisting(bool enabled);
+    /// A playlist file (.m3u8) written next to a downloaded playlist (FEATURES E10), default on.
+    [[nodiscard]] bool writePlaylistFile() const;
+    void setWritePlaylistFile(bool enabled);
     [[nodiscard]] bool useSessionCookies() const;
     void setUseSessionCookies(bool enabled);
     [[nodiscard]] bool embedThumbnail() const;

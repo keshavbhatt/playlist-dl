@@ -87,6 +87,7 @@ name (ADR-002), the repository licence (ADR-005).
 | E7 | Import 2.x download records (`download_records/*.json`) as finished or queued jobs | n/a | LATER | the record shape is documented in the analysis |
 | E8 | Speed limit | none | KEEP | done (`Settings::speedLimitKbps` applied at admission) |
 | E9 | Engine chip with version and update actions on the Downloads page and in Settings | Settings status line | KEEP | done (`DownloadsPage` engine chip; the Settings card lands with G1) |
+| E10 | A downloaded playlist plays as a whole: an .m3u8 written next to the videos when the playlist finishes (setting, on); Open on the card lists the items with their state, plays one, arranges the order and plays all through the file, writing it on the fly | Downloads page 2 listed the items | KEEP | done (`core::playlist_file`, `ui::PlaylistItemsSheet`, `DownloadJob::entries`; tst_playlist_file, tst_playlist_items_sheet) |
 
 ## F. Browser (the player)
 

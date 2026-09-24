@@ -59,6 +59,20 @@ private Q_SLOTS:
         return j;
     }
 
+    void playlistEntriesRoundTripThroughJson()
+    {
+        DownloadJob job;
+        job.title = u"List"_s;
+        job.options.isPlaylist = true;
+        job.entries << PlaylistEntry{u"a"_s, u"A"_s, u"/x/a.mp4"_s} << PlaylistEntry{u"b"_s, u"B"_s, {}};
+        const DownloadJob back = DownloadJob::fromJson(job.toJson());
+        QCOMPARE(back.entries.size(), 2);
+        QCOMPARE(back.entries.at(0).file, u"/x/a.mp4"_s);
+        QCOMPARE(back.entries.at(1).title, u"B"_s);
+        QVERIFY(back.entries.at(1).file.isEmpty());
+        QCOMPARE(back.downloadedEntryCount(), 1);
+    }
+
     void runsAJobToCompletion()
     {
         DownloadQueue queue;

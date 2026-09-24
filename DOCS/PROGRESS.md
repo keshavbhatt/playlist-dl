@@ -52,6 +52,12 @@
   delegate and filters. Verified live headless: `PLDL_DEBUG_DOWNLOAD` provisioned the
   engine and downloaded "Me at the zoo" (av1+aac, thumbnail embedded) in 151 s, exit 0.
   39 tests pass. Grabs of the demo queue in dark and light looked at.
+- Owner request: a downloaded playlist plays as a whole. `DownloadJob` remembers its
+  entries (the queue fills each one's file from the engine's item and file lines), the
+  controller writes an `.m3u8` next to the videos when a playlist finishes (setting), and
+  Open on a playlist card shows the new items sheet (state per entry, Play, Show in folder,
+  Move up and down, sort, Play all through the file, written in the order shown), which also
+  brings back 2.x's list of a playlist's downloaded items.
 - Owner request: the Downloads page shows the free tier's remaining downloads for today as
   a chip next to the title (hidden on Pro and during the evaluation), refreshed when a
   download is admitted and when the page is shown again.

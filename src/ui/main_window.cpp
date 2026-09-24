@@ -27,6 +27,7 @@
 #include "ui/pages/search_page.h"
 #include "ui/permission_prompt.h"
 #include "ui/plans_dialog.h"
+#include "ui/playlist_items_sheet.h"
 #include "ui/settings_dialog.h"
 #include "ui/shortcuts_dialog.h"
 #include "ui/side_rail.h"
@@ -43,6 +44,8 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QCloseEvent>
+#include <QDir>
+#include <QFile>
 #include <QFileInfo>
 #include <QHBoxLayout>
 #include <QLineEdit>
@@ -271,6 +274,8 @@ void MainWindow::connectActions()
     });
     connect(m_downloadsController, &DownloadsController::toast, this, &MainWindow::toast);
     connect(m_downloadsController, &DownloadsController::plansRequested, this, &MainWindow::showPlans);
+    connect(m_downloadsController, &DownloadsController::playlistItemsRequested, this,
+            &MainWindow::showPlaylistItems);
     connect(m_downloads, &DownloadsPage::engineSetupRequested, this, &MainWindow::showEngineSetup);
     // Browser shortcuts act while the Browser page is showing; New tab brings
     // it up. Ctrl+W is showHide's: it closes a tab there.
@@ -427,6 +432,18 @@ void MainWindow::openVideoOptions(const QUrl& url)
     const quint64 id = m_probe->probe(link, false);
     m_videoProbes.insert(id, link);
     qCInfo(lcUi) << "video options: probing" << link << "probe" << id;
+}
+
+void MainWindow::showPlaylistItems(quint64 jobId)
+{
+    const auto job = m_downloadsController->queue().job(jobId);
+    if (!job) {
+        return;
+    }
+    auto* sheet = new PlaylistItemsSheet(*job, m_theme, this);
+    sheet->setAttribute(Qt::WA_DeleteOnClose);
+    connect(sheet, &PlaylistItemsSheet::toast, this, &MainWindow::toast);
+    sheet->open();
 }
 
 void MainWindow::showPlans()
@@ -683,6 +700,36 @@ void MainWindow::debugOpen(const QString& what)
         showPage(PageId::Browser);
     } else if (what == u"downloads"_s) {
         showPage(PageId::Downloads);
+    } else if (what == u"playlist-items-demo"_s) {
+        // A playlist with three of five files on disk, for a grab of the items sheet.
+        core::DownloadJob job;
+        job.id = 9001;
+        job.title = u"Learn Qt in 12 videos"_s;
+        job.options.isPlaylist = true;
+        const QString folder = QDir::temp().filePath(u"playlist-dl-items-demo"_s);
+        QDir().mkpath(folder);
+        const QStringList titles{u"Getting started with Qt Widgets"_s, u"Signals and slots"_s,
+                                 u"Layouts that survive a resize"_s, u"Model, view, delegate"_s,
+                                 u"Style sheets without tears"_s};
+        for (int i = 0; i < titles.size(); ++i) {
+            core::PlaylistEntry entry;
+            entry.id = u"demo%1"_s.arg(i + 1);
+            entry.title = titles.at(i);
+            if (i < 3) {
+                entry.file = QDir(folder).filePath(u"%1 - %2.mp4"_s.arg(i + 1, 3, 10, u'0').arg(titles.at(i)));
+                QFile file(entry.file);
+                if (file.open(QIODevice::WriteOnly)) {
+                    file.write("demo");
+                }
+                job.outputFiles << entry.file;
+            }
+            job.entries << entry;
+        }
+        job.options.outputDirectory = folder;
+        job.state = core::DownloadState::Completed;
+        m_downloadsController->queue().setJobs({job});
+        showPage(PageId::Downloads);
+        showPlaylistItems(job.id);
     } else if (what == u"downloads-demo"_s) {
         m_downloadsController->queue().setJobs(demoDownloads());
         showPage(PageId::Downloads);

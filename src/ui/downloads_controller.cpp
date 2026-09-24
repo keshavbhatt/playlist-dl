@@ -1,6 +1,7 @@
 #include "ui/downloads_controller.h"
 
 #include "core/downloads/download_queue.h"
+#include "core/downloads/playlist_file.h"
 #include "core/notifications/notification_service.h"
 #include "core/settings/settings.h"
 #include "core/youtube_url.h"
@@ -168,7 +169,15 @@ void DownloadsController::wireNotifications()
         if (!job) {
             return;
         }
-        if (key == QLatin1StringView(kOpenKey) && !job->primaryFile().isEmpty()) {
+        if (key == QLatin1StringView(kOpenKey) && job->isPlaylist()) {
+            // A playlist plays as a whole through its playlist file when it exists.
+            const QString list = core::playlist_file::pathFor(*job);
+            if (QFileInfo::exists(list)) {
+                platform::openFile(list);
+            } else {
+                Q_EMIT playlistItemsRequested(job->id);
+            }
+        } else if (key == QLatin1StringView(kOpenKey) && !job->primaryFile().isEmpty()) {
             platform::openFile(job->primaryFile());
         } else if (key == QLatin1StringView(kFolderKey) && !job->primaryFile().isEmpty()) {
             platform::revealInFileManager(job->primaryFile());
@@ -404,7 +413,9 @@ void DownloadsController::handleCardAction(quint64 id, Action action)
         m_queue->retry(id);
         break;
     case Action::Open:
-        if (!job->primaryFile().isEmpty()) {
+        if (job->isPlaylist()) {
+            Q_EMIT playlistItemsRequested(id); // the items, Play all and the playlist file
+        } else if (!job->primaryFile().isEmpty()) {
             platform::openFile(job->primaryFile());
         }
         break;
@@ -440,6 +451,22 @@ void DownloadsController::keepThumbnail(quint64 id)
     m_queue->setThumbnail(id, local);
 }
 
+bool DownloadsController::writePlaylistFileFor(quint64 id)
+{
+    if (!m_settings.writePlaylistFile()) {
+        return false;
+    }
+    const auto job = m_queue->job(id);
+    if (!job || !job->isPlaylist()) {
+        return false;
+    }
+    const bool written = core::playlist_file::writeFor(*job);
+    if (written) {
+        qCInfo(lcUi) << "playlist file written for" << id << core::playlist_file::pathFor(*job);
+    }
+    return written;
+}
+
 void DownloadsController::handleJobFinished(quint64 id, core::DownloadState state)
 {
     if (const auto finished = m_queue->job(id); finished && finished->thumbnail.startsWith(u'/')) {
@@ -451,6 +478,9 @@ void DownloadsController::handleJobFinished(quint64 id, core::DownloadState stat
     const auto job = m_queue->job(id);
     if (!job) {
         return;
+    }
+    if (job->isPlaylist()) {
+        writePlaylistFileFor(id); // whatever landed, even after a cancel or a failure
     }
     if (state == core::DownloadState::Completed) {
         Q_EMIT jobCompleted(id, job->title, job->primaryFile());

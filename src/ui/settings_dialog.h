@@ -137,6 +137,7 @@ private:
     QSpinBox* m_concurrent = nullptr;
     QSpinBox* m_speedLimit = nullptr;
     QCheckBox* m_skipExisting = nullptr;
+    QCheckBox* m_playlistFile = nullptr;
     QCheckBox* m_sessionCookies = nullptr;
     // engine card
     QLabel* m_engineStatus = nullptr;

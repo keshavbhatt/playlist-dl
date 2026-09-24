@@ -61,6 +61,8 @@ qt_add_library(pldl_ui STATIC
     plans_dialog.h
     playlist_entry_delegate.cpp
     playlist_entry_delegate.h
+    playlist_items_sheet.cpp
+    playlist_items_sheet.h
     playlist_model.cpp
     playlist_model.h
     pldl_style.cpp

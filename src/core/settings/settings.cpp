@@ -32,6 +32,7 @@ constexpr bool kDefaultOrganiseDownloads = true;
 constexpr bool kDefaultNumberPlaylistFiles = true;
 constexpr int kDefaultAudioBitrate = 0;
 constexpr bool kDefaultSkipExisting = true;
+constexpr bool kDefaultWritePlaylistFile = true;
 constexpr VideoQuality kDefaultQuality = VideoQuality::Best;
 constexpr Container kDefaultContainer = Container::Mp4;
 constexpr AudioFormat kDefaultAudioFormat = AudioFormat::Best;
@@ -537,6 +538,18 @@ bool Settings::skipExisting() const
 void Settings::setSkipExisting(bool enabled)
 {
     if (storeBool(keys::kSkipExisting, kDefaultSkipExisting, enabled)) {
+        Q_EMIT downloadDefaultsChanged();
+    }
+}
+
+bool Settings::writePlaylistFile() const
+{
+    return boolValue(keys::kWritePlaylistFile, kDefaultWritePlaylistFile);
+}
+
+void Settings::setWritePlaylistFile(bool enabled)
+{
+    if (storeBool(keys::kWritePlaylistFile, kDefaultWritePlaylistFile, enabled)) {
         Q_EMIT downloadDefaultsChanged();
     }
 }

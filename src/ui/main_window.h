@@ -86,6 +86,8 @@ public:
     /// A short confirmation in the window's corner ("Added to queue").
     void toast(const QString& text);
     void showPlans();
+    /// The items of a playlist download (Open on its card): play one, play all, arrange the playlist file.
+    void showPlaylistItems(quint64 jobId);
 
 public Q_SLOTS:
     void showAndRaise();

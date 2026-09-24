@@ -4,6 +4,7 @@
 
 #include <QDateTime>
 #include <QJsonObject>
+#include <QList>
 #include <QString>
 
 // One entry of the download queue (FEATURES E6). Pure data + JSON; the
@@ -25,6 +26,19 @@ enum class DownloadState
 [[nodiscard]] bool isActiveState(DownloadState state);
 [[nodiscard]] bool isFinishedState(DownloadState state);
 [[nodiscard]] QString stateLabel(DownloadState state);
+
+/// One entry of a playlist job (FEATURES E10): known from the options sheet
+/// before the download, its file filled in when the engine moves it into
+/// place. Persisted with the job so the items sheet can list what landed.
+struct PlaylistEntry
+{
+    QString id;
+    QString title;
+    QString file; ///< final path, empty until downloaded
+
+    [[nodiscard]] QJsonObject toJson() const;
+    [[nodiscard]] static PlaylistEntry fromJson(const QJsonObject& object);
+};
 
 struct DownloadJob
 {
@@ -49,6 +63,8 @@ struct DownloadJob
     QString currentItemTitle;  ///< playlist: current item
 
     QStringList outputFiles; ///< final paths (after_move)
+    QList<PlaylistEntry> entries; ///< playlist: the picked entries in order, files as they land
+    QString currentItemId;        ///< playlist: the entry the engine is on, runtime only
     QString error;
     QDateTime createdAt;
     QDateTime finishedAt;
@@ -60,6 +76,8 @@ struct DownloadJob
     [[nodiscard]] double progress() const;
     /// A short status line for the card ("12.4 MB of 118 MB · 3.2 MB/s · 0:32").
     [[nodiscard]] QString statusLine() const;
+    /// Playlist: how many entries have their file.
+    [[nodiscard]] int downloadedEntryCount() const;
     /// The primary output file (first), or empty.
     [[nodiscard]] QString primaryFile() const;
     /// The card's second line: the current entry and its place for a playlist
