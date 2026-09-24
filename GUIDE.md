@@ -7,8 +7,8 @@ window and the settings that matter.
 ## The window
 
 A rail on the left holds the pages: **Search** (Ctrl+1), **Playlist** (Ctrl+2), **Browser**
-(Ctrl+3) and **Downloads** (Ctrl+4), with **Settings** (Ctrl+,) and your account at the
-bottom. Every action has a keyboard shortcut; press Ctrl+/ for the list.
+(Ctrl+3) and **Downloads** (Ctrl+4), with **Settings** (Ctrl+,), your account and **About**
+at the bottom. Every action has a keyboard shortcut; press Ctrl+/ for the list.
 
 ## Search
 

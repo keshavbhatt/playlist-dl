@@ -52,6 +52,8 @@
   delegate and filters. Verified live headless: `PLDL_DEBUG_DOWNLOAD` provisioned the
   engine and downloaded "Me at the zoo" (av1+aac, thumbnail embedded) in 151 s, exit 0.
   39 tests pass. Grabs of the demo queue in dark and light looked at.
+- Owner request: About reachable from the rail's bottom (info glyph under Account); the
+  About sheet itself already matched Red's shape.
 - Owner request: a new browser tab opens empty by default; Settings, Browser offers Empty
   tab, YouTube or a custom address (the address row shows for the custom choice only).
   Grabbed: the empty New tab and the settings page.

@@ -96,6 +96,7 @@ void SideRail::setupUi()
     layout->addStretch(1);
     layout->addWidget(makeButton(m_actions.settings, u"settings"_s), 0, Qt::AlignHCenter);
     layout->addWidget(makeButton(m_actions.account, u"account"_s), 0, Qt::AlignHCenter);
+    layout->addWidget(makeButton(m_actions.about, u"info"_s), 0, Qt::AlignHCenter);
 }
 
 void SideRail::applyIcons()
