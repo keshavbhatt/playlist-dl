@@ -298,8 +298,11 @@ void AccountDialog::refresh()
                 expiry = st.evaluationEndTimestamp > 0 ? dateText(st.evaluationEndTimestamp)
                                                        : tr("%1 days after the first start").arg(m_license.evaluationDays());
             }
+            // Plural written by hand: "%n" rendered literally once (LESSONS).
             bannerText = u"<b>%1</b> %2"_s.arg(
-                tr("Free plan: %n download(s) a day.", nullptr, services::LicenseService::kFreeDownloadsPerDay),
+                services::LicenseService::kFreeDownloadsPerDay == 1
+                    ? tr("Free plan: one download a day.")
+                    : tr("Free plan: %1 downloads a day.").arg(services::LicenseService::kFreeDownloadsPerDay),
                 tr("Pro has no daily limit."));
             break;
         }
@@ -334,9 +337,9 @@ void AccountDialog::refresh()
         pro ? tr("Pro: unlimited downloads with no daily count, whole playlists in one go however long they "
                  "are, and every quality up to 4K and lossless audio.")
             : tr("Free covers search, the built-in browser with sign-in, every quality up to 4K and lossless "
-                 "audio, subtitles, and up to %n download(s) a day; a playlist counts each video you pick. "
-                 "Pro removes the daily limit.",
-                 nullptr, services::LicenseService::kFreeDownloadsPerDay));
+                 "audio, subtitles, and up to %1 downloads a day; a playlist counts each video you pick. "
+                 "Pro removes the daily limit.")
+                  .arg(services::LicenseService::kFreeDownloadsPerDay));
     m_planBadge->setText(badge);
     m_planBadge->setProperty("pldlPro", pro);
     m_planBadge->style()->unpolish(m_planBadge);

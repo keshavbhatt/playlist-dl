@@ -71,10 +71,9 @@ QFrame* planCard(const QString& name, const QString& badge, const QString& price
 QStringList accountFreeItems()
 {
     return {QObject::tr("Search YouTube playlists"), QObject::tr("Play in the built-in browser, signed in"),
-            QObject::tr("Up to %n download(s) a day; a playlist counts each video", nullptr,
-                        services::LicenseService::kFreeDownloadsPerDay),
+            QObject::tr("Up to %1 downloads a day").arg(services::LicenseService::kFreeDownloadsPerDay),
             QObject::tr("Every quality up to 4K and lossless audio"),
-            QObject::tr("Subtitles, thumbnails and metadata embedded")};
+            QObject::tr("Subtitles and thumbnails embedded")};
 }
 
 QStringList accountProItems()
