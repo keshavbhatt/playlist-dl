@@ -6,6 +6,7 @@
 #include "ui/icons.h"
 #include "ui/pldl_style.h"
 
+#include <QCheckBox>
 #include <QFileInfo>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -54,6 +55,19 @@ void PlaylistItemsSheet::setupUi()
     m_summary->setWordWrap(true);
     root->addWidget(m_summary);
 
+    // Which items play: every downloaded one unless unchecked.
+    auto* selectRow = new QHBoxLayout;
+    m_selectAll = new QCheckBox(tr("Select all"), this);
+    m_selectAll->setObjectName(u"selectAllBox"_s);
+    m_selectAll->setTristate(true);
+    connect(m_selectAll, &QCheckBox::clicked, this, [this] {
+        // A click on the box (not a state set from code) toggles everything.
+        setAllChecked(m_selectAll->checkState() != Qt::Unchecked);
+    });
+    selectRow->addWidget(m_selectAll);
+    selectRow->addStretch(1);
+    root->addLayout(selectRow);
+
     m_list = new QListWidget(this);
     m_list->setObjectName(u"itemList"_s);
     m_list->setAccessibleName(tr("Playlist items"));
@@ -61,6 +75,21 @@ void PlaylistItemsSheet::setupUi()
     m_list->setMinimumHeight(260);
     m_list->setUniformItemSizes(true);
     connect(m_list, &QListWidget::itemSelectionChanged, this, &PlaylistItemsSheet::refreshButtons);
+    connect(m_list, &QListWidget::itemChanged, this, [this](QListWidgetItem* item) {
+        if (m_syncing) {
+            return;
+        }
+        const QString file = item->data(kFileRole).toString();
+        if (file.isEmpty()) {
+            return;
+        }
+        if (item->checkState() == Qt::Checked) {
+            m_leftOut.remove(file);
+        } else {
+            m_leftOut.insert(file);
+        }
+        refreshButtons();
+    });
     connect(m_list, &QListWidget::itemDoubleClicked, this, [this](QListWidgetItem*) { playSelected(); });
     root->addWidget(m_list, 1);
 
@@ -140,6 +169,7 @@ void PlaylistItemsSheet::rebuildList()
 {
     const Tokens t = Tokens::forScheme(m_theme.isDark());
     const int selected = m_list->currentRow();
+    m_syncing = true;
     m_list->clear();
     int index = 0;
     for (const core::PlaylistEntry& entry : m_entries) {
@@ -153,10 +183,17 @@ void PlaylistItemsSheet::rebuildList()
             m_list);
         item->setData(kFileRole, downloaded ? entry.file : QString());
         item->setToolTip(entry.file.isEmpty() ? tr("Not downloaded yet") : entry.file);
+        if (downloaded) {
+            item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+            item->setCheckState(m_leftOut.contains(entry.file) ? Qt::Unchecked : Qt::Checked);
+        } else {
+            item->setFlags(item->flags() & ~Qt::ItemIsUserCheckable & ~Qt::ItemIsSelectable);
+        }
         item->setForeground(downloaded ? t.text : t.muted);
         item->setIcon(icons::themed(downloaded ? u"check"_s : (missing ? u"warning"_s : u"downloads"_s),
                                     downloaded ? t.success : t.muted));
     }
+    m_syncing = false;
     if (selected >= 0 && selected < m_list->count()) {
         m_list->setCurrentRow(selected);
     }
@@ -167,7 +204,7 @@ void PlaylistItemsSheet::rebuildList()
     if (QFileInfo::exists(playlistFilePath())) {
         summary += u' ' + tr("A playlist file is next to the videos; Play all updates it in the order shown.");
     } else {
-        summary += u' ' + tr("Play all writes a playlist file next to the videos in the order shown.");
+        summary += u' ' + tr("Play all writes a playlist file next to the videos with the checked items in the order shown.");
     }
     m_summary->setText(summary);
     refreshButtons();
@@ -182,16 +219,53 @@ void PlaylistItemsSheet::refreshButtons()
     m_reveal->setEnabled(playable);
     m_up->setEnabled(selected && row > 0);
     m_down->setEnabled(selected && row < m_list->count() - 1);
-    const bool any = downloadedCount() > 0;
-    m_save->setEnabled(any);
-    m_playAll->setEnabled(any);
+    const int chosen = static_cast<int>(orderedFiles().size());
+    const int have = downloadedCount();
+    m_save->setEnabled(chosen > 0);
+    m_playAll->setEnabled(chosen > 0);
+    m_playAll->setText(chosen > 0 && chosen < have ? tr("Play %1 of %2").arg(chosen).arg(have) : tr("Play all"));
+    // Re-entered from the list's selection signal while rebuildList runs:
+    // keep its syncing flag, do not reset it.
+    const bool wasSyncing = m_syncing;
+    m_syncing = true;
+    m_selectAll->setEnabled(have > 0);
+    m_selectAll->setCheckState(chosen == 0 ? Qt::Unchecked : (chosen == have ? Qt::Checked : Qt::PartiallyChecked));
+    m_syncing = wasSyncing;
+}
+
+bool PlaylistItemsSheet::isChecked(int row) const
+{
+    if (row < 0 || row >= m_list->count()) {
+        return false;
+    }
+    const QString file = m_list->item(row)->data(kFileRole).toString();
+    return !file.isEmpty() && !m_leftOut.contains(file);
+}
+
+void PlaylistItemsSheet::setChecked(int row, bool checked)
+{
+    if (row < 0 || row >= m_list->count()) {
+        return;
+    }
+    QListWidgetItem* item = m_list->item(row);
+    if (item->data(kFileRole).toString().isEmpty()) {
+        return; // not downloaded: nothing to play
+    }
+    item->setCheckState(checked ? Qt::Checked : Qt::Unchecked); // itemChanged keeps m_leftOut
+}
+
+void PlaylistItemsSheet::setAllChecked(bool checked)
+{
+    for (int row = 0; row < m_list->count(); ++row) {
+        setChecked(row, checked);
+    }
 }
 
 QStringList PlaylistItemsSheet::orderedFiles() const
 {
     QStringList files;
     for (const core::PlaylistEntry& entry : m_entries) {
-        if (!entry.file.isEmpty() && QFileInfo::exists(entry.file)) {
+        if (!entry.file.isEmpty() && QFileInfo::exists(entry.file) && !m_leftOut.contains(entry.file)) {
             files << entry.file;
         }
     }
@@ -200,7 +274,9 @@ QStringList PlaylistItemsSheet::orderedFiles() const
 
 int PlaylistItemsSheet::downloadedCount() const
 {
-    return static_cast<int>(orderedFiles().size());
+    return static_cast<int>(std::count_if(m_entries.cbegin(), m_entries.cend(), [](const core::PlaylistEntry& e) {
+        return !e.file.isEmpty() && QFileInfo::exists(e.file);
+    }));
 }
 
 QString PlaylistItemsSheet::playlistFilePath() const
@@ -212,8 +288,8 @@ bool PlaylistItemsSheet::writePlaylistFile()
 {
     QList<core::PlaylistEntry> present;
     for (const core::PlaylistEntry& entry : m_entries) {
-        if (!entry.file.isEmpty() && QFileInfo::exists(entry.file)) {
-            present << entry;
+        if (!entry.file.isEmpty() && QFileInfo::exists(entry.file) && !m_leftOut.contains(entry.file)) {
+            present << entry; // the checked ones, in the order shown
         }
     }
     if (present.isEmpty()) {
@@ -277,7 +353,7 @@ void PlaylistItemsSheet::revealSelected()
 void PlaylistItemsSheet::playAll()
 {
     if (!writePlaylistFile()) {
-        Q_EMIT toast(tr("Nothing downloaded yet"));
+        Q_EMIT toast(tr("Nothing to play: check at least one downloaded item"));
         return;
     }
     rebuildList();

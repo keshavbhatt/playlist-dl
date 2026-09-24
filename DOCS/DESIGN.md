@@ -162,9 +162,10 @@ The 2.x download widget rebuilt as a page:
   open, show in folder, retry, remove. Double click opens the file.
 - A playlist is one card with the aggregate progress and the current entry. Open on it
   shows the **Playlist items** sheet (owner, 2026-09-24): every entry with its state
-  (downloaded, not downloaded, file missing), Play for one, Show in folder, Move up and down,
-  sort by name or playlist order, Save playlist file, and **Play all**, which writes the
-  `.m3u8` next to the videos in the order shown and opens it in the media player. The file
+  (downloaded, not downloaded, file missing) and a check box to leave it out (Select all
+  above the list), Play for one, Show in folder, Move up and down, sort by name or playlist
+  order, Save playlist file, and **Play all** ("Play 3 of 5" when some are unticked), which
+  writes the `.m3u8` next to the videos with the checked items in the order shown and opens it in the media player. The file
   is also written when the playlist finishes (Settings, Downloads: Write a playlist file).
 - Filters: All, Active, Finished, Failed. Empty state: "Downloads you start will show up
   here".

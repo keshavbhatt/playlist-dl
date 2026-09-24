@@ -6,6 +6,7 @@
 #include "core/theme/theme_service.h"
 #include "ui/playlist_items_sheet.h"
 
+#include <QCheckBox>
 #include <QFile>
 #include <QListWidget>
 #include <QPushButton>
@@ -92,6 +93,39 @@ private Q_SLOTS:
         const QString text = QString::fromUtf8(written.readAll());
         QVERIFY(text.startsWith(u"#EXTM3U\n#PLAYLIST:Mix\n#EXTINF:-1,Alpha\n002 - Alpha.mp4\n#EXTINF:-1,Beta\n001 - Beta.mp4\n"_s));
         QVERIFY(!text.contains(u"Gamma"_s)); // not downloaded: not in the file
+    }
+
+    void uncheckedItemsStayOutOfThePlaylist()
+    {
+        PlaylistItemsSheet sheet(m_job, *m_theme);
+        QVERIFY(sheet.isChecked(0));
+        QVERIFY(sheet.isChecked(1));
+        QVERIFY(!sheet.isChecked(2)); // not downloaded: never checkable
+        QCOMPARE(sheet.selectAllBox()->checkState(), Qt::Checked);
+        sheet.setChecked(0, false);
+        QVERIFY(!sheet.isChecked(0));
+        QCOMPARE(sheet.orderedFiles().size(), 1);
+        QVERIFY(sheet.orderedFiles().first().endsWith(u"002 - Alpha.mp4"_s));
+        QCOMPARE(sheet.selectAllBox()->checkState(), Qt::PartiallyChecked);
+        QCOMPARE(sheet.playAllButton()->text(), u"Play 1 of 2"_s);
+        QVERIFY(sheet.writePlaylistFile());
+        QFile written(sheet.playlistFilePath());
+        QVERIFY(written.open(QIODevice::ReadOnly));
+        const QString text = QString::fromUtf8(written.readAll());
+        QVERIFY(text.contains(u"Alpha"_s));
+        QVERIFY(!text.contains(u"Beta"_s));
+        // The choice survives arranging.
+        sheet.sortByName();
+        QCOMPARE(sheet.orderedFiles().size(), 1);
+        sheet.setAllChecked(false);
+        QCOMPARE(sheet.orderedFiles().size(), 0);
+        QVERIFY(!sheet.playAllButton()->isEnabled());
+        QCOMPARE(sheet.selectAllBox()->checkState(), Qt::Unchecked);
+        sheet.setAllChecked(true);
+        QCOMPARE(sheet.orderedFiles().size(), 2);
+        QCOMPARE(sheet.playAllButton()->text(), u"Play all"_s);
+        sheet.setChecked(2, true); // not downloaded: ignored
+        QVERIFY(!sheet.isChecked(2));
     }
 
     void nothingDownloadedDisablesPlayAll()

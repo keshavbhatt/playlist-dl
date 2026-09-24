@@ -52,6 +52,8 @@
   delegate and filters. Verified live headless: `PLDL_DEBUG_DOWNLOAD` provisioned the
   engine and downloaded "Me at the zoo" (av1+aac, thumbnail embedded) in 151 s, exit 0.
   39 tests pass. Grabs of the demo queue in dark and light looked at.
+- Owner request: the items sheet has a check box per downloaded item and Select all; unticked
+  items stay out of Play all and the playlist file ("Play 3 of 5").
 - Owner request: a downloaded playlist plays as a whole. `DownloadJob` remembers its
   entries (the queue fills each one's file from the engine's item and file lines), the
   controller writes an `.m3u8` next to the videos when a playlist finishes (setting), and
