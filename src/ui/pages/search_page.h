@@ -16,6 +16,7 @@ class QHBoxLayout;
 class QLabel;
 class QLineEdit;
 class QListView;
+class QToolButton;
 class QListWidget;
 class QPushButton;
 class QStackedWidget;
@@ -98,6 +99,8 @@ public:
     [[nodiscard]] QPushButton* searchButton() const { return m_button; }
     [[nodiscard]] BadgeLabel* sourceChip() const { return m_chip; }
     [[nodiscard]] QListView* resultsView() const { return m_list; }
+    [[nodiscard]] QToolButton* gridViewButton() const { return m_gridButton; }
+    [[nodiscard]] QToolButton* listViewButton() const { return m_listButton; }
     [[nodiscard]] QListWidget* suggestionsPopup() const { return m_popup; }
     [[nodiscard]] QWidget* recentRow() const { return m_recentRow; }
     [[nodiscard]] QPushButton* loadMoreButton() const { return m_loadMore; }
@@ -141,6 +144,7 @@ private:
     void moveSuggestion(int delta);
     void pickSuggestion();
     void layoutGrid();
+    void applyViewMode();
     void placePopup();
     [[nodiscard]] static bool looksLikeLink(const QString& text);
 
@@ -151,6 +155,8 @@ private:
     QLineEdit* m_field = nullptr;
     QPushButton* m_button = nullptr;
     BadgeLabel* m_chip = nullptr;
+    QToolButton* m_gridButton = nullptr;
+    QToolButton* m_listButton = nullptr;
     QWidget* m_recentRow = nullptr;
     QHBoxLayout* m_recentLayout = nullptr;
     QListWidget* m_popup = nullptr;

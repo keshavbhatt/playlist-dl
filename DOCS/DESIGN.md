@@ -87,8 +87,10 @@ The 2.x home: a search field with online suggestions, results as playlist cards.
 - Suggestions drop down under the field as the user types (debounced 250 ms, from the
   suggestion endpoint; Esc closes, arrows move, Enter picks).
 - Results: a grid of playlist cards (thumbnail 16:9 with the video-count badge in the
-  corner, title on two lines, channel, "Updated <date>" when known). Click opens the
-  Playlist page. A "Load more" pill at the end.
+  corner, title on two lines, channel). Click opens the Playlist page. A "Load more" pill
+  at the end. Two flat buttons at the header's right end switch between the grid and a
+  list of rows (small picture on the left, title on one line, channel under it); the
+  choice is remembered (owner request, 2026-09-24).
 - Source chip in the header's right corner: "Search" normally; when the ktechpit service
   fails the results come from the engine and the chip reads "Search (engine)" with a
   tooltip explaining the fallback (ADR-003). Never the tool's name.

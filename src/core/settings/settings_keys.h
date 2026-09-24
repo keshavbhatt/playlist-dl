@@ -57,7 +57,8 @@ inline constexpr QLatin1StringView kEmbedMetadata{"downloads/embedMetadata"};
 inline constexpr QLatin1StringView kSubtitleLanguages{"downloads/subtitleLanguages"};
 
 // search/
-inline constexpr QLatin1StringView kSearchServiceMode{"search/serviceMode"};       ///< Automatic / Engine only (ADR-003)
+inline constexpr QLatin1StringView kSearchServiceMode{"search/serviceMode"};
+inline constexpr QLatin1StringView kSearchGridView{"search/gridView"};            ///< cards (true) or rows (false)       ///< Automatic / Engine only (ADR-003)
 inline constexpr QLatin1StringView kSearchResultsPerPage{"search/resultsPerPage"}; ///< the engine's page size
 inline constexpr QLatin1StringView kSearchKeepHistory{"search/keepHistory"};       ///< the recent-query chips
 inline constexpr QLatin1StringView kSearchRecentQueries{"search/recentQueries"};   ///< most recent first, at most 8

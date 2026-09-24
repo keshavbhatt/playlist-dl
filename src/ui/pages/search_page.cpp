@@ -81,7 +81,7 @@ SearchPage::SearchPage(core::Settings& settings, core::ThemeService& theme, Thum
     setSource(services::PlaylistSearch::Source::Service);
     rebuildRecent();
     setState(State::Empty);
-    applyIcons();
+    applyViewMode();
 }
 
 SearchPage::~SearchPage() = default;
@@ -128,6 +128,28 @@ void SearchPage::buildHeader()
     m_chip->setObjectName(u"sourceChip"_s);
     m_chip->setGlyph(u"search"_s);
     headerLayout()->addWidget(m_chip);
+
+    // Grid or list (FEATURES B10): two exclusive flat buttons, the choice kept
+    // in Settings so it survives a restart and other views can follow it.
+    auto makeViewButton = [this](const QString& name, const QString& tip) {
+        auto* button = new QToolButton(this);
+        button->setObjectName(name);
+        button->setProperty("pldlFlat", true);
+        button->setCheckable(true);
+        button->setAutoExclusive(true);
+        button->setCursor(Qt::PointingHandCursor);
+        button->setToolTip(tip);
+        button->setAccessibleName(tip);
+        button->setFocusPolicy(Qt::TabFocus);
+        headerLayout()->addWidget(button);
+        return button;
+    };
+    m_gridButton = makeViewButton(u"gridViewButton"_s, tr("Show results as cards"));
+    m_gridButton->setChecked(true);
+    m_listButton = makeViewButton(u"listViewButton"_s, tr("Show results as a list"));
+    connect(m_gridButton, &QToolButton::clicked, this, [this] { m_settings.setSearchGridView(true); });
+    connect(m_listButton, &QToolButton::clicked, this, [this] { m_settings.setSearchGridView(false); });
+    connect(&m_settings, &core::Settings::searchChanged, this, &SearchPage::applyViewMode);
 }
 
 void SearchPage::buildRecent()
@@ -286,6 +308,9 @@ void SearchPage::applyIcons()
             chip->setIcon(icons::themed(u"clock"_s, t.muted));
         }
     }
+    const bool grid = m_gridButton->isChecked();
+    m_gridButton->setIcon(icons::themed(u"grid"_s, grid ? t.accent : t.muted));
+    m_listButton->setIcon(icons::themed(u"list"_s, grid ? t.muted : t.accent));
     m_list->viewport()->update();
 }
 
@@ -788,6 +813,26 @@ void SearchPage::showEvent(QShowEvent* event)
     }
 }
 
+void SearchPage::applyViewMode()
+{
+    const bool grid = m_settings.searchGridView();
+    if (m_gridButton->isChecked() != grid) {
+        m_gridButton->setChecked(grid);
+        m_listButton->setChecked(!grid);
+    }
+    const auto layout = grid ? SearchCardDelegate::Layout::Grid : SearchCardDelegate::Layout::List;
+    if (m_delegate->layout() != layout) {
+        m_delegate->setLayout(layout);
+        m_list->setViewMode(grid ? QListView::IconMode : QListView::ListMode);
+        m_list->setFlow(grid ? QListView::LeftToRight : QListView::TopToBottom);
+        m_list->setWrapping(grid);
+        // A stale grid size from the other layout would size the rows wrong.
+        m_list->setGridSize(QSize());
+    }
+    applyIcons();
+    layoutGrid();
+}
+
 void SearchPage::layoutGrid()
 {
     // The width the cards share is the same whether the scrollbar shows or
@@ -800,6 +845,17 @@ void SearchPage::layoutGrid()
         return;
     }
     constexpr int gap = SearchCardDelegate::kGap;
+    if (m_delegate->layout() == SearchCardDelegate::Layout::List) {
+        // One row per result, as wide as the view.
+        const int rowWidth = width - gap;
+        if (rowWidth == m_delegate->cardWidth() && m_list->gridSize() == m_delegate->itemSize()) {
+            return;
+        }
+        m_delegate->setCardWidth(rowWidth);
+        m_list->setGridSize(m_delegate->itemSize());
+        m_list->doItemsLayout();
+        return;
+    }
     // Every item carries its gutter on the right and below, so a column is
     // a card plus a gap: as many as the minimum card allows, the cards
     // stretched to share the width, capped so a wide window gets more

@@ -186,9 +186,16 @@ private Q_SLOTS:
         QCOMPARE(m_settings->searchMode(), SearchMode::Automatic);
         QCOMPARE(m_settings->searchResultsPerPage(), 20);
         QVERIFY(m_settings->keepSearchHistory());
+        QVERIFY(m_settings->searchGridView());
         QVERIFY(m_settings->recentQueries().isEmpty());
 
         QSignalSpy changed(m_settings.get(), &Settings::searchChanged);
+        m_settings->setSearchGridView(false);
+        QVERIFY(!m_settings->searchGridView());
+        m_settings->setSearchGridView(false);
+        QCOMPARE(changed.count(), 1);
+        m_settings->setSearchGridView(true);
+        changed.clear();
         m_settings->setSearchMode(SearchMode::EngineOnly);
         m_settings->setSearchMode(SearchMode::EngineOnly);
         QCOMPARE(m_settings->searchMode(), SearchMode::EngineOnly);

@@ -242,6 +242,9 @@ public:
     void setSearchResultsPerPage(int count);
     static constexpr int kMinSearchResultsPerPage = 10;
     static constexpr int kMaxSearchResultsPerPage = 50;
+    /// Search results as a card grid (default) or as a list of rows (FEATURES B10).
+    [[nodiscard]] bool searchGridView() const;
+    void setSearchGridView(bool grid);
     /// Whether the Search page remembers the last queries as chips.
     [[nodiscard]] bool keepSearchHistory() const;
     void setKeepSearchHistory(bool enabled);

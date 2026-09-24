@@ -52,6 +52,8 @@
   delegate and filters. Verified live headless: `PLDL_DEBUG_DOWNLOAD` provisioned the
   engine and downloaded "Me at the zoo" (av1+aac, thumbnail embedded) in 151 s, exit 0.
   39 tests pass. Grabs of the demo queue in dark and light looked at.
+- Owner request: the Search page switches between the card grid and a list of rows (two
+  header buttons, `search/gridView`); grabbed in both modes.
 - Playlist page and Download options sheet merged: the playlist read flat through the
   engine, selection tools, unavailable entries, the sheet for a playlist selection and for one
   video, the browser's Download this routed by link kind. Verified live headless: a public

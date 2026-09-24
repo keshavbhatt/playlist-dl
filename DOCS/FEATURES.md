@@ -46,6 +46,7 @@ name (ADR-002), the repository licence (ADR-005).
 | B7 | Bookmark playlist | menu entry without a handler | LATER | a bookmarks page after 3.0 |
 | B8 | Force reload of a cached result | yes | DROP | results are not cached beyond the HTTP cache |
 | B9 | Empty, loading and error states with Retry; Esc cancels | Esc cancels; error dialog | KEEP | done (`SearchPage` states, Esc cancels) |
+| B10 | Results as a card grid or a list of rows, a toggle in the header, remembered (setting) | grid of rows | KEEP | done (`SearchCardDelegate::Layout`, `Settings::searchGridView`; tst_search_page) |
 
 ## C. Playlist page
 

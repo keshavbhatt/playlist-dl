@@ -14,6 +14,7 @@ bottom. Every action has a keyboard shortcut; press Ctrl+/ for the list.
 
 Type what you are looking for and press Enter. Suggestions appear as you type; the results
 are playlist cards with the number of videos on each. Click a card to open the playlist.
+The two buttons at the right end of the header switch between cards and a list of rows.
 Recent searches come back as chips under the field (Settings, General, Keep search history).
 
 You can also paste a link: a playlist link opens the Playlist page, a video link offers to
