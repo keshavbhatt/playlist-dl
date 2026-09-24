@@ -584,8 +584,15 @@ QWidget* SettingsDialog::buildSearch()
                                 core::Settings::kMaxSearchResultsPerPage, 10,
                                 [this](int v) { m_settings.setSearchResultsPerPage(v); });
     m_resultsPerPage->setObjectName(u"resultsPerPageSpin"_s);
-    QWidget* search = card(tr("Search"), {row(tr("Results per page"), m_resultsPerPage)}, this);
-    return page(tr("Search"), tr("How many results a search brings back at a time."), {search}, this);
+    m_suggest = makeCheck(this, m_loading, [this](bool on) { m_settings.setSearchSuggestions(on); });
+    m_suggest->setObjectName(u"suggestCheck"_s);
+    QWidget* search = card(tr("Search"),
+                           {row(tr("Suggest as I type"), m_suggest,
+                                tr("Completions appear under the field while you type a query.")),
+                            row(tr("Results per page"), m_resultsPerPage)},
+                           this);
+    return page(tr("Search"), tr("Suggestions while typing and how many results a search brings back at a time."),
+                {search}, this);
 }
 
 QWidget* SettingsDialog::buildAdvanced()
@@ -669,6 +676,7 @@ void SettingsDialog::loadValues()
     loadDownloadValues();
     loadBrowserValues();
     m_resultsPerPage->setValue(m_settings.searchResultsPerPage());
+    m_suggest->setChecked(m_settings.searchSuggestions());
     selectData(m_hardware, static_cast<int>(m_settings.hardwareAcceleration()));
     m_loading = false;
 }

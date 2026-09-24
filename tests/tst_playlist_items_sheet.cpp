@@ -8,6 +8,8 @@
 
 #include <QCheckBox>
 #include <QFile>
+#include <QFrame>
+#include <QLabel>
 #include <QListWidget>
 #include <QPushButton>
 #include <QTemporaryDir>
@@ -93,6 +95,25 @@ private Q_SLOTS:
         const QString text = QString::fromUtf8(written.readAll());
         QVERIFY(text.startsWith(u"#EXTM3U\n#PLAYLIST:Mix\n#EXTINF:-1,Alpha\n002 - Alpha.mp4\n#EXTINF:-1,Beta\n001 - Beta.mp4\n"_s));
         QVERIFY(!text.contains(u"Gamma"_s)); // not downloaded: not in the file
+    }
+
+    void anExistingPlaylistFileShowsTheBanner()
+    {
+        {
+            PlaylistItemsSheet sheet(m_job, *m_theme);
+            QVERIFY(!sheet.hasPlaylistFile());
+            QVERIFY(!sheet.playlistFileBanner()->isVisibleTo(&sheet));
+            QVERIFY(sheet.findChild<QLabel*>(u"summary"_s)->text().contains(u"Play all writes"_s));
+            QVERIFY(sheet.writePlaylistFile()); // Save: the file is there now
+            QVERIFY(sheet.hasPlaylistFile());
+            QVERIFY(sheet.playlistFileBanner()->isVisibleTo(&sheet));
+        }
+        PlaylistItemsSheet sheet(m_job, *m_theme);
+        QVERIFY(sheet.hasPlaylistFile());
+        QVERIFY(sheet.playlistFileBanner()->isVisibleTo(&sheet));
+        QVERIFY(sheet.findChild<QLabel*>(u"playlistFileBannerText"_s)->text().contains(u"Mix.m3u8"_s));
+        QVERIFY(!sheet.findChild<QLabel*>(u"summary"_s)->text().contains(u"Play all writes"_s));
+        QVERIFY(sheet.findChild<QPushButton*>(u"playExistingButton"_s) != nullptr);
     }
 
     void uncheckedItemsStayOutOfThePlaylist()

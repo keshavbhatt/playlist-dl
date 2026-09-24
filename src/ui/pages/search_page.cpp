@@ -78,6 +78,12 @@ SearchPage::SearchPage(core::Settings& settings, core::ThemeService& theme, Thum
     connect(&m_thumbnails, &ThumbnailCache::ready, this,
             [this](const QString&) { m_list->viewport()->update(); });
     connect(&m_settings, &core::Settings::searchChanged, this, &SearchPage::rebuildRecent);
+    connect(&m_settings, &core::Settings::searchChanged, this, [this] {
+        if (!m_settings.searchSuggestions()) { // switched off while a popup or a request was up
+            hideSuggestions();
+            m_suggestions->cancel();
+        }
+    });
 
     rebuildRecent();
     setState(State::Empty);
@@ -97,7 +103,7 @@ void SearchPage::buildHeader()
     m_field->setClearButtonEnabled(true);
     m_field->installEventFilter(this);
     connect(m_field, &QLineEdit::textEdited, this, [this](const QString& text) {
-        if (text.trimmed().isEmpty() || looksLikeLink(text)) {
+        if (!m_settings.searchSuggestions() || text.trimmed().isEmpty() || looksLikeLink(text)) {
             hideSuggestions();
             m_suggestions->cancel();
             return;
@@ -396,7 +402,7 @@ void SearchPage::typeQuery(const QString& text)
 {
     m_field->setFocus();
     m_field->setText(text);
-    if (!text.trimmed().isEmpty() && !looksLikeLink(text)) {
+    if (m_settings.searchSuggestions() && !text.trimmed().isEmpty() && !looksLikeLink(text)) {
         m_suggestions->request(text);
     }
 }

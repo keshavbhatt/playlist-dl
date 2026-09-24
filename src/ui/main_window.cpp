@@ -780,8 +780,9 @@ void MainWindow::debugOpen(const QString& what)
     } else if (what.startsWith(u"playlist-items:"_s)) {
         showPage(PageId::Downloads);
         showPlaylistItems(what.mid(15).toULongLong());
-    } else if (what == u"playlist-items-demo"_s) {
-        // A playlist with three of five files on disk, for a grab of the items sheet.
+    } else if (what == u"playlist-items-demo"_s || what == u"playlist-items-demo-file"_s) {
+        // A playlist with three of five files on disk, for a grab of the items sheet;
+        // the -file variant has a playlist file there already (the banner).
         core::DownloadJob job;
         job.id = 9001;
         job.title = u"Learn Qt in 12 videos"_s;
@@ -807,6 +808,12 @@ void MainWindow::debugOpen(const QString& what)
         }
         job.options.outputDirectory = folder;
         job.state = core::DownloadState::Completed;
+        const QString playlistFile = core::playlist_file::pathFor(job);
+        if (what.endsWith(u"-file"_s)) {
+            core::playlist_file::writeFor(job);
+        } else {
+            QFile::remove(playlistFile);
+        }
         m_downloadsController->queue().setJobs({job});
         showPage(PageId::Downloads);
         showPlaylistItems(job.id);

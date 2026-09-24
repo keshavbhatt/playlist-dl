@@ -45,6 +45,7 @@ constexpr bool kDefaultEmbedMetadata = true;
 constexpr int kDefaultSearchResultsPerPage = 20;
 constexpr bool kDefaultKeepSearchHistory = true;
 constexpr bool kDefaultSearchGridView = true;
+constexpr bool kDefaultSearchSuggestions = true;
 constexpr bool kDefaultEngineAutoUpdate = true;
 constexpr bool kDefaultEngineUseSystem = false;
 constexpr HardwareAcceleration kDefaultHardwareAcceleration = HardwareAcceleration::Auto;
@@ -616,6 +617,18 @@ void Settings::setSearchResultsPerPage(int count)
 {
     const int clamped = std::clamp(count, kMinSearchResultsPerPage, kMaxSearchResultsPerPage);
     if (storeInt(keys::kSearchResultsPerPage, kDefaultSearchResultsPerPage, clamped)) {
+        Q_EMIT searchChanged();
+    }
+}
+
+bool Settings::searchSuggestions() const
+{
+    return boolValue(keys::kSearchSuggestions, kDefaultSearchSuggestions);
+}
+
+void Settings::setSearchSuggestions(bool enabled)
+{
+    if (storeBool(keys::kSearchSuggestions, kDefaultSearchSuggestions, enabled)) {
         Q_EMIT searchChanged();
     }
 }

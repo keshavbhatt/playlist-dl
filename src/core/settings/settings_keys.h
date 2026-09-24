@@ -61,6 +61,7 @@ inline constexpr QLatin1StringView kSubtitleLanguages{"downloads/subtitleLanguag
 inline constexpr QLatin1StringView kSearchGridView{"search/gridView"};            ///< cards (true) or rows (false)       ///< Automatic / Engine only (ADR-003)
 inline constexpr QLatin1StringView kSearchResultsPerPage{"search/resultsPerPage"}; ///< the engine's page size
 inline constexpr QLatin1StringView kSearchKeepHistory{"search/keepHistory"};       ///< the recent-query chips
+inline constexpr QLatin1StringView kSearchSuggestions{"search/suggestions"};       ///< completions while typing (B5)
 inline constexpr QLatin1StringView kSearchRecentQueries{"search/recentQueries"};   ///< most recent first, at most 8
 
 // engine/

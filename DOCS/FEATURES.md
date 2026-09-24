@@ -41,7 +41,7 @@ name (ADR-002), the repository licence (ADR-005).
 | B2 | Engine-based search as the fallback: when the service times out (8 s), errors, or answers with anything but a non-empty array, the same query runs through the engine's playlist search; an "Engine search" chip appears in the header (ADR-003) | none: an outage looked like "no results" | KEEP | done (`services::PlaylistSearch`, `services::SearchService`; tst_playlist_search) |
 | B3 | Setting "Results per page" | none | KEEP | done (`Settings::searchResultsPerPage`, Settings, Search) |
 | B4 | Paste a playlist or video link in the field: a playlist resolves to the Playlist page, a video opens the Download options sheet for it | "Process Playlist" button | KEEP | done (`SearchPage::linkOf`, `MainWindow::openVideoOptions`) |
-| B5 | Search suggestions while typing (https, encoded query, JSON client) | plain http, JSONP breaks silently | KEEP | done (`services::SearchSuggestions`, https JSON client, two hosts with a retry; verified live) |
+| B5 | Search suggestions while typing (https, encoded query, JSON client); Settings, Search, Suggest as I type (on) | plain http, JSONP breaks silently | KEEP | done (`services::SearchSuggestions`, https JSON client, two hosts with a retry, `Settings::searchSuggestions`; verified live) |
 | B6 | Recent queries as chips (setting, on); Load more | none | KEEP | done (`Settings::recentQueries`, Load more) |
 | B7 | Bookmark playlist | menu entry without a handler | LATER | a bookmarks page after 3.0 |
 | B8 | Force reload of a cached result | yes | DROP | results are not cached beyond the HTTP cache |
@@ -87,7 +87,7 @@ name (ADR-002), the repository licence (ADR-005).
 | E7 | Import 2.x download records (`download_records/*.json`) as finished or queued jobs | n/a | LATER | the record shape is documented in the analysis |
 | E8 | Speed limit | none | KEEP | done (`Settings::speedLimitKbps` applied at admission) |
 | E9 | Engine chip with version and update actions on the Downloads page and in Settings | Settings status line | KEEP | done (`DownloadsPage` engine chip; the Settings card lands with G1) |
-| E10 | A downloaded playlist plays as a whole: an .m3u8 written next to the videos when the playlist finishes (setting, on); Open on the card lists the items with their state, plays one, unticks the ones to leave out, arranges the order and plays all through the file, writing it on the fly | Downloads page 2 listed the items | KEEP | done (`core::playlist_file`, `ui::PlaylistItemsSheet`, `DownloadJob::entries`; tst_playlist_file, tst_playlist_items_sheet) |
+| E10 | A downloaded playlist plays as a whole: an .m3u8 written next to the videos when the playlist finishes (setting, on); Open on the card lists the items with their state, plays one, unticks the ones to leave out, arranges the order and plays all through the file, writing it on the fly; a banner says when the folder already has a playlist file, with Play as is | Downloads page 2 listed the items | KEEP | done (`core::playlist_file`, `ui::PlaylistItemsSheet`, `DownloadJob::entries`; tst_playlist_file, tst_playlist_items_sheet) |
 
 ## F. Browser (the player)
 

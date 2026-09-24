@@ -240,6 +240,9 @@ public:
     /// Search results as a card grid (default) or as a list of rows (FEATURES B10).
     [[nodiscard]] bool searchGridView() const;
     void setSearchGridView(bool grid);
+    /// Suggestions under the query field as it is typed (FEATURES B5), default on.
+    [[nodiscard]] bool searchSuggestions() const;
+    void setSearchSuggestions(bool enabled);
     /// Whether the Search page remembers the last queries as chips.
     [[nodiscard]] bool keepSearchHistory() const;
     void setKeepSearchHistory(bool enabled);

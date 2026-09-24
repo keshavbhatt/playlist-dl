@@ -12,7 +12,8 @@ at the bottom. Every action has a keyboard shortcut; press Ctrl+/ for the list.
 
 ## Search
 
-Type what you are looking for and press Enter. Suggestions appear as you type; the results
+Type what you are looking for and press Enter. Suggestions appear as you type (Settings, Search,
+Suggest as I type); the results
 are playlist cards with the number of videos on each. Click a card to open the playlist.
 The two buttons at the right end of the header switch between cards and a list of rows.
 Recent searches come back as chips under the field (Settings, General, Keep search history).
@@ -56,7 +57,8 @@ Every download is a card with its progress, speed and time left. A playlist is o
 that shows which video it is on. **Open** on a playlist lists its videos with their state:
 play one, show it in the folder, untick the ones to leave out, arrange or shuffle the order, and
 **Play all** writes a playlist file
-(.m3u8) next to the videos and opens it in your media player. The file is also written when
+(.m3u8) next to the videos and opens it in your media player. When the folder already has one, a
+notice says so with **Play as is** to open it untouched. The file is also written when
 the playlist finishes downloading (Settings, Downloads, Write a playlist file). Hover a card for pause or resume, cancel, retry, open,
 show in folder and remove. Removing a download that has files asks whether to keep them or
 delete them too. The filters show active, finished or failed downloads; the

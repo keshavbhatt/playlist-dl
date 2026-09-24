@@ -133,6 +133,10 @@ private Q_SLOTS:
         QCOMPARE(m_settings->concurrentDownloads(), 4);
         perPage->setValue(30);
         QCOMPARE(m_settings->searchResultsPerPage(), 30);
+        auto* suggest = dialog->findChild<QCheckBox*>(u"suggestCheck"_s);
+        QVERIFY(suggest != nullptr && suggest->isChecked()); // on by default
+        suggest->setChecked(false);
+        QVERIFY(!m_settings->searchSuggestions());
 
         // A custom browser identity: the field appears and stores its text.
         dialog->showPage(SettingsDialog::Browser);

@@ -117,6 +117,7 @@ private:
     QComboBox* m_startPage = nullptr;
     QComboBox* m_closeAction = nullptr;
     QCheckBox* m_keepHistory = nullptr;
+    QCheckBox* m_suggest = nullptr;
     QCheckBox* m_showWhatsNew = nullptr;
     QCheckBox* m_notifyFinish = nullptr;
     // appearance

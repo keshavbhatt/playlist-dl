@@ -198,6 +198,11 @@ private Q_SLOTS:
         QVERIFY(!m_settings->searchGridView());
         m_settings->setSearchGridView(false);
         QCOMPARE(changed.count(), 1);
+        QVERIFY(m_settings->searchSuggestions()); // on by default
+        m_settings->setSearchSuggestions(false);
+        QVERIFY(!m_settings->searchSuggestions());
+        m_settings->setSearchSuggestions(false);
+        QCOMPARE(changed.count(), 2);
         m_settings->setSearchGridView(true);
         changed.clear();
         m_settings->setSearchResultsPerPage(5);

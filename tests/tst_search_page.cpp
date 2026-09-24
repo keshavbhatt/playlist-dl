@@ -161,6 +161,23 @@ private Q_SLOTS:
         QVERIFY(!m_page->suggestions().isPending());
     }
 
+    void suggestionsFollowTheSetting()
+    {
+        QLineEdit* field = m_page->queryField();
+        field->setFocus();
+        QTest::keyClicks(field, u"lofi"_s);
+        QVERIFY(m_page->suggestions().isPending());
+        m_settings->setSearchSuggestions(false); // switched off mid-request: dropped
+        QVERIFY(!m_page->suggestions().isPending());
+        QTest::keyClicks(field, u" beats"_s);
+        QVERIFY(!m_page->suggestions().isPending());
+        m_page->typeQuery(u"jazz"_s);
+        QVERIFY(!m_page->suggestions().isPending());
+        m_settings->setSearchSuggestions(true);
+        QTest::keyClicks(field, u"y"_s);
+        QVERIFY(m_page->suggestions().isPending());
+    }
+
     void aPastedPlaylistLinkGoesOutAsARequest()
     {
         QSignalSpy playlist(m_page.get(), &SearchPage::playlistRequested);

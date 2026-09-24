@@ -9,6 +9,7 @@
 #include <QStringList>
 
 class QCheckBox;
+class QFrame;
 class QLabel;
 class QListWidget;
 class QPushButton;
@@ -47,6 +48,8 @@ public:
     [[nodiscard]] int downloadedCount() const;
     /// Where the playlist file goes (the job's folder).
     [[nodiscard]] QString playlistFilePath() const;
+    /// Whether a playlist file is already in the folder (the banner says so).
+    [[nodiscard]] bool hasPlaylistFile() const;
     /// Writes the playlist file in the order shown; false when nothing is downloaded or the write fails.
     bool writePlaylistFile();
     /// Moves the selected row by `delta` (-1 up, +1 down).
@@ -58,6 +61,7 @@ public:
     [[nodiscard]] QListWidget* list() const { return m_list; }
     [[nodiscard]] QPushButton* playAllButton() const { return m_playAll; }
     [[nodiscard]] QCheckBox* selectAllBox() const { return m_selectAll; }
+    [[nodiscard]] QFrame* playlistFileBanner() const { return m_banner; }
 
 Q_SIGNALS:
     void toast(const QString& text);
@@ -65,6 +69,7 @@ Q_SIGNALS:
 private:
     void setupUi();
     void rebuildList();
+    void refreshBanner();
     void refreshButtons();
     void playSelected();
     void revealSelected();
@@ -77,6 +82,8 @@ private:
     QSet<QString> m_leftOut; ///< files unchecked by the user
     bool m_syncing = false;  ///< the list's check marks are being set from code
     QLabel* m_summary = nullptr;
+    QFrame* m_banner = nullptr;   ///< an existing playlist file, with Play as is and Folder
+    QLabel* m_bannerText = nullptr;
     QCheckBox* m_selectAll = nullptr;
     QListWidget* m_list = nullptr;
     QPushButton* m_play = nullptr;

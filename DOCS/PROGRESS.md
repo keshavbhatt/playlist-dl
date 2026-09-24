@@ -28,6 +28,9 @@
 
 ### 2026-09-24, M6
 
+- Owner request: Settings, Search, Suggest as I type (on by default) gates the suggestions;
+  the Playlist items sheet shows a banner when the folder already has a playlist file, with
+  Play as is and Folder (`playlist-items-demo-file` hook).
 - Kit update ported (owner request): the What's new sheet takes the whole changelog, opens
   on the running version and carries a Version picker once there are two releases; About
   shows a flat What's new link beside the version; `whatsnew:<version>` and

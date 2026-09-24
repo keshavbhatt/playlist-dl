@@ -8,6 +8,7 @@
 
 #include <QCheckBox>
 #include <QFileInfo>
+#include <QFrame>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QListWidget>
@@ -55,6 +56,36 @@ void PlaylistItemsSheet::setupUi()
     m_summary->setProperty("pldlMuted", true);
     m_summary->setWordWrap(true);
     root->addWidget(m_summary);
+
+    // A playlist file already in the folder: say so, since Play all and Save
+    // replace it. Play as is opens it untouched.
+    m_banner = new QFrame(this);
+    m_banner->setObjectName(u"playlistFileBanner"_s);
+    m_banner->setProperty("pldlBanner", true);
+    auto* bannerRow = new QHBoxLayout(m_banner);
+    bannerRow->setContentsMargins(14, 8, 10, 8);
+    bannerRow->setSpacing(10);
+    auto* bannerIcon = new QLabel(m_banner);
+    bannerIcon->setFixedSize(18, 18);
+    bannerIcon->setPixmap(icons::themed(u"playlist"_s, t.accent).pixmap(QSize(18, 18), devicePixelRatioF()));
+    bannerRow->addWidget(bannerIcon);
+    m_bannerText = new QLabel(m_banner);
+    m_bannerText->setObjectName(u"playlistFileBannerText"_s);
+    m_bannerText->setWordWrap(true);
+    m_bannerText->setTextFormat(Qt::RichText);
+    bannerRow->addWidget(m_bannerText, 1);
+    auto* playAsIs = new QPushButton(tr("Play as is"), m_banner);
+    playAsIs->setObjectName(u"playExistingButton"_s);
+    playAsIs->setProperty("pldlFlat", true);
+    playAsIs->setToolTip(tr("Open the playlist file as it is, without rewriting it"));
+    connect(playAsIs, &QPushButton::clicked, this, [this] { platform::openFile(playlistFilePath()); });
+    bannerRow->addWidget(playAsIs);
+    auto* showFile = new QPushButton(tr("Folder"), m_banner);
+    showFile->setProperty("pldlFlat", true);
+    showFile->setToolTip(tr("Show the playlist file in its folder"));
+    connect(showFile, &QPushButton::clicked, this, [this] { platform::revealInFileManager(playlistFilePath()); });
+    bannerRow->addWidget(showFile);
+    root->addWidget(m_banner);
 
     // Which items play: every downloaded one unless unchecked.
     auto* selectRow = new QHBoxLayout;
@@ -206,13 +237,28 @@ void PlaylistItemsSheet::rebuildList()
     const int total = static_cast<int>(m_entries.size());
     QString summary = have == total ? tr("%1 of %2 downloaded, all there.").arg(have).arg(total)
                                     : tr("%1 of %2 downloaded.").arg(have).arg(total);
-    if (QFileInfo::exists(playlistFilePath())) {
-        summary += u' ' + tr("A playlist file is next to the videos; Play all updates it in the order shown.");
-    } else {
+    if (!hasPlaylistFile()) {
         summary += u' ' + tr("Play all writes a playlist file next to the videos with the checked items in the order shown.");
     }
     m_summary->setText(summary);
+    refreshBanner();
     refreshButtons();
+}
+
+bool PlaylistItemsSheet::hasPlaylistFile() const
+{
+    return QFileInfo::exists(playlistFilePath());
+}
+
+void PlaylistItemsSheet::refreshBanner()
+{
+    const bool present = hasPlaylistFile();
+    m_banner->setVisible(present);
+    if (present) {
+        m_bannerText->setText(tr("This folder already has a playlist file, <b>%1</b>. Play all and Save replace it "
+                                 "with the checked items in the order shown.")
+                                  .arg(QFileInfo(playlistFilePath()).fileName().toHtmlEscaped()));
+    }
 }
 
 void PlaylistItemsSheet::refreshButtons()
@@ -301,8 +347,13 @@ bool PlaylistItemsSheet::writePlaylistFile()
         return false;
     }
     const QString path = playlistFilePath();
-    return core::playlist_file::write(
+    const bool had = hasPlaylistFile();
+    const bool ok = core::playlist_file::write(
         path, core::playlist_file::m3uContent(present, QFileInfo(path).absolutePath(), m_job.title));
+    if (ok && !had) {
+        rebuildList(); // the banner appears, the summary stops promising the file
+    }
+    return ok;
 }
 
 void PlaylistItemsSheet::moveSelected(int delta)
