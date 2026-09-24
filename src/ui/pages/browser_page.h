@@ -105,6 +105,9 @@ public:
     [[nodiscard]] QLabel* adsBadge() const { return m_adsBadge; }
     [[nodiscard]] QLabel* signedInBadge() const { return m_signedInBadge; }
     [[nodiscard]] QPushButton* detectedButton() const { return m_detected; }
+    /// Download this, reading "Open playlist" while the current tab shows a
+    /// playlist page (the window lands it on the Playlist page).
+    [[nodiscard]] QPushButton* downloadButton() const { return m_download; }
     /// The small × next to the floating button: hides it for this page's
     /// current media (it may cover page controls); a new report shows it again.
     [[nodiscard]] QToolButton* detectedDismissButton() const { return m_detectedDismiss; }

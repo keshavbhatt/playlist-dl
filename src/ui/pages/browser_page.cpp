@@ -2,6 +2,7 @@
 
 #include "core/settings/settings.h"
 #include "core/theme/theme_service.h"
+#include "core/youtube_url.h"
 #include "ui/browser_tab.h"
 #include "ui/busy_button.h"
 #include "ui/icons.h"
@@ -893,6 +894,13 @@ void BrowserPage::syncToolbar()
     m_reload->setAccessibleName(m_loading ? tr("Stop") : tr("Reload"));
     const bool downloadable = url.isValid() && (url.scheme() == u"http"_s || url.scheme() == u"https"_s);
     m_download->setEnabled(downloadable && !busy::isBusy(m_download));
+    // A playlist page lands on the Playlist page instead of the queue (FEATURES W3).
+    if (!busy::isBusy(m_download)) {
+        const bool playlist = core::classifyYouTubeUrl(url).kind == core::YouTubeUrlKind::Playlist;
+        m_download->setText(playlist ? tr("Open playlist") : tr("Download this"));
+        m_download->setToolTip(playlist ? tr("Open this playlist on the Playlist page (Ctrl+D)")
+                                        : tr("Download the page you are looking at (Ctrl+D)"));
+    }
 }
 
 void BrowserPage::focusAddress()
