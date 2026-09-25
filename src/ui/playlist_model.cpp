@@ -58,6 +58,7 @@ void PlaylistModel::setEntries(const QList<core::MediaEntry>& entries, const QSt
         item->setData(index, Role::IndexRole);
         item->setData(entry.id, Role::IdRole);
         item->setData(entry.title, Role::TitleRole);
+        item->setData(entry.title.isEmpty() ? tr("Item %1").arg(index) : entry.title, Qt::AccessibleTextRole);
         item->setData(entry.uploader, Role::UploaderRole);
         item->setData(entry.thumbnail.isEmpty() && !entry.id.isEmpty() ? core::thumbnailUrl(entry.id).toString()
                                                                         : entry.thumbnail,

@@ -13,7 +13,10 @@
 
 class QCheckBox;
 class QComboBox;
+class QHBoxLayout;
 class QLabel;
+class QResizeEvent;
+class QSpacerItem;
 class QLineEdit;
 class QListView;
 class QPushButton;
@@ -146,6 +149,7 @@ Q_SIGNALS:
 
 protected:
     bool eventFilter(QObject* watched, QEvent* event) override;
+    void resizeEvent(QResizeEvent* event) override;
     void onThemeChanged() override;
 
 private:
@@ -201,6 +205,11 @@ private:
     QPushButton* m_copyLink = nullptr;
     QStackedWidget* m_stack = nullptr;
     QWidget* m_listPane = nullptr;
+    QHBoxLayout* m_toolRow = nullptr;      ///< select all, the range, then (when wide) filter, sort, skip
+    QWidget* m_toolRow2 = nullptr;         ///< filter, sort, skip when the page is narrow
+    bool m_toolbarNarrow = false;
+    QSpacerItem* m_toolStretch = nullptr; ///< keeps row one left-aligned while the filter is on row two
+    void relayoutToolbar();
     QCheckBox* m_selectAll = nullptr;
     QSpinBox* m_from = nullptr;
     QSpinBox* m_to = nullptr;

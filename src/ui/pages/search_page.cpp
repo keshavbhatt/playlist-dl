@@ -582,6 +582,8 @@ void SearchPage::appendResults(const QList<services::SearchResult>& results)
         m_results.append(result);
         auto* item = new QStandardItem;
         item->setData(result.title, SearchCardDelegate::TitleRole);
+        item->setData(result.channel.isEmpty() ? result.title : u"%1, %2"_s.arg(result.title, result.channel),
+                      Qt::AccessibleTextRole);
         item->setData(result.channel, SearchCardDelegate::ChannelRole);
         item->setData(result.thumbnailUrl, SearchCardDelegate::ThumbnailRole);
         item->setData(result.url, SearchCardDelegate::UrlRole);

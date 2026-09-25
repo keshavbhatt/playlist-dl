@@ -45,8 +45,12 @@
      playlist; toasts take an action (Added to queue offers View); the rail badge and the
      range slider announce themselves; links by drag and drop; a clipboard link offered
      once as a toast when the window comes to the front.
-- Left as listed: the Browser empty tab invitation, the Playlist toolbar at narrow widths,
-  merging Appearance into General, a screen-reader pass, and the three owner questions.
+- Round 4 ("fix the remaining batch"): an empty browser tab shows a themed invitation
+  (`web::startPageHtml`, served at about:blank so the address stays empty and the tab
+  stays untouched); the Playlist toolbar moves filter, sort and skip to a second row below
+  1000 px; Appearance folded into General as the Look card (`settings:appearance` still
+  lands there); every sheet names its controls from their labels and the two list models
+  carry accessible text per item. Left: the three owner questions.
 
 ### 2026-09-24, M6
 

@@ -81,9 +81,9 @@ the page title shows its state.
 
 ## Settings
 
-- **General**: the page the app starts on, what closing does (quit or keep in the tray),
-  search history, What's new after updates, notifications.
-- **Appearance**: light, dark or the system theme; interface scale.
+- **General**: the page the app starts on, light, dark or the system theme, interface
+  scale, what closing does (quit or keep in the tray), search history, What's new after
+  updates, notifications.
 - **Downloads**: the folder, a folder per playlist, numbering, the defaults for new
   downloads, concurrent downloads, speed limit, skip already downloaded, use my
   sign-in, and the download engine card (check for updates, update, auto-update).

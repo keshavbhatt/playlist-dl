@@ -39,13 +39,12 @@ public:
     enum Page
     {
         General,
-        Appearance,
         Downloads,
         Browser,
         Search,
         Advanced,
     };
-    static constexpr int kPageCount = 6;
+    static constexpr int kPageCount = 5;
 
     SettingsDialog(core::Settings& settings, core::ThemeService& theme, services::EngineManager& engine,
                    web::RequestInterceptor& interceptor, bool trayAvailable, QWidget* parent = nullptr);
@@ -83,7 +82,7 @@ private:
     void setupUi();
     void applyNavIcons();
     QWidget* buildGeneral();
-    QWidget* buildAppearance();
+    QWidget* buildLook(); ///< the theme and scale card, on the General page
     QWidget* buildDownloads();
     QWidget* buildDownloadDefaults();
     QWidget* buildEngineCard();

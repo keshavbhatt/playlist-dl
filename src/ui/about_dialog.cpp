@@ -1,3 +1,4 @@
+#include "ui/a11y.h"
 #include "ui/about_dialog.h"
 
 #include "core/downloads/engine_spec.h"
@@ -149,6 +150,7 @@ void AboutDialog::setupUi()
     buttons->addWidget(close);
     root->addLayout(buttons);
     close->setFocus(); // Enter closes; the What's new link keeps its ring for keyboard users only
+    a11y::nameControlsFromLabels(this);
 }
 
 void AboutDialog::showWhatsNew()

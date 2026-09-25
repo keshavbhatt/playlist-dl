@@ -23,6 +23,8 @@
 #include <QHBoxLayout>
 #include <QKeyEvent>
 #include <QLabel>
+#include <QResizeEvent>
+#include <QSpacerItem>
 #include <QMenu>
 #include <QLineEdit>
 #include <QListView>
@@ -180,6 +182,7 @@ void PlaylistPage::buildToolbar()
     auto* layout = new QHBoxLayout(row);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(8);
+    m_toolRow = layout;
 
     m_selectAll = new QCheckBox(tr("Select all"), row);
     m_selectAll->setObjectName(u"selectAllBox"_s);
@@ -260,6 +263,15 @@ void PlaylistPage::buildToolbar()
     layout->addWidget(m_skip);
 
     dynamic_cast<QVBoxLayout*>(m_listPane->layout())->addWidget(row);
+    // Filter, sort and skip drop to a second row when the page is narrow
+    // (review 2026-09-25: one row was tight at the window's minimum width).
+    m_toolRow2 = new QWidget(m_listPane);
+    m_toolRow2->setObjectName(u"toolbarRow2"_s);
+    auto* layout2 = new QHBoxLayout(m_toolRow2);
+    layout2->setContentsMargins(0, 0, 0, 0);
+    layout2->setSpacing(8);
+    m_toolRow2->hide();
+    dynamic_cast<QVBoxLayout*>(m_listPane->layout())->addWidget(m_toolRow2);
 }
 
 void PlaylistPage::buildList()
@@ -358,6 +370,42 @@ void PlaylistPage::applyIcons()
     m_playAll->setIcon(icons::themed(u"play"_s, t.text, t.muted));
     m_copyLink->setIcon(icons::themed(u"copy"_s, t.text, t.muted));
     renderThumbnail();
+}
+
+void PlaylistPage::resizeEvent(QResizeEvent* event)
+{
+    Page::resizeEvent(event);
+    relayoutToolbar();
+}
+
+void PlaylistPage::relayoutToolbar()
+{
+    constexpr int kNarrowBelow = 1000;
+    constexpr int kWideAbove = 1060; // hysteresis: no flapping around the edge
+    const bool narrow = m_toolbarNarrow ? width() < kWideAbove : width() < kNarrowBelow;
+    if (narrow == m_toolbarNarrow || m_toolRow2 == nullptr) {
+        return;
+    }
+    m_toolbarNarrow = narrow;
+    auto* layout2 = dynamic_cast<QHBoxLayout*>(m_toolRow2->layout());
+    QHBoxLayout* from = narrow ? m_toolRow : layout2;
+    QHBoxLayout* to = narrow ? layout2 : m_toolRow;
+    for (QWidget* widget : {static_cast<QWidget*>(m_filter), static_cast<QWidget*>(m_sort), static_cast<QWidget*>(m_skip)}) {
+        from->removeWidget(widget);
+        to->addWidget(widget, widget == m_filter ? 1 : 0);
+        widget->setParent(narrow ? m_toolRow2 : m_toolRow->parentWidget());
+        widget->show();
+    }
+    // Row one keeps its controls together once the filter's stretch has left it.
+    if (narrow) {
+        if (m_toolStretch == nullptr) {
+            m_toolStretch = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        }
+        m_toolRow->addItem(m_toolStretch);
+    } else if (m_toolStretch != nullptr) {
+        m_toolRow->removeItem(m_toolStretch);
+    }
+    m_toolRow2->setVisible(narrow);
 }
 
 void PlaylistPage::onThemeChanged()

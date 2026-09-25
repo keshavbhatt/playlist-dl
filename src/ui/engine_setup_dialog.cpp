@@ -1,3 +1,4 @@
+#include "ui/a11y.h"
 #include "ui/engine_setup_dialog.h"
 
 #include "core/downloads/engine_spec.h"
@@ -113,6 +114,7 @@ void EngineSetupDialog::setupUi()
     });
     buttons->addWidget(m_action);
     root->addLayout(buttons);
+    a11y::nameControlsFromLabels(this);
 }
 
 void EngineSetupDialog::refresh(const services::EngineManager::Status& s)

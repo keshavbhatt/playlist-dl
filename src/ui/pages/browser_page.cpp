@@ -128,13 +128,17 @@ void BrowserPage::restoreSession()
         }
         if (web) {
             m_tabs.last().untouched = false;
-            m_tabs.last().view->loadUrl(url);
+            if (core::Settings::isEmptyStartPage(url.toString())) {
+                loadStart(m_tabs.last().view);
+            } else {
+                m_tabs.last().view->loadUrl(url);
+            }
         } else {
-            m_tabs.last().view->loadUrl(startPage());
+            loadStart(m_tabs.last().view);
         }
     }
     if (session.urls.isEmpty()) {
-        m_tabs.first().view->loadUrl(startPage());
+        loadStart(m_tabs.first().view);
     }
     m_restoring = false;
     setCurrentIndex(session.urls.isEmpty() ? 0 : session.current);
@@ -496,7 +500,7 @@ void BrowserPage::onThemeChanged()
     applyErrorStyle();
 }
 
-void BrowserPage::applyErrorStyle()
+web::ErrorPageStyle BrowserPage::pageStyle() const
 {
     const Tokens t = Tokens::forScheme(theme().isDark());
     web::ErrorPageStyle style;
@@ -505,9 +509,32 @@ void BrowserPage::applyErrorStyle()
     style.muted = t.muted;
     style.accent = t.accentStrong;
     style.accentHover = t.accentHover;
+    return style;
+}
+
+void BrowserPage::applyErrorStyle()
+{
+    const web::ErrorPageStyle style = pageStyle();
     for (const Tab& tab : std::as_const(m_tabs)) {
         tab.view->setErrorPageStyle(style);
+        if (tab.untouched && core::Settings::isEmptyStartPage(tab.view->url().toString())) {
+            loadStart(tab.view); // the invitation follows the theme
+        }
     }
+}
+
+void BrowserPage::loadStart(web::WebView* view)
+{
+    const QUrl start = startPage();
+    if (!core::Settings::isEmptyStartPage(start.toString())) {
+        view->loadUrl(start);
+        return;
+    }
+    // An empty tab says what to do instead of showing nothing (review 2026-09-25).
+    view->setHtml(web::startPageHtml(pageStyle(), tr("Type an address or a search above"),
+                                     tr("Any site works here. Download this saves what a page shows; a playlist page "
+                                        "opens on the Playlist page. Sign in to a site once and downloads use it too.")),
+                  QUrl(QString(core::Settings::kEmptyStartPage)));
 }
 
 void BrowserPage::updateTabDescriptions()
@@ -543,7 +570,7 @@ int BrowserPage::newTab()
     updateTabDescriptions();
     applyErrorStyle();
     if (!m_restoring) {
-        tab.view->loadUrl(startPage()); // a restored tab loads its own address instead
+        loadStart(tab.view); // a restored tab loads its own address instead
     }
     tab.button->setTitle(hostOf(startPage()));
     const int index = static_cast<int>(m_tabs.size()) - 1;
@@ -563,6 +590,10 @@ int BrowserPage::open(const QUrl& url)
     }
     const int current = currentIndex();
     if (current >= 0 && m_tabs.at(current).untouched) {
+        if (core::Settings::isEmptyStartPage(url.toString())) {
+            loadStart(m_tabs.at(current).view); // an empty address is the invitation, not a blank page
+            return current;
+        }
         m_tabs[current].untouched = false;
         m_tabs.at(current).view->loadUrl(url);
         m_address->setText(url.toString());

@@ -1,3 +1,4 @@
+#include "ui/a11y.h"
 #include "ui/bug_report_dialog.h"
 
 #include "core/theme/theme_service.h"
@@ -113,6 +114,7 @@ BugReportDialog::BugReportDialog(const core::Settings& settings, const core::The
     connect(close, &QPushButton::clicked, this, &QDialog::reject);
     buttons->addWidget(close);
     root->addLayout(buttons);
+    a11y::nameControlsFromLabels(this);
 }
 
 QString BugReportDialog::diagnostics() const

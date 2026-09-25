@@ -54,7 +54,7 @@ name (ADR-002), the repository licence (ADR-005).
 |---|---|---|---|---|
 | P1 | Playlist read flat through the engine (`-J --flat-playlist`), typed `MediaInfo`; header with thumbnail, title, channel, count, total duration | `python3 core --dump-single-json`, blocking start | KEEP | done (`ui::PlaylistPage`, `services::MediaProbe` flat; verified live on PLBCF2DAC6FFB574DE) |
 | P2 | Rows with checkbox, index, thumbnail, title, duration; play on hover; download this one | yes (no per-row download) | KEEP | done (`ui::PlaylistEntryDelegate`, `ui::PlaylistModel`) |
-| P3 | Select all, range from/to with the range slider, filter, sort | select all, filter | KEEP | done (select all, From/To with `RangeSlider`, filter, sort; no Newest: flat entries carry no date) |
+| P3 | Select all, range from/to with the range slider, filter, sort (filter, sort and skip drop to a second row when the page is narrow) | select all, filter | KEEP | done (select all, From/To with `RangeSlider`, filter, sort; no Newest: flat entries carry no date) |
 | P4 | Unavailable (private, deleted) entries shown muted and unchecked, never downloaded | filtered in one place, inverted in two | KEEP | done (`PlaylistModel`: private, deleted and untitled entries unavailable; tst_playlist_page) |
 | P5 | Skip videos already in the download folder (setting, on) | none | KEEP | done (page-local toggle, Downloaded badge; `Settings::skipExisting` exists for the sheet) |
 | P6 | Play whole playlist, play a video: opens the Browser page on the YouTube page | GitHub Pages player wrapper | KEEP | done (Play all and the row's play glyph open the Browser page) |
@@ -93,7 +93,7 @@ name (ADR-002), the repository licence (ADR-005).
 
 | # | Feature | 2.x | Decision | Status / class |
 |---|---|---|---|---|
-| W1 | UMD's browser page, general purpose, tied to no site (every http and https page stays in it, only mailto, tel and magnet go to the desktop): tabs on one persistent named profile, toolbar, address bar, find in page, badges, pop-ups as windows, script dialogs as sheets, permission prompts | one view, default (off-the-record in Qt 6) profile | KEEP | done (`web::*`, `ui::BrowserPage`, `ui::BrowserTabButton`; tst_browser_page) |
+| W1 | UMD's browser page, general purpose, tied to no site, an empty tab shows a themed invitation (every http and https page stays in it, only mailto, tel and magnet go to the desktop): tabs on one persistent named profile, toolbar, address bar, find in page, badges, pop-ups as windows, script dialogs as sheets, permission prompts | one view, default (off-the-record in Qt 6) profile | KEEP | done (`web::*`, `ui::BrowserPage`, `ui::BrowserTabButton`; tst_browser_page) |
 | W2 | Ad blocking in three layers (interceptor host list, InnerTube response hooks, cosmetic CSS) with the "Ads blocked" badge; trackers blocked | 589-line substring list rebuilt per request, skip clicker, core.css | KEEP | done (`core::BlockList`, `web::RequestInterceptor`, `adblock.js`; badge on the page) |
 | W3 | Download this: a YouTube playlist page opens the Playlist page, a YouTube video page opens the Download options sheet, a page on any other site is probed and the answer decides (ADR-006); page-detected media button | none | KEEP | done (`BrowserPage` reads "Open playlist" on a playlist page; a video probes and opens the sheet; page-media button) |
 | W4 | Sign-in works (sanitised Chrome UA, Firefox identity on Google sign-in hosts) and is shared with the engine | Firefox 72 UA everywhere | KEEP | done (`web::user_agent`, `web::CookieExporter`; the engine hand-off lands with E5) |
@@ -105,7 +105,7 @@ name (ADR-002), the repository licence (ADR-005).
 
 ## G. Settings surface
 
-Six pages (DESIGN.md section 3): General, Appearance, Downloads, Browser, Search, Advanced.
+Five pages (DESIGN.md section 3): General (with the Look card), Downloads, Browser, Search, Advanced.
 Target 30 options at most. Restart required: interface scale, hardware acceleration.
 
 | # | Feature | 2.x | Decision | Status / class |

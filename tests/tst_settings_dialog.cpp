@@ -90,9 +90,8 @@ private Q_SLOTS:
         }
         auto* nav = dialog->findChild<QListWidget*>(u"settingsNav"_s);
         QVERIFY(nav != nullptr);
-        QCOMPARE(nav->count(), 6);
-        const QStringList titles{u"General"_s, u"Appearance"_s, u"Downloads"_s,
-                                 u"Browser"_s, u"Search"_s,     u"Advanced"_s};
+        QCOMPARE(nav->count(), 5); // Appearance lives on General (review 2026-09-25)
+        const QStringList titles{u"General"_s, u"Downloads"_s, u"Browser"_s, u"Search"_s, u"Advanced"_s};
         for (int i = 0; i < titles.size(); ++i) {
             QCOMPARE(nav->item(i)->text(), titles.at(i));
             QVERIFY(!nav->item(i)->icon().isNull());

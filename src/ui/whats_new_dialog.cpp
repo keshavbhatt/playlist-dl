@@ -1,3 +1,4 @@
+#include "ui/a11y.h"
 #include "ui/whats_new_dialog.h"
 
 #include "core/changelog.h"
@@ -150,6 +151,7 @@ void WhatsNewDialog::setupUi()
     }
     showVersion(m_picker->count() > 0 ? m_picker->currentData().toString() : m_running);
     ok->setFocus(); // Enter dismisses; the picker is one Shift+Tab away
+    a11y::nameControlsFromLabels(this);
 }
 
 void WhatsNewDialog::showVersion(const QString& version)

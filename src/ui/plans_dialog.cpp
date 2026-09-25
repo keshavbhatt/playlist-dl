@@ -1,3 +1,4 @@
+#include "ui/a11y.h"
 #include "ui/plans_dialog.h"
 
 #include "core/theme/theme_service.h"
@@ -137,6 +138,7 @@ PlansDialog::PlansDialog(services::LicenseService& license, const core::ThemeSer
     connect(close, &QPushButton::clicked, this, &QDialog::accept);
     buttons->addWidget(close);
     root->addLayout(buttons);
+    a11y::nameControlsFromLabels(this);
 }
 
 } // namespace pldl::ui

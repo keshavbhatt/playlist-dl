@@ -1,3 +1,4 @@
+#include "ui/a11y.h"
 #include "ui/account_dialog.h"
 
 #include "core/theme/theme_service.h"
@@ -54,6 +55,7 @@ AccountDialog::AccountDialog(services::LicenseService& license, const core::Them
     connect(&m_license, &services::LicenseService::statusChanged, this, &AccountDialog::refresh);
     connect(&m_license, &services::LicenseService::checkingChanged, this, [this](bool) { refresh(); });
     refresh();
+    a11y::nameControlsFromLabels(this);
 }
 
 QWidget* AccountDialog::buildAccountCard()

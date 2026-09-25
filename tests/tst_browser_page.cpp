@@ -72,6 +72,39 @@ private:
 };
 
 /// Answers 401 with a Basic challenge until an Authorization header arrives.
+/// Serves one small HTML page at /watch, so a test needs no network.
+class PageServer : public QObject
+{
+    Q_OBJECT
+
+public:
+    bool listen()
+    {
+        connect(&m_server, &QTcpServer::newConnection, this, [this] {
+            while (QTcpSocket* socket = m_server.nextPendingConnection()) {
+                connect(socket, &QTcpSocket::readyRead, this, [socket] {
+                    if (!socket->readAll().contains("\r\n\r\n")) {
+                        return;
+                    }
+                    const QByteArray body("<!doctype html><title>Watch</title><p>steady</p>");
+                    socket->write("HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: " +
+                                  QByteArray::number(body.size()) + "\r\nConnection: close\r\n\r\n" + body);
+                    socket->disconnectFromHost();
+                });
+                connect(socket, &QTcpSocket::disconnected, socket, &QObject::deleteLater);
+            }
+        });
+        return m_server.listen(QHostAddress::LocalHost, 0);
+    }
+    [[nodiscard]] QUrl url() const
+    {
+        return QUrl(u"http://127.0.0.1:"_s + QString::number(m_server.serverPort()) + u"/watch"_s);
+    }
+
+private:
+    QTcpServer m_server;
+};
+
 class AuthServer : public QObject
 {
     Q_OBJECT
@@ -349,13 +382,17 @@ private Q_SLOTS:
         page.show();
         QVERIFY(QTest::qWaitForWindowExposed(&page));
         page.activateWindow();
-        page.open(QUrl(u"https://example.com/watch"_s));
-        QTRY_VERIFY_WITH_TIMEOUT(page.currentUrl().host() == u"example.com"_s, 15000);
+        PageServer server; // local: the old example.com load failed without a network
+        QVERIFY(server.listen());
+        page.open(server.url());
+        QTRY_VERIFY_WITH_TIMEOUT(page.currentUrl().path() == u"/watch"_s, 15000);
+        QTRY_VERIFY_WITH_TIMEOUT(page.addressField()->text().contains(u"/watch"_s), 15000);
         page.focusAddress();
         QTRY_VERIFY(page.addressField()->hasFocus());
         page.addressField()->setText(u"something else"_s);
         QTest::keyClick(page.addressField(), Qt::Key_Escape);
-        QVERIFY(page.addressField()->text().contains(u"example.com/watch"_s));
+        QVERIFY(page.addressField()->text().contains(u"127.0.0.1"_s));
+        QVERIFY(page.addressField()->text().contains(u"/watch"_s));
         QVERIFY(!page.addressField()->hasFocus());
     }
 
@@ -434,6 +471,23 @@ private Q_SLOTS:
         QTRY_VERIFY_WITH_TIMEOUT(field->progress() >= 0 || page.currentUrl().scheme() == u"data"_s, 5000);
         QTRY_VERIFY_WITH_TIMEOUT(field->progress() < 0, 5000); // the load ended
         QCOMPARE(page.currentView()->mapTo(&page, QPoint(0, 0)).y(), topBefore);
+    }
+
+    void anEmptyTabShowsTheInvitation()
+    {
+        pldl::ui::BrowserPage page(*m_settings, *m_theme, u"7.0.0-test"_s);
+        page.resize(1000, 640);
+        page.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&page));
+        QVERIFY(page.addressField()->text().isEmpty());
+        QString text;
+        QTRY_VERIFY_WITH_TIMEOUT(
+            (page.currentView()->page()->toPlainText([&text](const QString& t) { text = t; }),
+             QTest::qWait(50), text.contains(u"Type an address"_s)),
+            8000);
+        QVERIFY(text.contains(u"Download this"_s));
+        // Still an untouched tab: the next open reuses it, and the address stays empty.
+        QVERIFY(page.addressField()->text().isEmpty());
     }
 
     void anEmptyStartPageIsANewTab()

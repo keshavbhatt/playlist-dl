@@ -24,4 +24,9 @@ struct ErrorPageStyle
 [[nodiscard]] QString errorPageHtml(const ErrorPageStyle& style, const QString& title, const QString& detail,
                                     const QUrl& retryUrl);
 
+/// Self-contained HTML for an empty tab (the "New tab" start page): the brand
+/// mark, an invitation and what the Download button does. Empty <title>, so
+/// the tab keeps its "New tab" label; served at about:blank.
+[[nodiscard]] QString startPageHtml(const ErrorPageStyle& style, const QString& title, const QString& detail);
+
 } // namespace pldl::web

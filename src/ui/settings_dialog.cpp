@@ -196,7 +196,7 @@ void SettingsDialog::setupUi()
     m_nav->setIconSize(QSize(18, 18));
     m_nav->setSpacing(0);
     for (const QString& name :
-         {tr("General"), tr("Appearance"), tr("Downloads"), tr("Browser"), tr("Search"), tr("Advanced")}) {
+         {tr("General"), tr("Downloads"), tr("Browser"), tr("Search"), tr("Advanced")}) {
         m_nav->addItem(name);
     }
     root->addWidget(m_nav);
@@ -208,7 +208,6 @@ void SettingsDialog::setupUi()
 
     m_pages = new QStackedWidget(this);
     m_pages->addWidget(buildGeneral());
-    m_pages->addWidget(buildAppearance());
     m_pages->addWidget(buildDownloads());
     m_pages->addWidget(buildBrowser());
     m_pages->addWidget(buildSearch());
@@ -240,8 +239,7 @@ void SettingsDialog::setupUi()
 void SettingsDialog::applyNavIcons()
 {
     const Tokens t = Tokens::forScheme(m_theme.isDark());
-    const QStringList names{u"general"_s, u"palette"_s, u"downloads"_s,
-                            u"globe"_s,   u"search"_s,  u"advanced"_s};
+    const QStringList names{u"general"_s, u"downloads"_s, u"globe"_s, u"search"_s, u"advanced"_s};
     for (int i = 0; i < m_nav->count() && i < names.size(); ++i) {
         m_nav->item(i)->setIcon(icons::themed(names.at(i), t.text));
     }
@@ -250,7 +248,7 @@ void SettingsDialog::applyNavIcons()
 int SettingsDialog::pageIndex(const QString& name)
 {
     static const QHash<QString, int> kNames{
-        {u"general"_s, General}, {u"appearance"_s, Appearance}, {u"downloads"_s, Downloads},
+        {u"general"_s, General}, {u"appearance"_s, General}, {u"downloads"_s, Downloads},
         {u"browser"_s, Browser}, {u"search"_s, Search},         {u"advanced"_s, Advanced},
     };
     return kNames.value(name.trimmed().toLower(), General);
@@ -322,11 +320,12 @@ QWidget* SettingsDialog::buildGeneral()
                                row(tr("Notifications on finish"), m_notifyFinish,
                                    tr("A desktop notification when a download completes."))},
                               this);
-    return page(tr("General"), tr("How the app starts, closes and keeps you informed."), {startup, behaviour},
+    return page(tr("General"), tr("How the app starts, looks, closes and keeps you informed."),
+                {startup, buildLook(), behaviour},
                 this);
 }
 
-QWidget* SettingsDialog::buildAppearance()
+QWidget* SettingsDialog::buildLook()
 {
     using namespace settings_form;
     m_themeChoice = makeCombo(this, m_loading,
@@ -339,12 +338,10 @@ QWidget* SettingsDialog::buildAppearance()
                        qRound(core::Settings::kMaxInterfaceScale * 100), 25,
                        [this](int v) { m_settings.setInterfaceScale(v / 100.0); });
     m_scale->setSuffix(u" %"_s);
-    QWidget* look =
-        card(tr("Look"),
-             {row(tr("Theme"), m_themeChoice, tr("System follows the desktop's light or dark setting.")),
-              row(tr("Interface scale"), m_scale, tr("Takes effect after a restart."))},
-             this);
-    return page(tr("Appearance"), tr("Theme and size."), {look}, this);
+    return card(tr("Look"),
+                {row(tr("Theme"), m_themeChoice, tr("System follows the desktop's light or dark setting.")),
+                 row(tr("Interface scale"), m_scale, tr("Takes effect after a restart."))},
+                this);
 }
 
 QWidget* SettingsDialog::buildDownloads()

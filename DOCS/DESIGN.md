@@ -177,7 +177,7 @@ The 2.x download widget rebuilt as a page:
 
 - **General**: Start page (Search, Last page), When closing (Quit, Keep in tray), Keep
   search history, Show What's new after updates, Notifications on finish.
-- **Appearance**: Theme (System, Light, Dark), Interface scale (restart).
+- (Look, on General): Theme (System, Light, Dark), Interface scale (restart).
 - **Downloads**: Folder, Subfolder per playlist, Number files in playlist order, Default
   kind, Default video quality and container, Default audio format and quality, Subtitles,
   Embed thumbnail and metadata, Concurrent downloads (1 to 5), Speed limit, Skip already

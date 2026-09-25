@@ -1,3 +1,4 @@
+#include "ui/a11y.h"
 #include "ui/playlist_items_sheet.h"
 
 #include "core/downloads/playlist_file.h"
@@ -223,6 +224,7 @@ void PlaylistItemsSheet::setupUi()
     root->addLayout(footer);
 
     rebuildList();
+    a11y::nameControlsFromLabels(this);
 }
 
 void PlaylistItemsSheet::rebuildList()

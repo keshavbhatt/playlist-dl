@@ -2,6 +2,7 @@
 
 #include "ui/badge_label.h"
 #include "ui/address_field.h"
+#include "web/error_page.h"
 #include "ui/pages/page.h"
 
 #include <QJsonObject>
@@ -159,6 +160,10 @@ private:
     void beginDownload(QPushButton* source, const QUrl& url);
     void updateTabDescriptions();
     void applyErrorStyle();
+    [[nodiscard]] web::ErrorPageStyle pageStyle() const;
+    /// Loads the start page into `view`: the setting's address, or the themed
+    /// invitation when the setting is an empty tab (review 2026-09-25).
+    void loadStart(web::WebView* view);
     /// The open tabs are remembered (debounced) and come back on the next start.
     void scheduleSessionSave();
     void saveSession();
