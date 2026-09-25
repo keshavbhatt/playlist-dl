@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
     QStandardPaths::setTestModeEnabled(true);
     qputenv("QTEST_FUNCTION_TIMEOUT", "900000"); // the ffmpeg build is ~128 MB
     QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName(u"red-engine-test"_s);
+    QCoreApplication::setApplicationName(u"playlist-dl-engine-test"_s);
     QCoreApplication::setOrganizationName(u"ktechpit"_s);
     TestEngineManager test;
     return QTest::qExec(&test, argc, argv);

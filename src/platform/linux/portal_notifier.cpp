@@ -54,7 +54,7 @@ bool PortalNotifier::isAvailable() const
 
 QString PortalNotifier::portalId(quint64 id)
 {
-    return u"red-%1"_s.arg(id);
+    return u"playlist-dl-%1"_s.arg(id);
 }
 
 void PortalNotifier::show(quint64 id, const core::Notification& n)
@@ -97,7 +97,7 @@ void PortalNotifier::close(quint64 id)
 void PortalNotifier::onActionInvoked(const QString& id, const QString& action, const QVariantList& parameters)
 {
     Q_UNUSED(parameters)
-    if (!id.startsWith(u"red-"_s)) {
+    if (!id.startsWith(u"playlist-dl-"_s)) {
         return;
     }
     bool ok = false;
