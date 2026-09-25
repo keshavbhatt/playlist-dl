@@ -375,7 +375,7 @@ QWidget* SettingsDialog::buildDownloads()
               row(tr("Skip already downloaded"), m_skipExisting,
                   tr("A file that is already in the folder is left alone.")),
               row(tr("Write a playlist file"), m_playlistFile,
-                  tr("An .m3u8 next to the videos of a playlist, so a media player plays them in order."))},
+                  tr("An .m3u8 next to the files of a playlist, so a media player plays them in order."))},
              this);
 
     m_concurrent = makeSpin(this, m_loading, 1, core::Settings::kMaxConcurrentDownloads, 1,

@@ -109,7 +109,7 @@ QString PlaylistEntryDelegate::actionLabel(Action action)
     case Action::Play:
         return tr("Play");
     case Action::Download:
-        return tr("Download this video");
+        return tr("Download this item");
     }
     return {};
 }

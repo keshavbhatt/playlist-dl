@@ -99,11 +99,11 @@ private Q_SLOTS:
         QCOMPARE(m_page->currentUrl(), QUrl(u"https://www.youtube.com/playlist?list=PLdemo"_s));
         QCOMPARE(m_page->titleLabel()->toolTip(), u"Learn Qt in 12 videos"_s);
         QCOMPARE(m_page->channelLabel()->text(), u"Tutorials"_s);
-        QVERIFY(m_page->countLabel()->text().startsWith(u"12 videos, "_s));
+        QVERIFY(m_page->countLabel()->text().startsWith(u"12 items, "_s));
         QCOMPARE(m_page->proxy()->rowCount(), 12);
         QCOMPARE(m_page->list()->model()->rowCount(), 12);
         QCOMPARE(m_page->selectedCount(), 10); // two unavailable
-        QCOMPARE(m_page->downloadButton()->text(), u"Download 10 videos"_s);
+        QCOMPARE(m_page->downloadButton()->text(), u"Download 10 items"_s);
         QVERIFY(m_page->downloadButton()->isEnabled());
         QVERIFY(m_page->footerLabel()->text().startsWith(u"10 of 12 selected, "_s)); // with the total duration
         QCOMPARE(m_page->selectAllBox()->checkState(), Qt::Checked);
@@ -144,7 +144,7 @@ private Q_SLOTS:
         QCOMPARE(m_page->footerLabel()->text(), u"0 of 12 selected"_s);
         m_page->selectAllBox()->click();
         QCOMPARE(m_page->selectedCount(), 10);
-        QCOMPARE(m_page->downloadButton()->text(), u"Download 10 videos"_s);
+        QCOMPARE(m_page->downloadButton()->text(), u"Download 10 items"_s);
 
         // The range: the spins, the slider and the selection agree.
         m_page->fromSpin()->setValue(2);
@@ -152,7 +152,7 @@ private Q_SLOTS:
         QCOMPARE(m_page->selectedIndexes(), (QList<int>{2, 3, 5, 6}));
         QCOMPARE(m_page->rangeSlider()->lower(), 2);
         QCOMPARE(m_page->rangeSlider()->upper(), 6);
-        QCOMPARE(m_page->downloadButton()->text(), u"Download 4 videos"_s);
+        QCOMPARE(m_page->downloadButton()->text(), u"Download 4 items"_s);
         QCOMPARE(m_page->selectAllBox()->checkState(), Qt::PartiallyChecked);
         // A row click widens it: the spins follow the selection's ends.
         m_page->model()->setChecked(9, true);
@@ -160,7 +160,7 @@ private Q_SLOTS:
         QCOMPARE(m_page->rangeSlider()->upper(), 10);
         // A single video's button text is singular.
         m_page->setRange(1, 1);
-        QCOMPARE(m_page->downloadButton()->text(), u"Download 1 video"_s);
+        QCOMPARE(m_page->downloadButton()->text(), u"Download 1 item"_s);
         m_page->downloadButton()->click();
         QCOMPARE(downloads.count(), 1);
         QCOMPARE(downloads.at(0).at(1).value<QList<int>>(), (QList<int>{1}));
@@ -277,7 +277,7 @@ private Q_SLOTS:
         QCOMPARE(m_page->model()->rowCount(), 3);
         QVERIFY(!m_page->model()->isUnavailable(0));
         QVERIFY(m_page->model()->isChecked(0)); // downloadable like any other
-        QCOMPARE(m_page->downloadButton()->text(), u"Download 3 items"_s);
+        QCOMPARE(m_page->downloadButton()->text(), u"Download 3 items"_s); // items everywhere
         QVERIFY(m_page->titleLabel()->toolTip().contains(u"Sia"_s));
     }
 
@@ -292,7 +292,7 @@ private Q_SLOTS:
         QCOMPARE(m_page->statusLabel()->text(), u"This playlist is empty"_s);
         QVERIFY(!m_page->list()->isVisible());
         QVERIFY(!m_page->retryButton()->isVisible());
-        QCOMPARE(m_page->countLabel()->text(), u"0 videos"_s);
+        QCOMPARE(m_page->countLabel()->text(), u"0 items"_s);
 
         // No engine: the page waits for it, header from the search card.
         QSignalSpy engine(m_page.get(), &PlaylistPage::engineNeeded);
@@ -306,7 +306,7 @@ private Q_SLOTS:
         QCOMPARE(engine.count(), 1);
         QCOMPARE(m_page->titleLabel()->toolTip(), u"Known from the card"_s);
         QCOMPARE(m_page->channelLabel()->text(), u"Card channel"_s);
-        QCOMPARE(m_page->countLabel()->text(), u"42 videos"_s);
+        QCOMPARE(m_page->countLabel()->text(), u"42 items"_s);
         QCOMPARE(m_page->statusLabel()->text(), u"Reading the playlist"_s);
         QVERIFY(busy::isBusy(m_page->downloadButton()));
         QCOMPARE(m_page->currentUrl(), QUrl(known.url));

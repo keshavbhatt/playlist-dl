@@ -15,7 +15,7 @@ at the bottom. Every action has a keyboard shortcut; press F1 or Ctrl+/ for the 
 
 Type what you are looking for and press Enter. Suggestions appear as you type (Settings, Search,
 Suggest as I type); the results
-are playlist cards with the number of videos on each. Click a card to open the playlist.
+are playlist cards with the number of items on each. Click a card to open the playlist.
 The two buttons at the right end of the header switch between cards and a list of rows.
 Recent searches come back as chips under the field (Settings, General, Keep search history).
 A playlist link from any other site (a SoundCloud set, for example) opens on the Playlist page
@@ -33,7 +33,7 @@ many come at a time.
 
 ## Playlist
 
-The playlist's videos with their thumbnails and lengths. Tick the ones you want, use
+The playlist's items with their thumbnails and lengths. Tick the ones you want, use
 "Select all", the From and To boxes or the slider for a range, the filter field to find a
 title, and the sort menu. Videos that are private or removed are greyed out and never
 downloaded. Hover a row for **Play** (opens the video on the Browser page) and **Download**
@@ -61,7 +61,7 @@ detected" button appears in the bottom right corner.
 ## Downloads
 
 Every download is a card with its progress, speed and time left. A playlist is one card
-that shows which video it is on. **Open** on a playlist lists its videos with their state:
+that shows which item it is on. **Open** on a playlist lists its items with their state:
 play one, show it in the folder, untick the ones to leave out, arrange or shuffle the order
 from the **Arrange** menu, and **Play all** writes a playlist file (.m3u8) next to the files
 and opens it in your media player. When the folder already has one, a notice says so with

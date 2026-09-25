@@ -83,9 +83,9 @@ QString SearchCardDelegate::countText(qint64 count)
         return {};
     }
     if (count == 1) {
-        return tr("1 video");
+        return tr("1 item");
     }
-    return tr("%1 videos").arg(QLocale().toString(count));
+    return tr("%1 items").arg(QLocale().toString(count));
 }
 
 void SearchCardDelegate::setHoverPos(const QPoint& pos)

@@ -27,7 +27,7 @@
       channels and single tracks.
     </p>
     <ul>
-      <li>Search YouTube playlists by keyword, with suggestions as you type; results show the cover, channel and video count</li>
+      <li>Search YouTube playlists by keyword, with suggestions as you type; results show the cover, channel and item count</li>
       <li>Paste a playlist link from YouTube, SoundCloud, Bandcamp, Vimeo, Mixcloud, Dailymotion, Twitch and more, or a link to a single video or track</li>
       <li>Browse the playlist before you download: every item with its thumbnail and length, select all, a range or a few, filter and sort</li>
       <li>Download a whole playlist in one go: a batch download queue with pause, resume, retry and a folder per playlist, files numbered in playlist order</li>

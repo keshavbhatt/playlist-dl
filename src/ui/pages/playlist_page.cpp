@@ -824,9 +824,8 @@ void PlaylistPage::setEngineStatus(const services::EngineManager::Status& status
 
 QString PlaylistPage::itemWord(int count) const
 {
-    if (core::isYouTubeHost(m_url.host())) {
-        return count == 1 ? tr("1 video") : tr("%1 videos").arg(count);
-    }
+    // "items" everywhere (owner, 2026-09-25): a playlist holds videos on one
+    // site and tracks on another, and the audio choice makes "videos" wrong.
     return count == 1 ? tr("1 item") : tr("%1 items").arg(count);
 }
 

@@ -85,6 +85,16 @@ BrowserPage::BrowserPage(core::Settings& settings, core::ThemeService& theme, co
     m_escape->setContext(Qt::WidgetWithChildrenShortcut);
     m_escape->setEnabled(false);
     connect(m_escape, &QShortcut::activated, this, [this] {
+        if (m_address->hasFocus() && m_fullScreenView == nullptr) {
+            // Esc while typing an address restores the address, even mid-load;
+            // the shortcut fires before the field's own filter sees the key.
+            m_address->clearFocus();
+            syncToolbar();
+            if (web::WebView* view = currentView(); view != nullptr) {
+                view->setFocus(Qt::OtherFocusReason);
+            }
+            return;
+        }
         if (m_fullScreenView != nullptr) {
             exitFullScreen();
         } else if (isDownloadBusy()) {

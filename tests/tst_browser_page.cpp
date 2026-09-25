@@ -390,7 +390,7 @@ private Q_SLOTS:
         page.focusAddress();
         QTRY_VERIFY(page.addressField()->hasFocus());
         page.addressField()->setText(u"something else"_s);
-        QTest::keyClick(page.addressField(), Qt::Key_Escape);
+        QTest::keyClick(page.addressField(), Qt::Key_Escape); // even while the page still loads
         QVERIFY(page.addressField()->text().contains(u"127.0.0.1"_s));
         QVERIFY(page.addressField()->text().contains(u"/watch"_s));
         QVERIFY(!page.addressField()->hasFocus());

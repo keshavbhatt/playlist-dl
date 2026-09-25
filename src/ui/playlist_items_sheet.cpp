@@ -198,7 +198,7 @@ void PlaylistItemsSheet::setupUi()
     footer->setSpacing(8);
     m_save = new QPushButton(tr("Save playlist file"), this);
     m_save->setObjectName(u"saveButton"_s);
-    m_save->setToolTip(tr("Writes an .m3u8 next to the videos in the order shown"));
+    m_save->setToolTip(tr("Writes an .m3u8 next to the files in the order shown"));
     m_save->setCursor(Qt::PointingHandCursor);
     connect(m_save, &QPushButton::clicked, this, [this] {
         if (writePlaylistFile()) {

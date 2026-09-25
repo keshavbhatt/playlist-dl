@@ -158,7 +158,7 @@ private Q_SLOTS:
         QVERIFY(!PlaylistEntryDelegate::actionAt(QPoint(200, 136), row, false));
         QVERIFY(!PlaylistEntryDelegate::actionAt(play, row, true));
         QCOMPARE(PlaylistEntryDelegate::actionLabel(Action::Play), u"Play"_s);
-        QCOMPARE(PlaylistEntryDelegate::actionLabel(Action::Download), u"Download this video"_s);
+        QCOMPARE(PlaylistEntryDelegate::actionLabel(Action::Download), u"Download this item"_s);
     }
 
     void clicksToggleAndTrigger()

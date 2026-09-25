@@ -230,8 +230,8 @@ private Q_SLOTS:
         QCOMPARE(first.data(SearchCardDelegate::TitleRole).toString(), u"Playlist 0"_s);
         QCOMPARE(first.data(SearchCardDelegate::CountRole).toLongLong(), 0);
         QCOMPARE(SearchCardDelegate::countText(-1), QString());
-        QCOMPARE(SearchCardDelegate::countText(1), u"1 video"_s);
-        QCOMPARE(SearchCardDelegate::countText(12), u"12 videos"_s);
+        QCOMPARE(SearchCardDelegate::countText(1), u"1 item"_s);
+        QCOMPARE(SearchCardDelegate::countText(12), u"12 items"_s);
 
         // A click on a card chooses its playlist.
         const QModelIndex third = m_page->resultsView()->model()->index(2, 0);

@@ -367,9 +367,7 @@ void DownloadOptionsSheet::updateKind()
     m_groups->setCurrentIndex(audio ? 1 : 0);
     if (m_playlist) {
         const int count = static_cast<int>(m_indexes.size());
-        const bool youtube = core::isYouTubeHost(m_url.host());
-        m_download->setText(count == 1 ? (youtube ? tr("Download 1 video") : tr("Download 1 item"))
-                                       : (youtube ? tr("Download %1 videos") : tr("Download %1 items")).arg(count));
+        m_download->setText(count == 1 ? tr("Download 1 item") : tr("Download %1 items").arg(count));
         m_download->setEnabled(count > 0);
     } else {
         m_download->setText(audio ? tr("Download audio") : tr("Download video"));

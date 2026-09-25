@@ -56,7 +56,7 @@ name (ADR-002), the repository licence (ADR-005).
 | P2 | Rows with checkbox, index, thumbnail, title, duration; play on hover; download this one | yes (no per-row download) | KEEP | done (`ui::PlaylistEntryDelegate`, `ui::PlaylistModel`) |
 | P3 | Select all, range from/to with the range slider, filter, sort (filter, sort and skip drop to a second row when the page is narrow) | select all, filter | KEEP | done (select all, From/To with `RangeSlider`, filter, sort; no Newest: flat entries carry no date) |
 | P4 | Unavailable (private, deleted) entries shown muted and unchecked, never downloaded | filtered in one place, inverted in two | KEEP | done (`PlaylistModel`: private, deleted and untitled entries unavailable; tst_playlist_page) |
-| P5 | Skip videos already in the download folder (setting, on) | none | KEEP | done (page-local toggle, Downloaded badge; `Settings::skipExisting` exists for the sheet) |
+| P5 | Skip items already in the download folder (setting, on) | none | KEEP | done (page-local toggle, Downloaded badge; `Settings::skipExisting` exists for the sheet) |
 | P6 | Play whole playlist, play a video: opens the Browser page on the YouTube page | GitHub Pages player wrapper | KEEP | done (Play all and the row's play glyph open the Browser page) |
 | P7 | Play author uploads | sent the display name as a channel id | DROP | the channel link on the Browser page does it |
 | P8 | Copy playlist URL | yes | KEEP | done (Copy link) |
@@ -87,7 +87,7 @@ name (ADR-002), the repository licence (ADR-005).
 | E7 | Import 2.x download records (`download_records/*.json`) as finished or queued jobs | n/a | LATER | the record shape is documented in the analysis |
 | E8 | Speed limit | none | KEEP | done (`Settings::speedLimitKbps` applied at admission) |
 | E9 | Engine chip with version and update actions on the Downloads page and in Settings | Settings status line | KEEP | done (`DownloadsPage` engine chip; the Settings card lands with G1) |
-| E10 | A downloaded playlist plays as a whole: an .m3u8 written next to the videos when the playlist finishes (setting, on); Open on the card lists the items with their state, plays one, unticks the ones to leave out, arranges the order and plays all through the file, writing it on the fly; a banner says when the folder already has a playlist file, with Play as is | Downloads page 2 listed the items | KEEP | done (`core::playlist_file`, `ui::PlaylistItemsSheet`, `DownloadJob::entries`; tst_playlist_file, tst_playlist_items_sheet) |
+| E10 | A downloaded playlist plays as a whole: an .m3u8 written next to the files when the playlist finishes (setting, on); Open on the card lists the items with their state, plays one, unticks the ones to leave out, arranges the order and plays all through the file, writing it on the fly; a banner says when the folder already has a playlist file, with Play as is | Downloads page 2 listed the items | KEEP | done (`core::playlist_file`, `ui::PlaylistItemsSheet`, `DownloadJob::entries`; tst_playlist_file, tst_playlist_items_sheet) |
 
 ## F. Browser (the player)
 

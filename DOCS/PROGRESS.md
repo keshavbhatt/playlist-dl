@@ -45,6 +45,11 @@
      playlist; toasts take an action (Added to queue offers View); the rail badge and the
      range slider announce themselves; links by drag and drop; a clipboard link offered
      once as a toast when the window comes to the front.
+- Owner: "it still labels videos instead of items": items everywhere now (Playlist page counts
+  and Download button, the options sheet's playlist button, search cards, the row action),
+  no site or kind exception; guide, README and metainfo say item count. Found on the way:
+  Esc in the address bar while a page loaded stopped the page instead of restoring the
+  address (the stop shortcut fired first); fixed, and the Escape test serves its page locally.
 - Round 4 ("fix the remaining batch"): an empty browser tab shows a themed invitation
   (`web::startPageHtml`, served at about:blank so the address stays empty and the tab
   stays untouched); the Playlist toolbar moves filter, sort and skip to a second row below

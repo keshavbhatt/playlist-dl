@@ -165,7 +165,7 @@ public:
     void setEngineStatus(const services::EngineManager::Status& status);
 
 private:
-    /// "video" on a YouTube playlist, "item" anywhere else (playlists come from any site).
+    /// "1 item" / "%1 items": the page never says videos (owner, 2026-09-25).
     [[nodiscard]] QString itemWord(int count) const;
     void fillHeader(const QString& title, const QString& channel, const QString& thumbnail, int count,
                     double totalDuration);

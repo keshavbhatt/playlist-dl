@@ -90,7 +90,7 @@ private Q_SLOTS:
         const MediaInfo info = pldl::ui::PlaylistPage::demoInfo();
         m_sheet->setPlaylist(info, {6, 1, 2, 3, 5});
         QVERIFY(m_sheet->isPlaylist());
-        QCOMPARE(m_sheet->downloadButton()->text(), u"Download 5 videos"_s);
+        QCOMPARE(m_sheet->downloadButton()->text(), u"Download 5 items"_s);
         QVERIFY(m_sheet->ownFolderBox()->isVisibleTo(m_sheet.get()));
         QVERIFY(m_sheet->numberBox()->isVisibleTo(m_sheet.get()));
         QVERIFY(m_sheet->folderLabel()->toolTip().endsWith(u"/pldl-sheet/Learn Qt in 12 videos"_s));

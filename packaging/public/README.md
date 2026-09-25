@@ -28,7 +28,7 @@ sudo snap install playlist-dl
 
 **Find a playlist**
 - Search YouTube playlists by keyword, with suggestions as you type. Every result shows its
-  cover, channel and video count, as cards or a list.
+  cover, channel and item count, as cards or a list.
 - Paste a playlist link from any site the download engine reads (SoundCloud sets, Bandcamp
   albums, Vimeo showcases and many more), or a link to a single video or track.
 - Browse the playlist: every item with its thumbnail and length; select all, a range or a
