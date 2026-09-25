@@ -119,6 +119,6 @@ Target 30 options at most. Restart required: interface scale, hardware accelerat
 | # | Feature | 2.x | Decision | Status / class |
 |---|---|---|---|---|
 | L1 | Shared AccountAndLicense module, app code PLDL, 10-day evaluation | own module, 30 days, http | KEEP | done (`services::LicenseService`, app code PLDL, 10 days) |
-| L2 | 2.x account id migrated on first start from `org.keshavnrj.ubuntu/Playlist DL.conf` (`accountId`) or `~/Downloads/.Playlist DL.id` | n/a | KEEP | done (`core::legacyAccountId`, tst_legacy_account; the 2.x download folder too, ADR-002) |
+| L2 | 2.x account id migrated on first start | n/a | KEEP | done (`core::legacyAccountId`, tst_legacy_account; the 2.x download folder too, ADR-002) |
 | L3 | Gate: assumed Red's model, a daily allowance of free downloads (5 a day), everything visible; the owner may prefer 2.x's quality gate | quality above "Poor" | KEEP (assumption) | done as assumed (`DownloadsController::admit`, `LicenseService::canDownload`, 5 a day; the gate sheet offers View plans; the Downloads page shows "N of 5 downloads left today" on Free) |
 | L4 | Plans sheet listing what is free and what Pro adds | none | KEEP | done (`ui::PlansDialog`, `ui::AccountDialog`: Free is 5 downloads a day with every quality, Pro has no daily limit; reworded 2026-09-24) |

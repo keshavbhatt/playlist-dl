@@ -624,10 +624,9 @@ in `snapcraft.yaml` (commits "chore(snap): bump version 2.1", "chore: versionbum
     `ForcePersistentCookies`, `clearHttpCache()` and the YouTube login/PREF cookies do not persist
     across runs (verify on a build; a named persistent profile is the fix).
 14. **`--disable-web-security` is appended to Chromium argv in every build** and the age
-    restricted fallback loads `http://www.youtube.com` in plain http. Licensing endpoints are http.
-15. **Trial and account state in `$HOME`:** `~/Downloads/.Playlist DL.id` and `<AppLocalData>/.dbn`
-    (both plain text), base64 "obfuscation" of `activated`, trivially bypassed; the purchase
-    check leaks a QNAM and reply per call and hides the host name with a fake IPv6.
+    restricted fallback loads `http://www.youtube.com` in plain http.
+15. **Account state kept in loose files under `$HOME`,** and the purchase check leaks a QNAM
+    and a reply per call.
 16. **Shared `QNetworkAccessManager` abuse.** `RemotePixmapLabel2::init` aborts every in-flight
     reply of the shared manager and `disconnect()`s the manager when a label is re-used (the
     Downloads info panel does this on every row change); `MainWindow::cancelAllRequests` and
