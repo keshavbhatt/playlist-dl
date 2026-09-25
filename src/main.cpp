@@ -16,6 +16,10 @@
 #include <QMenu>
 #include <QSettings>
 #include <QStandardPaths>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QFile>
 #include <QTimer>
 
 using namespace Qt::StringLiterals;
@@ -184,7 +188,28 @@ int main(int argc, char* argv[])
         grabTimer->setInterval(std::max(1000, delayMs));
         QObject::connect(grabTimer, &QTimer::timeout, &window, [&window, spec, grabTimer, shot]() mutable {
             const QString path = spec.first().contains(u"%1"_s) ? spec.first().arg(++shot) : spec.first();
+            // Beside each picture, the rectangles of the named widgets on it
+            // (<png>.json), so the guide's callouts land on the real controls.
+            const auto writeGeometry = [](QWidget* top, const QString& pngPath) {
+                QJsonObject rects;
+                for (QWidget* child : top->findChildren<QWidget*>()) {
+                    if (child->objectName().isEmpty() || !child->isVisible() || child->window() != top) {
+                        continue;
+                    }
+                    const QPoint origin = child->mapTo(top, QPoint(0, 0));
+                    if (!QRect(origin, child->size()).intersects(top->rect())) {
+                        continue; // scrolled out of the picture
+                    }
+                    rects.insert(child->objectName(),
+                                 QJsonArray{origin.x(), origin.y(), child->width(), child->height()});
+                }
+                QFile file(pngPath + u".json"_s);
+                if (file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+                    file.write(QJsonDocument(rects).toJson(QJsonDocument::Compact));
+                }
+            };
             window.grab().save(path);
+            writeGeometry(&window, path);
             qInfo("debug grab saved to %s", qPrintable(path));
             // Dialogs are separate top-level windows: grab those too.
             int extra = 0;
@@ -194,6 +219,7 @@ int main(int argc, char* argv[])
                     (popup || !top->windowTitle().isEmpty())) {
                     const QString dialogPath = path.chopped(4) + u"-dialog%1.png"_s.arg(++extra);
                     top->grab().save(dialogPath);
+                    writeGeometry(top, dialogPath);
                     qInfo("debug grab saved to %s (%s)", qPrintable(dialogPath),
                           qPrintable(top->windowTitle()));
                 }

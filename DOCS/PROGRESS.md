@@ -58,7 +58,9 @@
   Download from a link asks for one with the clipboard's link offered; a Supported sites
   sheet (the engine's list, cached per version) from Help and the Search empty state;
   the changelog opens without "rebuilt from the ground up" and without a Removed section.
-  The guide's annotated screenshots follow.
+  The guide carries nine annotated screenshots (`scripts/guide-screenshots.py`: headless
+  grabs with a JSON sidecar of the named widgets' rectangles, numbered callouts drawn on the
+  real controls, legends in GUIDE.md).
 - About carries the GPL's Appropriate Legal Notices (v3, 5d): copyright, GPL v3 or later,
   no warranty, the module's own terms, and one Licences link to LICENSING.md (owner: "one link").
 - Owner: shortcuts are invisible unless one knows F1. The rail's last button is a Help menu

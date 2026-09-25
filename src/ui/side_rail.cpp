@@ -78,14 +78,19 @@ void SideRail::setupUi()
         group->addAction(page);
     }
 
-    layout->addWidget(makeButton(m_actions.home, u"search"_s), 0, Qt::AlignHCenter);
-    layout->addWidget(makeButton(m_actions.playlist, u"playlist"_s), 0, Qt::AlignHCenter);
-    layout->addWidget(makeButton(m_actions.browser, u"globe"_s), 0, Qt::AlignHCenter);
+    const auto named = [this](QAction* action, const QString& icon, const QString& name) {
+        QToolButton* button = makeButton(action, icon);
+        button->setObjectName(name);
+        return button;
+    };
+    layout->addWidget(named(m_actions.home, u"search"_s, u"railSearch"_s), 0, Qt::AlignHCenter);
+    layout->addWidget(named(m_actions.playlist, u"playlist"_s, u"railPlaylist"_s), 0, Qt::AlignHCenter);
+    layout->addWidget(named(m_actions.browser, u"globe"_s, u"railBrowser"_s), 0, Qt::AlignHCenter);
 
     // Downloads button with a count badge overlaid on its corner.
     auto* downloadsHost = new QWidget(this);
     downloadsHost->setFixedSize(40, 40);
-    QToolButton* downloads = makeButton(m_actions.downloads, u"downloads"_s);
+    QToolButton* downloads = named(m_actions.downloads, u"downloads"_s, u"railDownloads"_s);
     downloads->setParent(downloadsHost);
     downloads->move(0, 0);
     m_badge = new QLabel(downloadsHost);
@@ -95,8 +100,8 @@ void SideRail::setupUi()
     m_badge->hide();
     layout->addWidget(downloadsHost, 0, Qt::AlignHCenter);
     layout->addStretch(1);
-    layout->addWidget(makeButton(m_actions.settings, u"settings"_s), 0, Qt::AlignHCenter);
-    layout->addWidget(makeButton(m_actions.account, u"account"_s), 0, Qt::AlignHCenter);
+    layout->addWidget(named(m_actions.settings, u"settings"_s, u"railSettings"_s), 0, Qt::AlignHCenter);
+    layout->addWidget(named(m_actions.account, u"account"_s, u"railAccount"_s), 0, Qt::AlignHCenter);
     // Help is a menu, so the shortcuts sheet is one click away without knowing
     // F1 (owner, 2026-09-25): the menu lists the keys next to each entry.
     QToolButton* help = makeButton(m_actions.help, u"info"_s);
