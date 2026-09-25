@@ -52,12 +52,12 @@ description: |
   * Single instance: `playlist-dl <link>` opens the link, `playlist-dl --download <link>`
     queues it.
 
-  Guide and help: https://github.com/keshavbhatt/p-pldl/blob/main/GUIDE.md
-  Bugs and requests: https://github.com/keshavbhatt/p-pldl/issues
+  Guide and help: https://github.com/keshavbhatt/playlist-dl/blob/main/GUIDE.md
+  Bugs and requests: https://github.com/keshavbhatt/playlist-dl/issues
 
-website: https://github.com/keshavbhatt/p-pldl
-issues: https://github.com/keshavbhatt/p-pldl/issues
-license: Proprietary
+website: https://github.com/keshavbhatt/playlist-dl
+issues: https://github.com/keshavbhatt/playlist-dl/issues
+license: GPL-3.0-or-later # the licensing module has its own licence: LICENSING.md
 icon: snap/gui/icon.svg
 
 platforms:

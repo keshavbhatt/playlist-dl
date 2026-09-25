@@ -104,6 +104,30 @@ the owner decides between a private repository with a metadata-only public one (
 model) and keeping the GPL, in which case the copied code has to be relicensed by its
 owner. Recorded as the first open question in PROGRESS.md.
 
+## ADR-008: open source, two licences by path (2026-09-25)
+
+**Context.** ADR-005 left the repository question open: the tree holds code copied from
+Red 10 and UMD 7, both shipped proprietary, and the owner owns all of it. Playlist-Dl 2.x
+had been GPL-3 all along (its `LICENSE`), which the owner had forgotten.
+
+**Decision.** The code goes public at github.com/keshavbhatt/playlist-dl: `main` holds
+3.x, `old-qt5` holds the 2.x code that was on the private `main`, and the old snap
+launcher artifacts that were the public repository's only content stay on
+`packaging-archive`. The program is GPL-3.0-or-later. The licensing module (the account,
+licence, evaluation-period and allowance code: `src/modules/AccountAndLicense/`,
+`src/core/licensing/`, `src/services/licensing/`, `src/ui/license_gate.*`, its two tests)
+is source-available under the Ktechpit Licensing Module License: read and build, never
+modify, bypass, redistribute or reuse. A GPLv3 section 7 additional permission lets
+official builds combine the two; anyone else's GPL fork must leave the module out.
+`LICENSING.md` explains it, `REUSE.toml` maps it, the module files carry SPDX headers,
+the metainfo declares `GPL-3.0-or-later AND LicenseRef-proprietary=...`, the snap says
+GPL-3.0-or-later. The private repository (p-pldl) keeps its history as a mirror.
+
+**Consequences.** Contributions to the GPL part are welcome; forks must replace the gate.
+A build switch that compiles the app without the module would make forking practical
+and is a follow-up. The copied Red and UMD code is relicensed by its owner through this
+decision; Red and UMD themselves stay proprietary.
+
 ## ADR-007: the display name (2026-09-25)
 
 The app is "Playlist Downloader" in the window, the store copy and the docs; the binary,

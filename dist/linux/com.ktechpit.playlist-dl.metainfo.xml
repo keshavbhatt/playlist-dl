@@ -2,7 +2,7 @@
 <component type="desktop-application">
   <id>com.ktechpit.playlist-dl</id>
   <metadata_license>CC0-1.0</metadata_license>
-  <project_license>LicenseRef-proprietary=https://raw.githubusercontent.com/keshavbhatt/p-pldl/main/LICENSE</project_license>
+  <project_license>GPL-3.0-or-later AND LicenseRef-proprietary=https://github.com/keshavbhatt/playlist-dl/blob/main/LICENSES/LicenseRef-Ktechpit-Licensing-Module.txt</project_license>
 
   <developer id="com.ktechpit">
     <name>Keshav Bhatt</name>
@@ -54,27 +54,27 @@
 
   <screenshots>
     <screenshot type="default">
-      <image>https://raw.githubusercontent.com/keshavbhatt/p-pldl/main/screenshots/00-hero.png</image>
+      <image>https://raw.githubusercontent.com/keshavbhatt/playlist-dl/main/screenshots/00-hero.png</image>
       <caption>Search YouTube playlists, or paste a playlist link from any site</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/keshavbhatt/p-pldl/main/screenshots/01-playlist.png</image>
+      <image>https://raw.githubusercontent.com/keshavbhatt/playlist-dl/main/screenshots/01-playlist.png</image>
       <caption>Browse the playlist and pick the items to download</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/keshavbhatt/p-pldl/main/screenshots/02-options.png</image>
+      <image>https://raw.githubusercontent.com/keshavbhatt/playlist-dl/main/screenshots/02-options.png</image>
       <caption>Playlist to MP3, or video up to 4K</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/keshavbhatt/p-pldl/main/screenshots/03-downloads.png</image>
+      <image>https://raw.githubusercontent.com/keshavbhatt/playlist-dl/main/screenshots/03-downloads.png</image>
       <caption>The download queue: a whole playlist in one go</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/keshavbhatt/p-pldl/main/screenshots/04-browser.png</image>
+      <image>https://raw.githubusercontent.com/keshavbhatt/playlist-dl/main/screenshots/04-browser.png</image>
       <caption>The built-in browser: a Download button on every page</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/keshavbhatt/p-pldl/main/screenshots/05-items.png</image>
+      <image>https://raw.githubusercontent.com/keshavbhatt/playlist-dl/main/screenshots/05-items.png</image>
       <caption>Play the downloaded playlist offline from its M3U8 file</caption>
     </screenshot>
   </screenshots>
@@ -115,12 +115,12 @@
     <keyword>offline music</keyword>
   </keywords>
 
-  <url type="homepage">https://github.com/keshavbhatt/p-pldl</url>
-  <url type="help">https://github.com/keshavbhatt/p-pldl/blob/main/GUIDE.md</url>
-  <url type="bugtracker">https://github.com/keshavbhatt/p-pldl/issues</url>
+  <url type="homepage">https://github.com/keshavbhatt/playlist-dl</url>
+  <url type="help">https://github.com/keshavbhatt/playlist-dl/blob/main/GUIDE.md</url>
+  <url type="bugtracker">https://github.com/keshavbhatt/playlist-dl/issues</url>
   <url type="donation">https://www.paypal.com/paypalme/keshavnrj/11</url>
   <url type="contact">https://ktechpit.com</url>
-  <url type="vcs-browser">https://github.com/keshavbhatt/p-pldl</url>
+  <url type="vcs-browser">https://github.com/keshavbhatt/playlist-dl</url>
 
   <provides>
     <binary>playlist-dl</binary>

@@ -292,7 +292,7 @@ void EngineManager::fetchRelease(const core::EngineComponent& component, bool ve
     // follows the rest (the CDN hop carries a signed, tag-less URL).
     const QUrl asset = core::latestAssetUrl(component.repo, component.assetName);
     QNetworkRequest request(asset);
-    request.setHeader(QNetworkRequest::UserAgentHeader, u"Playlist-Downloader/3 (+https://github.com/keshavbhatt/p-pldl)"_s);
+    request.setHeader(QNetworkRequest::UserAgentHeader, u"Playlist-Downloader/3 (+https://github.com/keshavbhatt/playlist-dl)"_s);
     request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::ManualRedirectPolicy);
     QNetworkReply* reply = m_network->head(request);
     m_activeReply = reply;
@@ -330,7 +330,7 @@ void EngineManager::fetchRelease(const core::EngineComponent& component, bool ve
 void EngineManager::fetchText(const QUrl& url, const std::function<void(const QByteArray&)>& then)
 {
     QNetworkRequest request(url);
-    request.setHeader(QNetworkRequest::UserAgentHeader, u"Playlist-Downloader/3 (+https://github.com/keshavbhatt/p-pldl)"_s);
+    request.setHeader(QNetworkRequest::UserAgentHeader, u"Playlist-Downloader/3 (+https://github.com/keshavbhatt/playlist-dl)"_s);
     request.setRawHeader("Accept", "application/vnd.github+json, text/plain, */*");
     QNetworkReply* reply = m_network->get(request);
     m_activeReply = reply;
@@ -355,7 +355,7 @@ void EngineManager::downloadFile(const QUrl& url, const QString& label,
     }
     setState(m_status.state, label, 0);
     QNetworkRequest request(url);
-    request.setHeader(QNetworkRequest::UserAgentHeader, u"Playlist-Downloader/3 (+https://github.com/keshavbhatt/p-pldl)"_s);
+    request.setHeader(QNetworkRequest::UserAgentHeader, u"Playlist-Downloader/3 (+https://github.com/keshavbhatt/playlist-dl)"_s);
     QNetworkReply* reply = m_network->get(request);
     m_activeReply = reply;
     connect(reply, &QNetworkReply::readyRead, this, [this, reply] {
@@ -448,7 +448,7 @@ void EngineManager::checkForUpdates(bool force)
         return;
     }
     QNetworkRequest request(core::latestReleaseUrl(core::ytdlpComponent(m_os, m_cpu).repo));
-    request.setHeader(QNetworkRequest::UserAgentHeader, u"Playlist-Downloader/3 (+https://github.com/keshavbhatt/p-pldl)"_s);
+    request.setHeader(QNetworkRequest::UserAgentHeader, u"Playlist-Downloader/3 (+https://github.com/keshavbhatt/playlist-dl)"_s);
     request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::ManualRedirectPolicy);
     m_status.checkingForUpdates = true;
     m_status.checkError.clear();

@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.21)
 project(playlist-dl
     VERSION 3.0.0
     DESCRIPTION "Search, browse, play and download YouTube playlists"
-    HOMEPAGE_URL "https://github.com/keshavbhatt/p-pldl"
+    HOMEPAGE_URL "https://github.com/keshavbhatt/playlist-dl"
     LANGUAGES CXX
 )
 

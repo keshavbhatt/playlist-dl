@@ -1,12 +1,15 @@
 # Playlist Downloader: project instructions
 
-Playlist Downloader (snap and binary `playlist-dl`, formerly "Playlist-Dl") is a proprietary
+Playlist Downloader (snap and binary `playlist-dl`, formerly "Playlist-Dl") is an open-source
 playlist search, browse, play and download app (Qt 6.11, C++20, CMake): playlists from any
 site the engine reads (owner, 2026-09-24), with YouTube as the search source. Version 3.0 is
 a from-scratch rewrite on branch `v3-rewrite`; the 2.x code on `main` (and its Qt 6 port on
 `qt6-cmake-migration`) is the frozen reference. Read `DOCS/` for the feature contract
 (FEATURES), design (DESIGN), decisions (DECISIONS, ADRs), lessons (LESSONS) and the progress
-log (PROGRESS). The rewrite follows `/home/commander/DCode/rewrite-kit/PLAYBOOK.md`.
+log (PROGRESS). The rewrite followed the owner's private rewrite kit (its PLAYBOOK); the
+kit itself is not part of this repository. The public repository is
+github.com/keshavbhatt/playlist-dl (`main`: 3.x, `old-qt5`: 2.x); the licence split is
+in LICENSING.md and REUSE.toml: GPL-3.0-or-later, licensing module under its own licence.
 
 ## Standing rules
 
@@ -36,7 +39,7 @@ log (PROGRESS). The rewrite follows `/home/commander/DCode/rewrite-kit/PLAYBOOK.
   (`~/.config/ktechpit/playlist-dl.conf`; the 2.x file is
   `~/.config/org.keshavnrj.ubuntu/Playlist DL.conf`).
 - Release checklist: date the `## [x.y.z]` changelog heading, add the metainfo `<release>`,
-  bump `project(VERSION)`, update the snap description, republish the public repo.
+  bump `project(VERSION)`, update the snap description, push `main`.
 
 ## Build and run (dev)
 

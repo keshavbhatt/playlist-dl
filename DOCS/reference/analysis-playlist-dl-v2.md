@@ -531,7 +531,7 @@ wayland x11`. Neither `python3`, `ffmpeg` nor `xdg-open` is staged; `python3` co
 base, ffmpeg does not exist inside the snap at all.
 
 **Snap (2.2, before the port):** `base: core20`, beineri `opt-qt-5.15.4-focal` PPA added as a
-package repository, `build-src` part with `plugin: nil` cloning `https://github.com/keshavbhatt/p-pldl.git`
+package repository, `build-src` part with `plugin: nil` cloning `https://github.com/keshavbhatt/playlist-dl.git`
 and running `qmake src && make -j4` by hand, `desktop-launch` from the author's
 `qt515-core20` content snap (`SNAP_DESKTOP_RUNTIME=$SNAP/qt515-core20`), env `DISABLE_WAYLAND=1
 IS_SNAP=1 QT_QPA_PLATFORMTHEME=gtk3`, gtk/icon/sound theme content plugs, extra plugs

@@ -1,0 +1,26 @@
+version = 1
+SPDX-PackageName = "Playlist Downloader"
+SPDX-PackageSupplier = "Keshav Bhatt <connect@ktechpit.com>"
+SPDX-PackageDownloadLocation = "https://github.com/keshavbhatt/playlist-dl"
+
+# Everything is GPL-3.0-or-later except the licensing module below.
+[[annotations]]
+path = "**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2022-2026 Keshav Bhatt (Ktechpit)"
+SPDX-License-Identifier = "GPL-3.0-or-later"
+
+# The licensing module: account, licence, evaluation and allowance code.
+[[annotations]]
+path = [
+    "src/modules/AccountAndLicense/**",
+    "src/core/licensing/**",
+    "src/services/licensing/**",
+    "src/ui/license_gate.cpp",
+    "src/ui/license_gate.h",
+    "tests/tst_daily_allowance.cpp",
+    "tests/tst_legacy_account.cpp"
+]
+precedence = "override"
+SPDX-FileCopyrightText = "2026 Keshav Bhatt (Ktechpit)"
+SPDX-License-Identifier = "LicenseRef-Ktechpit-Licensing-Module"

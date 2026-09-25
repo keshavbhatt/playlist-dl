@@ -15,10 +15,9 @@
 
 ## Open questions for the owner
 
-1. **Repository licence** (ADR-005): the tree copies Red 10 and UMD 7 code, shipped
-   proprietary, into a public GPL-3 repository. Options: a private repository with a
-   metadata-only public one (the kit's model, recommended), or relicensing the copied code.
-   Nothing is pushed until this is answered.
+1. **Repository licence**: decided 2026-09-25 (ADR-008): open source at
+   github.com/keshavbhatt/playlist-dl, GPL-3.0-or-later with the licensing module under
+   the Ktechpit Licensing Module License.
 2. **The gate** (FEATURES L3): assumed Red's daily allowance (5 free downloads a day); 2.x
    gated quality above "Poor" instead.
 3. **Display name**: decided 2026-09-25: "Playlist Downloader" stays everywhere; About shows
