@@ -93,13 +93,6 @@ void AboutDialog::setupUi()
     author->setTextInteractionFlags(Qt::TextBrowserInteraction);
     connect(author, &QLabel::linkActivated, this, [](const QString& link) { platform::openUrl(link); });
     identity->addWidget(author);
-    auto* disclaimer =
-        new QLabel(tr("YouTube is a trademark of Google LLC. This app is independent and not affiliated with, "
-                      "endorsed by, or sponsored by YouTube or Google."),
-                   this);
-    disclaimer->setProperty("pldlMuted", true);
-    disclaimer->setWordWrap(true);
-    identity->addWidget(disclaimer);
     hero->addLayout(identity, 1);
     root->addLayout(hero);
 

@@ -78,5 +78,3 @@ every setting, the shortcuts and common problems. Bugs and requests go to the
 [connect@ktechpit.com](mailto:connect@ktechpit.com); please attach the diagnostics from
 *About, Copy* when reporting a problem.
 
-<sub>YouTube is a trademark of Google LLC. Playlist Downloader is an independent app and is
-not affiliated with, endorsed by, or sponsored by YouTube or Google.</sub>
