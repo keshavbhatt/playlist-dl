@@ -333,6 +333,18 @@ void Settings::setBrowserStartPage(const QString& url)
     }
 }
 
+bool Settings::verboseLogging() const
+{
+    return boolValue(keys::kVerboseLogging, false);
+}
+
+void Settings::setVerboseLogging(bool enabled)
+{
+    if (storeBool(keys::kVerboseLogging, false, enabled)) {
+        Q_EMIT generalChanged();
+    }
+}
+
 bool Settings::railExpanded() const
 {
     return boolValue(keys::kRailExpanded, false);

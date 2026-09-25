@@ -648,9 +648,13 @@ QWidget* SettingsDialog::buildAdvanced()
     reset->setObjectName(u"resetSettings"_s);
     reset->setProperty("pldlDanger", true);
     connect(reset, &QPushButton::clicked, this, &SettingsDialog::resetSettings);
+    m_verboseLog = makeCheck(this, m_loading, [this](bool on) { m_settings.setVerboseLogging(on); });
+    m_verboseLog->setObjectName(u"verboseLogCheck"_s);
     QWidget* support =
         card(tr("Support"),
-             {row(tr("Open log folder"), button(tr("Open folder"), &SettingsDialog::openLogFolderRequested)),
+             {row(tr("Verbose logging"), m_verboseLog,
+                  tr("Debug lines in the log, for a bug report. Off keeps the log short. Takes effect at once.")),
+              row(tr("Open log folder"), button(tr("Open folder"), &SettingsDialog::openLogFolderRequested)),
               row(tr("Copy diagnostics"), button(tr("Copy"), &SettingsDialog::copyDiagnosticsRequested),
                   tr("Versions, paths and recent log lines for a bug report. Never your session.")),
               row(tr("Reset settings"), reset, tr("Every option back to its default."))},
@@ -686,6 +690,7 @@ void SettingsDialog::loadValues()
     selectData(m_startPage, static_cast<int>(m_settings.startPage()));
     selectData(m_closeAction, static_cast<int>(m_settings.closeAction()));
     m_keepHistory->setChecked(m_settings.keepSearchHistory());
+    m_verboseLog->setChecked(m_settings.verboseLogging());
     m_showWhatsNew->setChecked(m_settings.showWhatsNew());
     m_notifyFinish->setChecked(m_settings.notifyOnDownloadFinish());
     selectData(m_themeChoice, static_cast<int>(m_settings.theme()));

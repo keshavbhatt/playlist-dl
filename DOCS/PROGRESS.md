@@ -52,6 +52,9 @@
   `EngineManager::downloadFile` now retries a transient failure once after 1.5 s. The
   engine's requests carried an old user agent; they now say Playlist-Downloader/3.
   Temporary cookie files, notification ids and the test profile dropped an old prefix.
+- Owner: debug logging off by default. `core::applyLogVerbosity` sets the app's categories'
+  debug rules from Settings, Advanced, Verbose logging (`advanced/verboseLogging`), at
+  start and on change; QT_LOGGING_RULES still outranks it, so dev-run keeps its rules.
 - Owner: the rail expands to show labels beside the glyphs (toggle under the logo, Ctrl+B),
   animated over 200 ms with the labels fading in over the last two thirds of the way, the
   glyphs staying put; the choice is a setting (`general/railExpanded`); `rail` hook;

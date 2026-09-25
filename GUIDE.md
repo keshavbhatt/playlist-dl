@@ -147,7 +147,8 @@ the page title shows its state.
 - **Browser**: start page (an empty tab, YouTube or an address of your own), restore tabs,
   block ads, Do Not Track, browser identity.
 - **Search**: results per page.
-- **Advanced**: hardware acceleration, clear cache, sign out and clear session, reset
+- **Advanced**: hardware acceleration, clear cache, sign out and clear session, verbose
+  logging (off unless you are reporting a problem), reset
   permissions, open the log folder, copy diagnostics, reset settings.
 
 ## Command line

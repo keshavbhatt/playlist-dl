@@ -191,6 +191,9 @@ private Q_SLOTS:
         QCOMPARE(m_settings->searchResultsPerPage(), 20);
         QVERIFY(m_settings->keepSearchHistory());
         QVERIFY(!m_settings->railExpanded());
+        QVERIFY(!m_settings->verboseLogging()); // quiet by default
+        m_settings->setVerboseLogging(true);
+        QVERIFY(m_settings->verboseLogging());
         m_settings->setRailExpanded(true);
         QVERIFY(m_settings->railExpanded());
         QVERIFY(!m_settings->searchGridView()); // rows by default

@@ -84,6 +84,9 @@ Application::Application(int& argc, char** argv)
     qCInfo(core::lcCore).noquote() << u"playlist-dl %1 (%2) profile=%3 on %4"_s.arg(
         QString::fromLatin1(version::kVersion), QString::fromLatin1(version::kGitRevision),
         m_cli.profile.isEmpty() ? u"default"_s : m_cli.profile, platform::describeHost());
+    core::applyLogVerbosity(m_settings->verboseLogging());
+    connect(m_settings.get(), &core::Settings::generalChanged, this,
+            [this] { core::applyLogVerbosity(m_settings->verboseLogging()); });
     qCInfo(core::lcCore) << "settings:" << m_settings->fileName() << "log:" << core::LogSink::logFilePath();
 }
 

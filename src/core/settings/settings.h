@@ -174,6 +174,9 @@ public:
     /// The YouTube choice of the Start page setting.
     static constexpr QLatin1StringView kYouTubeStartPage{"https://www.youtube.com/"};
     [[nodiscard]] static bool isEmptyStartPage(const QString& url);
+    /// Debug-level lines in the log (Settings, Advanced), default off; QT_LOGGING_RULES still wins.
+    [[nodiscard]] bool verboseLogging() const;
+    void setVerboseLogging(bool enabled);
     /// Whether the rail shows labels beside its glyphs (Ctrl+B), default off.
     [[nodiscard]] bool railExpanded() const;
     void setRailExpanded(bool expanded);

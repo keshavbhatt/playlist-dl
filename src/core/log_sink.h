@@ -9,6 +9,11 @@
 // memory for "Copy diagnostics".
 namespace pldl::core {
 
+/// Debug lines on or off for the app's categories (owner, 2026-09-25: quiet by
+/// default). The QT_LOGGING_RULES environment variable outranks this, so a
+/// developer's dev-run keeps its own rules.
+void applyLogVerbosity(bool verbose);
+
 class LogSink
 {
 public:

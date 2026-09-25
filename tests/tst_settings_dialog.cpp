@@ -132,6 +132,10 @@ private Q_SLOTS:
         QCOMPARE(m_settings->concurrentDownloads(), 4);
         perPage->setValue(30);
         QCOMPARE(m_settings->searchResultsPerPage(), 30);
+        auto* verbose = dialog->findChild<QCheckBox*>(u"verboseLogCheck"_s);
+        QVERIFY(verbose != nullptr && !verbose->isChecked());
+        verbose->setChecked(true);
+        QVERIFY(m_settings->verboseLogging());
         auto* suggest = dialog->findChild<QCheckBox*>(u"suggestCheck"_s);
         QVERIFY(suggest != nullptr && suggest->isChecked()); // on by default
         suggest->setChecked(false);

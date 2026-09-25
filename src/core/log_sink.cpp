@@ -3,6 +3,7 @@
 #include <QDateTime>
 #include <QDir>
 #include <QFile>
+#include <QLoggingCategory>
 #include <QFileInfo>
 #include <QMutex>
 #include <QMutexLocker>
@@ -13,6 +14,12 @@
 using namespace Qt::StringLiterals;
 
 namespace pldl::core {
+
+void applyLogVerbosity(bool verbose)
+{
+    QLoggingCategory::setFilterRules(verbose ? u"pldl.*.debug=true\npldl.web.js.debug=false"_s
+                                             : u"pldl.*.debug=false"_s);
+}
 
 namespace {
 

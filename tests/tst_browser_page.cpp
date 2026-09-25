@@ -96,9 +96,9 @@ public:
         });
         return m_server.listen(QHostAddress::LocalHost, 0);
     }
-    [[nodiscard]] QUrl url() const
+    [[nodiscard]] QUrl url(const QString& path = u"/watch"_s) const
     {
-        return QUrl(u"http://127.0.0.1:"_s + QString::number(m_server.serverPort()) + u"/watch"_s);
+        return QUrl(u"http://127.0.0.1:"_s + QString::number(m_server.serverPort()) + path);
     }
 
 private:
@@ -151,6 +151,11 @@ class TestBrowserPage : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
+    void initTestCase()
+    {
+        QVERIFY(m_pages.listen());
+    }
+
     void init()
     {
         m_dir = std::make_unique<QTemporaryDir>();
@@ -246,12 +251,12 @@ private Q_SLOTS:
         // about:blank is nothing to download: the button waits for a web page.
         page.downloadCurrent();
         QCOMPARE(spy.count(), 0);
-        page.open(QUrl(u"https://example.com/watch?v=1"_s));
+        page.open(m_pages.url(u"/watch?v=1"_s));
         // The URL is known to the view as soon as the load is requested.
-        QTRY_VERIFY_WITH_TIMEOUT(page.currentUrl().host() == u"example.com"_s, 30000); // a real network load; generous under a busy CI or a parallel build
+        QTRY_VERIFY_WITH_TIMEOUT(page.currentUrl().host() == u"127.0.0.1"_s, 15000);
         page.downloadCurrent();
         QCOMPARE(spy.count(), 1);
-        QCOMPARE(spy.at(0).at(0).toUrl(), QUrl(u"https://example.com/watch?v=1"_s));
+        QCOMPARE(spy.at(0).at(0).toUrl(), m_pages.url(u"/watch?v=1"_s));
         page.setDownloadBusy(true);
         QVERIFY(page.isDownloadBusy());
         QVERIFY(button->isEnabled()); // a busy button is the cancel
@@ -268,8 +273,8 @@ private Q_SLOTS:
         QVERIFY(QTest::qWaitForWindowExposed(&page));
         QPushButton* detected = page.detectedButton();
         QVERIFY(!detected->isVisible());
-        page.open(QUrl(u"https://example.com/clip"_s));
-        QTRY_VERIFY_WITH_TIMEOUT(page.currentUrl().host() == u"example.com"_s, 15000);
+        page.open(m_pages.url(u"/clip"_s));
+        QTRY_VERIFY_WITH_TIMEOUT(page.currentUrl().host() == u"127.0.0.1"_s, 15000);
 
         page.currentView()->setPageMedia(QJsonObject{{u"kind"_s, u"video"_s}, {u"height"_s, 1080}});
         QVERIFY(detected->isVisible());
@@ -285,7 +290,7 @@ private Q_SLOTS:
         QSignalSpy spy(&page, &pldl::ui::BrowserPage::downloadRequested);
         detected->click();
         QCOMPARE(spy.count(), 1);
-        QCOMPARE(spy.at(0).at(0).toUrl().host(), u"example.com"_s);
+        QCOMPARE(spy.at(0).at(0).toUrl().host(), u"127.0.0.1"_s);
         page.setDownloadBusy(false);
         page.currentView()->setPageMedia(QJsonObject{
             {u"kind"_s, u"audio"_s}, {u"direct"_s, u"https://cdn.example.net/track.mp3"_s}});
@@ -344,8 +349,8 @@ private Q_SLOTS:
         page.resize(1000, 640);
         page.show();
         QVERIFY(QTest::qWaitForWindowExposed(&page));
-        page.open(QUrl(u"https://example.com/clip"_s));
-        QTRY_VERIFY_WITH_TIMEOUT(page.currentUrl().host() == u"example.com"_s, 15000);
+        page.open(m_pages.url(u"/clip"_s));
+        QTRY_VERIFY_WITH_TIMEOUT(page.currentUrl().host() == u"127.0.0.1"_s, 15000);
         page.currentView()->setPageMedia(QJsonObject{{u"kind"_s, u"video"_s}, {u"height"_s, 720}});
         QSignalSpy spy(&page, &pldl::ui::BrowserPage::downloadRequested);
         page.detectedButton()->click();
@@ -382,9 +387,7 @@ private Q_SLOTS:
         page.show();
         QVERIFY(QTest::qWaitForWindowExposed(&page));
         page.activateWindow();
-        PageServer server; // local: the old example.com load failed without a network
-        QVERIFY(server.listen());
-        page.open(server.url());
+        page.open(m_pages.url());
         QTRY_VERIFY_WITH_TIMEOUT(page.currentUrl().path() == u"/watch"_s, 15000);
         QTRY_VERIFY_WITH_TIMEOUT(page.addressField()->text().contains(u"/watch"_s), 15000);
         page.focusAddress();
@@ -543,8 +546,8 @@ private Q_SLOTS:
         page.resize(1000, 640);
         page.show();
         QVERIFY(QTest::qWaitForWindowExposed(&page));
-        page.open(QUrl(u"https://example.com/clip"_s));
-        QTRY_VERIFY_WITH_TIMEOUT(page.currentUrl().host() == u"example.com"_s, 15000);
+        page.open(m_pages.url(u"/clip"_s));
+        QTRY_VERIFY_WITH_TIMEOUT(page.currentUrl().host() == u"127.0.0.1"_s, 15000);
         page.currentView()->setPageMedia(QJsonObject{{u"kind"_s, u"video"_s}, {u"height"_s, 720}});
         QVERIFY(page.detectedButton()->isVisible());
         QVERIFY(page.detectedDismissButton()->isVisible());
@@ -566,17 +569,17 @@ private Q_SLOTS:
             pldl::ui::BrowserPage page(*m_settings, *m_theme, u"7.0.0-test"_s);
             page.show();
             QVERIFY(QTest::qWaitForWindowExposed(&page));
-            page.open(QUrl(u"https://example.com/one"_s));
-            page.open(QUrl(u"https://example.org/two"_s));
-            QTRY_VERIFY_WITH_TIMEOUT(page.view(1)->url().host() == u"example.org"_s, 15000);
-            QTRY_VERIFY_WITH_TIMEOUT(page.view(0)->url().host() == u"example.com"_s, 15000);
+            page.open(m_pages.url(u"/one"_s));
+            page.open(m_pages.url(u"/two"_s));
+            QTRY_VERIFY_WITH_TIMEOUT(page.view(1)->url().path() == u"/two"_s, 15000);
+            QTRY_VERIFY_WITH_TIMEOUT(page.view(0)->url().path() == u"/one"_s, 15000);
             page.setCurrentIndex(0);
             QCOMPARE(page.tabCount(), 2);
         } // the session is written at teardown
         const pldl::core::Settings::BrowserSession saved = m_settings->browserSession();
         QCOMPARE(saved.urls.size(), 2);
-        QCOMPARE(saved.urls.at(0), u"https://example.com/one"_s);
-        QCOMPARE(saved.urls.at(1), u"https://example.org/two"_s);
+        QCOMPARE(saved.urls.at(0), m_pages.url(u"/one"_s).toString());
+        QCOMPARE(saved.urls.at(1), m_pages.url(u"/two"_s).toString());
         QCOMPARE(saved.current, 0);
 
         pldl::ui::BrowserPage again(*m_settings, *m_theme, u"7.0.0-test"_s);
@@ -584,8 +587,8 @@ private Q_SLOTS:
         QVERIFY(QTest::qWaitForWindowExposed(&again));
         QCOMPARE(again.tabCount(), 2);
         QCOMPARE(again.currentIndex(), 0);
-        QTRY_VERIFY_WITH_TIMEOUT(again.view(1)->url().host() == u"example.org"_s, 15000);
-        QTRY_VERIFY_WITH_TIMEOUT(again.view(0)->url().host() == u"example.com"_s, 15000);
+        QTRY_VERIFY_WITH_TIMEOUT(again.view(1)->url().path() == u"/two"_s, 15000);
+        QTRY_VERIFY_WITH_TIMEOUT(again.view(0)->url().path() == u"/one"_s, 15000);
     }
 
     void aStartLeavesTheSavedTabsAloneByDefault()
@@ -756,6 +759,7 @@ private Q_SLOTS:
     }
 
 private:
+    PageServer m_pages; ///< every page load in these tests is local
     std::unique_ptr<QTemporaryDir> m_dir;
     std::unique_ptr<pldl::core::Settings> m_settings;
     std::unique_ptr<pldl::core::ThemeService> m_theme;
