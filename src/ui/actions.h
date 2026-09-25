@@ -32,6 +32,7 @@ public:
     QAction* about = nullptr;
     QAction* help = nullptr;      ///< the rail's help menu: shortcuts, guide, report a bug, about
     QAction* reportBug = nullptr;
+    QAction* supportedSites = nullptr; ///< the sheet listing what the engine reads
     QAction* account = nullptr;
     QAction* quit = nullptr;
     // Browser page. Ctrl+W is shared with showHide: the window closes a tab

@@ -131,6 +131,8 @@ Q_SIGNALS:
     /// A link on any other site was pasted: the window probes it (a playlist
     /// opens the Playlist page, a single item the options sheet).
     void linkRequested(const QUrl& url);
+    /// The empty state's "Supported sites" link.
+    void supportedSitesRequested();
     /// The chosen card's result, with everything the Playlist page can show at once.
     void playlistChosen(const pldl::services::SearchResult& result);
     /// The engine is needed and not provisioned: the window sets it up and

@@ -52,6 +52,13 @@
   `EngineManager::downloadFile` now retries a transient failure once after 1.5 s. The
   engine's requests carried an old user agent; they now say Playlist-Downloader/3.
   Temporary cookie files, notification ids and the test profile dropped an old prefix.
+- Owner's list of seven (2026-09-25): Search shows rows by default; playlist cards carry a
+  Details button and a double click opens the items sheet (a single item's file otherwise);
+  a divider above the Settings footer; an ellipsis on every in-progress label; the launcher's
+  Download from a link asks for one with the clipboard's link offered; a Supported sites
+  sheet (the engine's list, cached per version) from Help and the Search empty state;
+  the changelog opens without "rebuilt from the ground up" and without a Removed section.
+  The guide's annotated screenshots follow.
 - About carries the GPL's Appropriate Legal Notices (v3, 5d): copyright, GPL v3 or later,
   no warranty, the module's own terms, and one Licences link to LICENSING.md (owner: "one link").
 - Owner: shortcuts are invisible unless one knows F1. The rail's last button is a Help menu

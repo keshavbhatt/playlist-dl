@@ -29,6 +29,7 @@ namespace pldl::services {
 class EngineManager;
 class LicenseService;
 class MediaProbe;
+class SupportedSites;
 } // namespace pldl::services
 
 namespace pldl::ui {
@@ -122,6 +123,8 @@ public Q_SLOTS:
     void showShortcuts();
     void showAbout();
     void showBugReport();
+    /// The Supported sites sheet, filtered to `filter` (empty: all).
+    void showSupportedSites(const QString& filter = {});
     void showAccount();
     /// Headless verification aid: opens a screen by name: "about",
     /// "shortcuts", "account", "plans", "bug", "whatsnew", "settings",
@@ -195,6 +198,7 @@ private:
     PlaylistPage* m_playlist = nullptr;
     std::optional<services::SearchResult> m_knownPlaylist; ///< the card chosen on Search, for the header
     QHash<quint64, QUrl> m_videoProbes;                    ///< openVideoOptions probes in flight
+    services::SupportedSites* m_sites = nullptr;
     QHash<quint64, QUrl> m_linkProbes;                     ///< openAnyLink probes in flight
     BrowserPage* m_browser = nullptr;
     DownloadsPage* m_downloads = nullptr;

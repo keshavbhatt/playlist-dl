@@ -271,12 +271,16 @@ void SearchPage::buildStage()
     invitation->setAlignment(Qt::AlignCenter);
     emptyLayout->addWidget(invitation);
     auto* scope = new QLabel(tr("Search finds YouTube playlists. For SoundCloud, Bandcamp, Vimeo and other sites, "
-                                "paste the playlist's link."),
+                                "paste the playlist's link. <a href=\"sites\">Supported sites</a>"),
                              m_emptyPane);
     scope->setObjectName(u"scopeNote"_s);
     scope->setProperty("pldlMuted", true);
+    scope->setTextFormat(Qt::RichText);
     scope->setAlignment(Qt::AlignCenter);
     scope->setWordWrap(true);
+    scope->setOpenExternalLinks(false);
+    scope->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    connect(scope, &QLabel::linkActivated, this, [this] { Q_EMIT supportedSitesRequested(); });
     emptyLayout->addWidget(scope);
     m_examplesRow = new QWidget(m_emptyPane);
     m_examplesRow->setObjectName(u"exampleChips"_s);

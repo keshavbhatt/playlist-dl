@@ -23,7 +23,9 @@ To start over, clear the field with its clear button, press Esc, or search with 
 empty: the results go and the start view comes back.
 Recent searches come back as chips under the field (Settings, General, Keep search history).
 A playlist link from any other site (a SoundCloud set, for example) opens on the Playlist page
-too; a link to a single track or video opens the download options.
+too; a link to a single track or video opens the download options. **Supported sites** (under
+the start view's note, and in the Help menu) lists every site the download engine reads, with a
+filter; Open takes a site to the built-in browser.
 
 You can also paste a link: a playlist link opens the Playlist page, a link to a single
 video or track opens the download options. A link dropped anywhere on the window does the

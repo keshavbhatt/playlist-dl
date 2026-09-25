@@ -7,6 +7,7 @@
 #include "platform/file_manager.h"
 #include "services/engine_manager.h"
 #include "services/licensing/license_service.h"
+#include "services/supported_sites.h"
 #include "services/media_probe.h"
 #include "ui/about_dialog.h"
 #include "ui/account_dialog.h"
@@ -36,6 +37,7 @@
 #include "ui/toast.h"
 #include "ui/tray_controller.h"
 #include "ui/whats_new_dialog.h"
+#include "ui/supported_sites_sheet.h"
 #include "web/web_profile.h"
 
 #include "core/downloads/download_queue.h"
@@ -121,8 +123,10 @@ void MainWindow::setupUi()
 
     m_engine = new services::EngineManager(m_settings, this);
     m_probe = new services::MediaProbe(this);
+    m_sites = new services::SupportedSites(this);
     connect(m_engine, &services::EngineManager::ready, this, [this](const core::EnginePaths& paths) {
         m_probe->setEnginePaths(paths);
+        m_sites->load(paths.ytdlp, m_engine->status().ytdlpVersion); // once per engine version, cached
         // A setup sheet the app opened on its own closes once the engine is
         // there (after a moment, so the ready state is seen); one the user
         // opened stays.
@@ -170,6 +174,7 @@ void MainWindow::setupUi()
     // the options sheet, as Download this and a link on any other site do.
     connect(m_search, &SearchPage::videoRequested, this,
             [this](const QUrl& url) { ensureEngine([this, url] { openVideoOptions(url); }); });
+    connect(m_search, &SearchPage::supportedSitesRequested, this, [this] { showSupportedSites(); });
     connect(m_search, &SearchPage::linkRequested, this,
             [this](const QUrl& url) { ensureEngine([this, url] { openAnyLink(url); }); });
     connect(m_search, &SearchPage::engineNeeded, this, [this] {
@@ -263,6 +268,7 @@ void MainWindow::connectActions()
             [] { platform::openDirectory(QFileInfo(core::LogSink::logFilePath()).absolutePath()); });
     connect(a.about, &QAction::triggered, this, &MainWindow::showAbout);
     connect(a.reportBug, &QAction::triggered, this, &MainWindow::showBugReport);
+    connect(a.supportedSites, &QAction::triggered, this, [this] { showSupportedSites(); });
     connect(a.account, &QAction::triggered, this, &MainWindow::showAccount);
     connect(a.quit, &QAction::triggered, this, &MainWindow::quit);
 
@@ -858,6 +864,23 @@ void MainWindow::showShortcuts()
     dialog->show();
 }
 
+void MainWindow::showSupportedSites(const QString& filter)
+{
+    if (!m_sites->isLoaded() && qEnvironmentVariableIsSet("PLDL_DEBUG_SITES")) {
+        m_sites->load(QString(), u"debug"_s);
+    }
+    auto* sheet = new SupportedSitesSheet(*m_sites, m_theme, this);
+    sheet->setAttribute(Qt::WA_DeleteOnClose);
+    connect(sheet, &SupportedSitesSheet::openSiteRequested, this, [this, sheet](const QUrl& url) {
+        sheet->close();
+        openUrl(url.toString());
+    });
+    if (!filter.isEmpty()) {
+        sheet->setFilter(filter);
+    }
+    sheet->show();
+}
+
 void MainWindow::showBugReport()
 {
     auto* dialog = new BugReportDialog(m_settings, m_theme, m_browser->userAgent(), QString(), this);
@@ -903,6 +926,8 @@ void MainWindow::debugOpen(const QString& what)
         m_accountDialog->showPlans();
     } else if (what == u"bug"_s) {
         showBugReport();
+    } else if (what == u"sites"_s || what.startsWith(u"sites:"_s)) {
+        showSupportedSites(what.section(u':', 1)); // PLDL_DEBUG_SITES=<file> feeds the list without an engine
     } else if (what == u"help"_s) {
         // The rail's help menu, popped without blocking, for a grab.
         if (auto* button = m_rail->findChild<QToolButton*>(u"helpButton"_s); button != nullptr && button->menu()) {

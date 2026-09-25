@@ -20,6 +20,8 @@ qt_add_library(pldl_services STATIC
     search_service.h
     search_suggestions.cpp
     search_suggestions.h
+    supported_sites.cpp
+    supported_sites.h
 )
 pldl_set_warnings(pldl_services)
 

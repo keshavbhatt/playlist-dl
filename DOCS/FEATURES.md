@@ -44,6 +44,7 @@ name (ADR-002), the repository licence (ADR-005).
 | B5 | Search suggestions while typing (https, encoded query, JSON client); Settings, Search, Suggest as I type (on); the empty state's example chips are three completions from the same service, seeds rotating by day, the fixed three as the fallback | plain http, JSONP breaks silently | KEEP | done (`services::SearchSuggestions`, https JSON client, two hosts with a retry, `Settings::searchSuggestions`; verified live) |
 | B6 | Recent queries as chips (setting, on); Load more | none | KEEP | done (`Settings::recentQueries`, Load more) |
 | B7 | Bookmark playlist | menu entry without a handler | LATER | a bookmarks page after 3.0 |
+| S13 | Supported sites sheet: the engine's site list read once per engine version and cached, a filter, Enter or Open sends the site's home page to the browser; from Help and the Search empty state | none | KEEP | done (`services::SupportedSites`, `ui::SupportedSitesSheet`; `sites[:filter]` hook, `PLDL_DEBUG_SITES=<file>`; tst_supported_sites, tst_supported_sites_sheet) |
 | B8 | Force reload of a cached result | yes | DROP | results are not cached beyond the HTTP cache |
 | B9 | Empty, loading and error states with Retry; Esc cancels | Esc cancels; error dialog | KEEP | done (`SearchPage` states, Esc cancels) |
 | B10 | Results as a card grid or a list of rows, a toggle in the header, remembered (setting) | grid of rows | KEEP | done (`SearchCardDelegate::Layout`, `Settings::searchGridView`; tst_search_page) |

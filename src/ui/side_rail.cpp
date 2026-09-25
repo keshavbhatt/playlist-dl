@@ -104,6 +104,7 @@ void SideRail::setupUi()
     helpMenu->setObjectName(u"helpMenu"_s);
     helpMenu->addAction(m_actions.shortcuts);
     helpMenu->addAction(m_actions.onlineGuide);
+    helpMenu->addAction(m_actions.supportedSites);
     helpMenu->addAction(m_actions.reportBug);
     helpMenu->addSeparator();
     helpMenu->addAction(m_actions.about);

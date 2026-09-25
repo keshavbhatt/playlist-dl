@@ -91,6 +91,8 @@ qt_add_library(pldl_ui STATIC
     toast.h
     tray_controller.cpp
     tray_controller.h
+    supported_sites_sheet.cpp
+    supported_sites_sheet.h
     whats_new_dialog.cpp
     whats_new_dialog.h
 )
