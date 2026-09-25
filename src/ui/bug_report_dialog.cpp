@@ -58,7 +58,7 @@ BugReportDialog::BugReportDialog(const core::Settings& settings, const core::The
     auto* intro =
         new QLabel(tr("A pre-filled report opens in your browser or mail app, and the diagnostics "
                       "(versions, engine state, recent log lines) are copied to your clipboard: paste "
-                      "them at the end of the report. Your sign-in and what you watched are never "
+                      "them at the end of the report. Your sign-in and what you searched for are never "
                       "included."),
                    this);
     intro->setProperty("pldlMuted", true);
@@ -80,7 +80,7 @@ BugReportDialog::BugReportDialog(const core::Settings& settings, const core::The
     root->addWidget(descriptionLabel);
     m_description = new QPlainTextEdit(this);
     m_description->setPlaceholderText(
-        tr("e.g. The video turns black after I switch to TV mode, and only a restart fixes it."));
+        tr("e.g. A 40-item playlist stops after the third download and Retry does nothing."));
     m_description->setMinimumHeight(110);
     root->addWidget(m_description, 1);
 
