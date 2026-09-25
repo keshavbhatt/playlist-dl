@@ -35,7 +35,8 @@ Actions::Actions(QWidget* owner)
     playlist = make(owner, tr("Playlist"), {QKeySequence(Qt::CTRL | Qt::Key_2)});
     browser = make(owner, tr("Browser"), {QKeySequence(Qt::CTRL | Qt::Key_3)});
     downloads = make(owner, tr("Downloads"), {QKeySequence(Qt::CTRL | Qt::Key_4)});
-    showHide = make(owner, tr("Hide window")); // the tray and the menu; no shortcut (Ctrl+W closes a tab)
+    // Ctrl+H hides to the tray, or minimises without one (owner, 2026-09-25); Ctrl+W closes a tab.
+    showHide = make(owner, tr("Hide window"), {QKeySequence(Qt::CTRL | Qt::Key_H)});
     settings = make(owner, tr("Settings…"), {QKeySequence(Qt::CTRL | Qt::Key_Comma)});
     shortcuts = make(owner, tr("Keyboard shortcuts"), {QKeySequence(Qt::Key_F1), QKeySequence(Qt::CTRL | Qt::Key_Slash)});
     onlineGuide = make(owner, tr("Online guide"));

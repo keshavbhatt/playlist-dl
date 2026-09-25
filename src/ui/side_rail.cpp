@@ -51,6 +51,7 @@ public:
     void setLabel(const QString& text) { m_label = text; update(); }
     void setLabelAlpha(qreal alpha) { m_alpha = std::clamp(alpha, 0.0, 1.0); update(); }
     void setBold(bool bold) { m_bold = bold; }
+    void setColours(const QColor& text, const QColor& active) { m_text = text; m_active = active; update(); }
 
 protected:
     void paintEvent(QPaintEvent*) override
@@ -76,7 +77,7 @@ protected:
             QFont font = painter.font();
             font.setWeight(m_bold ? QFont::DemiBold : QFont::Medium);
             painter.setFont(font);
-            painter.setPen(option.palette.color(isChecked() ? QPalette::Highlight : QPalette::ButtonText));
+            painter.setPen(isChecked() ? m_active : m_text); // the brand accent, not the palette's highlight
             const QRect textRect(kLabelLeft, 0, width() - kLabelLeft - 8, height());
             painter.drawText(textRect, Qt::AlignVCenter | Qt::AlignLeft,
                              painter.fontMetrics().elidedText(m_label, Qt::ElideRight, textRect.width()));
@@ -88,6 +89,8 @@ private:
     qreal m_alpha = 0.0;
     int m_glyph = kIconSize;
     bool m_bold = false;
+    QColor m_text;
+    QColor m_active;
 };
 
 SideRail::SideRail(Actions& actions, core::ThemeService& theme, QWidget* parent)
@@ -221,8 +224,10 @@ void SideRail::applyIcons()
             action->setIcon(icon);
         }
         b->setIcon(icon);
+        b->setColours(t.text, t.accent);
     }
     m_logo->setIcon(icons::brand());
+    m_logo->setColours(t.text, t.accent);
     m_badge->setStyleSheet(
         u"background:%1;color:%2;border-radius:8px;font-size:10px;font-weight:700;padding:0 4px;"_s.arg(
             t.accent.name(), t.accentText.name()));
