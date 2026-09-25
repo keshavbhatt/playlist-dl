@@ -45,6 +45,14 @@
      playlist; toasts take an action (Added to queue offers View); the rail badge and the
      range slider announce themselves; links by drag and drop; a clipboard link offered
      once as a toast when the window comes to the front.
+- Engine provisioning test run for real (`PLDL_NETWORK_TESTS=1`): the first run failed at the
+  engine download with "Remote host signaled shutdown" (the release host closed the
+  connection); the second and a clean third run passed end to end in 27 s and 99 s: yt-dlp
+  and the JS runtime fetched and verified, the missing converter reported with the pacman
+  hint, ready once the host ffmpeg is visible, and a real probe returned "Me at the zoo".
+  `EngineManager::downloadFile` now retries a transient failure once after 1.5 s. The
+  engine's requests identified themselves as Red/10; they now say Playlist-Downloader/3.
+  Temporary cookie files, notification ids and the test profile dropped the Red prefix.
 - Owner: a playlist read failed with "The download engine exited with code 255" and nothing
   else (three probes, each dead within 12 ms; the same binary and playlist work from a shell
   and from the scratch profile, so the cause is still open). `core::friendlyError` now puts

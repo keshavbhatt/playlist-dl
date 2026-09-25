@@ -11,6 +11,7 @@
 #include <QFileInfo>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QTimer>
 #include <QNetworkRequest>
 #include <QSaveFile>
 #include <QStandardPaths>
@@ -291,7 +292,7 @@ void EngineManager::fetchRelease(const core::EngineComponent& component, bool ve
     // follows the rest (the CDN hop carries a signed, tag-less URL).
     const QUrl asset = core::latestAssetUrl(component.repo, component.assetName);
     QNetworkRequest request(asset);
-    request.setHeader(QNetworkRequest::UserAgentHeader, u"Red/10 (+https://github.com/keshavbhatt/red)"_s);
+    request.setHeader(QNetworkRequest::UserAgentHeader, u"Playlist-Downloader/3 (+https://github.com/keshavbhatt/p-pldl)"_s);
     request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::ManualRedirectPolicy);
     QNetworkReply* reply = m_network->head(request);
     m_activeReply = reply;
@@ -329,7 +330,7 @@ void EngineManager::fetchRelease(const core::EngineComponent& component, bool ve
 void EngineManager::fetchText(const QUrl& url, const std::function<void(const QByteArray&)>& then)
 {
     QNetworkRequest request(url);
-    request.setHeader(QNetworkRequest::UserAgentHeader, u"Red/10 (+https://github.com/keshavbhatt/red)"_s);
+    request.setHeader(QNetworkRequest::UserAgentHeader, u"Playlist-Downloader/3 (+https://github.com/keshavbhatt/p-pldl)"_s);
     request.setRawHeader("Accept", "application/vnd.github+json, text/plain, */*");
     QNetworkReply* reply = m_network->get(request);
     m_activeReply = reply;
@@ -345,7 +346,7 @@ void EngineManager::fetchText(const QUrl& url, const std::function<void(const QB
 }
 
 void EngineManager::downloadFile(const QUrl& url, const QString& label,
-                                 const std::function<void(const QString&)>& then)
+                                 const std::function<void(const QString&)>& then, int attempt)
 {
     m_download = std::make_unique<QTemporaryFile>(QDir(engineDirectory()).filePath(u"download-XXXXXX"_s));
     if (!m_download->open()) {
@@ -354,7 +355,7 @@ void EngineManager::downloadFile(const QUrl& url, const QString& label,
     }
     setState(m_status.state, label, 0);
     QNetworkRequest request(url);
-    request.setHeader(QNetworkRequest::UserAgentHeader, u"Red/10 (+https://github.com/keshavbhatt/red)"_s);
+    request.setHeader(QNetworkRequest::UserAgentHeader, u"Playlist-Downloader/3 (+https://github.com/keshavbhatt/p-pldl)"_s);
     QNetworkReply* reply = m_network->get(request);
     m_activeReply = reply;
     connect(reply, &QNetworkReply::readyRead, this, [this, reply] {
@@ -367,10 +368,22 @@ void EngineManager::downloadFile(const QUrl& url, const QString& label,
             setState(m_status.state, label, static_cast<double>(received) / static_cast<double>(total));
         }
     });
-    connect(reply, &QNetworkReply::finished, this, [this, reply, then] {
+    connect(reply, &QNetworkReply::finished, this, [this, reply, then, url, label, attempt] {
         reply->deleteLater();
         m_activeReply = nullptr;
         if (reply->error() != QNetworkReply::NoError) {
+            // The release host closes connections now and then ("Remote host
+            // signaled shutdown"); one more try is what a person would do.
+            if (attempt < 1 && reply->error() != QNetworkReply::OperationCanceledError) {
+                qCWarning(lcServices) << "download failed, retrying once:" << reply->errorString();
+                m_download.reset();
+                QTimer::singleShot(1500, this, [this, url, label, then, attempt] {
+                    if (m_status.isBusy()) {
+                        downloadFile(url, label, then, attempt + 1);
+                    }
+                });
+                return;
+            }
             fail(tr("Download failed: %1").arg(reply->errorString()));
             return;
         }
@@ -435,7 +448,7 @@ void EngineManager::checkForUpdates(bool force)
         return;
     }
     QNetworkRequest request(core::latestReleaseUrl(core::ytdlpComponent(m_os, m_cpu).repo));
-    request.setHeader(QNetworkRequest::UserAgentHeader, u"Red/10 (+https://github.com/keshavbhatt/red)"_s);
+    request.setHeader(QNetworkRequest::UserAgentHeader, u"Playlist-Downloader/3 (+https://github.com/keshavbhatt/p-pldl)"_s);
     request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::ManualRedirectPolicy);
     m_status.checkingForUpdates = true;
     m_status.checkError.clear();

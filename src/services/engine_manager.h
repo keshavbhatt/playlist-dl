@@ -95,8 +95,12 @@ private:
     void queueComponent(const core::EngineComponent& component, bool verifySums);
     void fetchRelease(const core::EngineComponent& component, bool verifySums,
                       const std::function<void(const QUrl& asset, const QUrl& sums)>& then);
+    /// `attempt` counts retries: a transient network failure (the host closing
+    /// the connection mid-transfer) is tried again once before failing.
+    /// `attempt` counts retries: a transient network failure (the host closing
+    /// the connection mid-transfer) is tried once more before failing.
     void downloadFile(const QUrl& url, const QString& label,
-                      const std::function<void(const QString& path)>& then);
+                      const std::function<void(const QString& path)>& then, int attempt = 0);
     void fetchText(const QUrl& url, const std::function<void(const QByteArray&)>& then);
     void installBinary(const core::EngineComponent& component, const QString& tempPath,
                        const QString& expectedSha);
