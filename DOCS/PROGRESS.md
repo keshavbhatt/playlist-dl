@@ -52,6 +52,9 @@
   `EngineManager::downloadFile` now retries a transient failure once after 1.5 s. The
   engine's requests identified themselves as Red/10; they now say Playlist-Downloader/3.
   Temporary cookie files, notification ids and the test profile dropped the Red prefix.
+- Owner: the fixed example chips looked odd. They now come from the suggestion service:
+  three seeds a day (rotating through twelve), one completion each, deduplicated, the fixed
+  three until an answer arrives or when Suggest as I type is off (tst_search_page).
 - Owner: a playlist read failed with "The download engine exited with code 255" and nothing
   else (three probes, each dead within 12 ms; the same binary and playlist work from a shell
   and from the scratch profile, so the cause is still open). `core::friendlyError` now puts

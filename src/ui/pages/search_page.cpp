@@ -16,6 +16,7 @@
 #include <QAbstractButton>
 #include <QHBoxLayout>
 #include <QKeyEvent>
+#include <QDate>
 #include <QLabel>
 #include <QLineEdit>
 #include <QListView>
@@ -78,6 +79,28 @@ SearchPage::SearchPage(core::Settings& settings, core::ThemeService& theme, Thum
     });
     connect(&m_search->engine(), &services::SearchService::playlistCounted, this, &SearchPage::setPlaylistCount);
     connect(m_suggestions, &services::SearchSuggestions::suggestions, this, &SearchPage::showSuggestions);
+    for (int i = 0; i < 3; ++i) {
+        auto* ideas = new services::SearchSuggestions(this);
+        m_ideas << ideas;
+        m_ideaPicks << QString();
+        connect(ideas, &services::SearchSuggestions::suggestions, this, [this, i](const QStringList& list) {
+            // The seed's first completion that is not the seed itself is this chip.
+            for (const QString& text : list) {
+                if (text.size() >= 4 && text.size() <= 40 && !m_ideaPicks.contains(text, Qt::CaseInsensitive) &&
+                    text.compare(m_ideaSeeds.value(i), Qt::CaseInsensitive) != 0) {
+                    m_ideaPicks[i] = text;
+                    break;
+                }
+            }
+            QStringList shown;
+            for (const QString& pick : std::as_const(m_ideaPicks)) {
+                if (!pick.isEmpty()) {
+                    shown << pick;
+                }
+            }
+            setExamples(shown);
+        });
+    }
     connect(&m_thumbnails, &ThumbnailCache::ready, this,
             [this](const QString&) { m_list->viewport()->update(); });
     connect(&m_settings, &core::Settings::searchChanged, this, &SearchPage::rebuildRecent);
@@ -244,22 +267,13 @@ void SearchPage::buildStage()
     scope->setAlignment(Qt::AlignCenter);
     scope->setWordWrap(true);
     emptyLayout->addWidget(scope);
-    auto* examples = new QWidget(m_emptyPane);
-    examples->setObjectName(u"exampleChips"_s);
-    auto* exampleLayout = new QHBoxLayout(examples);
+    m_examplesRow = new QWidget(m_emptyPane);
+    m_examplesRow->setObjectName(u"exampleChips"_s);
+    auto* exampleLayout = new QHBoxLayout(m_examplesRow);
     exampleLayout->setContentsMargins(0, 0, 0, 0);
     exampleLayout->setSpacing(8);
-    exampleLayout->addStretch(1);
-    for (const QString& example : {tr("lofi hip hop"), tr("python tutorial"), tr("workout music")}) {
-        QToolButton* chip = makeChip(example, examples);
-        chip->setAccessibleName(tr("Search for %1").arg(example));
-        connect(chip, &QToolButton::clicked, this, [this, example] { search(example); });
-        m_exampleChips << chip;
-        exampleLayout->addWidget(chip);
-    }
-    exampleLayout->addStretch(1);
-    keyboard::installArrowNavigation(examples);
-    emptyLayout->addWidget(examples);
+    setExamples({}); // the fixed three until today's arrive (refreshExamples)
+    emptyLayout->addWidget(m_examplesRow);
     emptyLayout->addStretch(3);
     m_stage->addWidget(m_emptyPane);
 
@@ -873,7 +887,67 @@ void SearchPage::showEvent(QShowEvent* event)
     layoutGrid();
     if (m_state == State::Empty) {
         m_field->setFocus();
+        refreshExamples();
     }
+}
+
+void SearchPage::refreshExamples()
+{
+    // Fixed examples read as odd (owner, 2026-09-25): today's come from the
+    // suggestion service, as completions of a seed that changes with the day.
+    // Off with the suggestions setting; the fixed three stay then.
+    if (m_examplesAsked || !m_settings.searchSuggestions()) {
+        return;
+    }
+    static const QStringList kSeeds{u"best playlist"_s, u"top songs"_s,        u"study music"_s, u"workout playlist"_s,
+                                    u"lofi"_s,          u"chill mix"_s,        u"road trip songs"_s, u"piano covers"_s,
+                                    u"80s hits"_s,      u"meditation music"_s, u"coding music"_s, u"jazz"_s};
+    m_examplesAsked = true;
+    const int day = QDate::currentDate().dayOfYear();
+    m_ideaSeeds.clear();
+    for (int i = 0; i < m_ideas.size(); ++i) {
+        const QString seed = kSeeds.at((day + i * 4) % kSeeds.size());
+        m_ideaSeeds << seed;
+        m_ideas.at(i)->request(seed);
+    }
+}
+
+void SearchPage::setIdeasEndpoint(const QUrl& endpoint)
+{
+    for (services::SearchSuggestions* ideas : std::as_const(m_ideas)) {
+        ideas->setEndpoint(endpoint);
+    }
+}
+
+bool SearchPage::ideasPending() const
+{
+    return std::any_of(m_ideas.cbegin(), m_ideas.cend(),
+                       [](const services::SearchSuggestions* ideas) { return ideas->isPending(); });
+}
+
+void SearchPage::setExamples(const QStringList& examples)
+{
+    auto* layout = dynamic_cast<QHBoxLayout*>(m_examplesRow->layout());
+    while (QLayoutItem* item = layout->takeAt(0)) {
+        delete item->widget();
+        delete item;
+    }
+    m_exampleChips.clear();
+    const QStringList shown = examples.isEmpty()
+                                  ? QStringList{tr("lofi hip hop"), tr("python tutorial"), tr("workout music")}
+                                  : examples;
+    const Tokens t = Tokens::forScheme(theme().isDark());
+    layout->addStretch(1);
+    for (const QString& example : shown) {
+        QToolButton* chip = makeChip(example, m_examplesRow);
+        chip->setIcon(icons::themed(u"sparkles"_s, t.accent));
+        chip->setAccessibleName(tr("Search for %1").arg(example));
+        connect(chip, &QToolButton::clicked, this, [this, example] { search(example); });
+        m_exampleChips << chip;
+        layout->addWidget(chip);
+    }
+    layout->addStretch(1);
+    keyboard::installArrowNavigation(m_examplesRow);
 }
 
 void SearchPage::applyViewMode()

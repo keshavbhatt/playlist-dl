@@ -101,6 +101,14 @@ public:
     [[nodiscard]] const QList<services::SearchResult>& results() const { return m_results; }
     [[nodiscard]] services::PlaylistSearch& playlistSearch() { return *m_search; }
     [[nodiscard]] services::SearchSuggestions& suggestions() { return *m_suggestions; }
+    /// The services behind the empty state's example chips: three seeds a day, one
+    /// completion each, so the chips differ. Tests point them at a local server.
+    void setIdeasEndpoint(const QUrl& endpoint);
+    [[nodiscard]] bool ideasPending() const;
+    /// Asks once for today's example searches; the fixed three stay until an answer comes.
+    void refreshExamples();
+    /// Replaces the example chips (empty list: back to the fixed three).
+    void setExamples(const QStringList& examples);
     [[nodiscard]] QLineEdit* queryField() const { return m_field; }
     [[nodiscard]] QPushButton* searchButton() const { return m_button; }
     [[nodiscard]] QListView* resultsView() const { return m_list; }
@@ -158,6 +166,11 @@ private:
     ThumbnailCache& m_thumbnails;
     services::PlaylistSearch* m_search;
     services::SearchSuggestions* m_suggestions;
+    QList<services::SearchSuggestions*> m_ideas; ///< one per seed
+    QStringList m_ideaPicks;                     ///< one completion per seed, in seed order
+    QStringList m_ideaSeeds;                     ///< today's seeds, in the same order
+    QWidget* m_examplesRow = nullptr;
+    bool m_examplesAsked = false;
     QLineEdit* m_field = nullptr;
     QPushButton* m_button = nullptr;
     QToolButton* m_gridButton = nullptr;

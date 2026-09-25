@@ -23,6 +23,8 @@
 #include <QSignalSpy>
 #include <QStandardPaths>
 #include <QTemporaryDir>
+#include <QTcpServer>
+#include <QTcpSocket>
 #include <QTest>
 #include <QToolButton>
 
@@ -94,6 +96,7 @@ private Q_SLOTS:
         m_page = std::make_unique<SearchPage>(*m_settings, *m_theme, *m_thumbnails);
         // Nothing leaves the machine: the suggestions are a dead end and there is no engine.
         m_page->suggestions().setEndpoint(kDeadEndpoint);
+        m_page->setIdeasEndpoint(kDeadEndpoint);
         m_page->resize(1000, 640);
         m_page->show();
         QVERIFY(QTest::qWaitForWindowExposed(m_page.get()));
@@ -162,6 +165,54 @@ private Q_SLOTS:
         QVERIFY(m_page->suggestions().isPending()); // a query does ask (the dead end stays silent)
         QTest::keyClicks(field, u" www.example"_s);
         QVERIFY(!m_page->suggestions().isPending());
+    }
+
+    void examplesComeFromTheSuggestionService()
+    {
+        // A local stand-in for the service: every seed completes to "<seed> radio" and "<seed> mix".
+        QTcpServer server;
+        connect(&server, &QTcpServer::newConnection, this, [&server] {
+            while (QTcpSocket* socket = server.nextPendingConnection()) {
+                connect(socket, &QTcpSocket::readyRead, socket, [socket] {
+                    const QByteArray request = socket->readAll();
+                    if (!request.contains("\r\n\r\n")) {
+                        return;
+                    }
+                    const QByteArray line = request.left(request.indexOf("\r\n"));
+                    const QByteArray q = QUrl::fromPercentEncoding(line.mid(line.indexOf("q=") + 2).split(' ').first()).toUtf8();
+                    const QByteArray body = "[\"" + q + "\",[\"" + q + " radio\",\"" + q + " mix\",\"" + q + " mix\"]]";
+                    socket->write("HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " +
+                                  QByteArray::number(body.size()) + "\r\nConnection: close\r\n\r\n" + body);
+                    socket->disconnectFromHost();
+                });
+                connect(socket, &QTcpSocket::disconnected, socket, &QObject::deleteLater);
+            }
+        });
+        QVERIFY(server.listen(QHostAddress::LocalHost, 0));
+        const QUrl endpoint(u"http://127.0.0.1:"_s + QString::number(server.serverPort()) + u"/complete/search"_s);
+        m_page->setIdeasEndpoint(endpoint);
+        QWidget* examples = m_page->findChild<QWidget*>(u"exampleChips"_s);
+        QCOMPARE(examples->findChildren<QToolButton*>().size(), 3); // the fixed three first
+        m_page->refreshExamples();
+        // Three seeds, one completion each: three chips, all "<seed> radio", all different.
+        QTRY_VERIFY_WITH_TIMEOUT(!m_page->ideasPending(), 5000);
+        const QList<QToolButton*> chips = examples->findChildren<QToolButton*>();
+        QCOMPARE(chips.size(), 3);
+        QStringList texts;
+        for (QToolButton* chip : chips) {
+            QVERIFY(chip->text().endsWith(u" radio"_s));
+            texts << chip->text();
+        }
+        QCOMPARE(texts.removeDuplicates(), 0);
+        m_page->refreshExamples(); // asked once per page
+        QVERIFY(!m_page->ideasPending());
+        // Suggestions off: a page asks nothing and keeps the fixed examples.
+        m_settings->setSearchSuggestions(false);
+        SearchPage quiet(*m_settings, *m_theme, *m_thumbnails);
+        quiet.setIdeasEndpoint(endpoint);
+        quiet.refreshExamples();
+        QVERIFY(!quiet.ideasPending());
+        QCOMPARE(quiet.findChild<QWidget*>(u"exampleChips"_s)->findChildren<QToolButton*>().size(), 3);
     }
 
     void suggestionsFollowTheSetting()
