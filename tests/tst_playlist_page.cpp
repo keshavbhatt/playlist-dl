@@ -307,7 +307,7 @@ private Q_SLOTS:
         QCOMPARE(m_page->titleLabel()->toolTip(), u"Known from the card"_s);
         QCOMPARE(m_page->channelLabel()->text(), u"Card channel"_s);
         QCOMPARE(m_page->countLabel()->text(), u"42 items"_s);
-        QCOMPARE(m_page->statusLabel()->text(), u"Reading the playlist"_s);
+        QCOMPARE(m_page->statusLabel()->text(), u"Reading the playlist…"_s);
         QVERIFY(busy::isBusy(m_page->downloadButton()));
         QCOMPARE(m_page->currentUrl(), QUrl(known.url));
         QVERIFY(m_page->copyLinkButton()->isEnabled());

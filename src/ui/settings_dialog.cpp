@@ -215,6 +215,10 @@ void SettingsDialog::setupUi()
     Q_ASSERT(m_pages->count() == kPageCount);
     root->addWidget(m_pages, 1);
     // A way out that is not the window control (review 2026-09-24); Esc works too.
+    auto* rule = new QFrame(this);
+    rule->setFrameShape(QFrame::NoFrame);
+    rule->setProperty("pldlSeparator", true);
+    outer->addWidget(rule);
     auto* footer = new QHBoxLayout;
     footer->setContentsMargins(24, 10, 24, 14);
     footer->addStretch(1);
@@ -789,7 +793,7 @@ void SettingsDialog::resetSettings()
 QString SettingsDialog::engineStatusText(const services::EngineManager::Status& s)
 {
     if (s.isBusy()) {
-        return tr("Setting up");
+        return tr("Setting up…");
     }
     if (s.ytdlpPath.isEmpty() || s.jsRuntime.isEmpty()) {
         return tr("Not installed");

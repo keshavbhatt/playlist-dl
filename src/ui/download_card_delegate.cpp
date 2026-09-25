@@ -109,11 +109,23 @@ QString DownloadCardDelegate::actionLabel(Action action, core::DownloadState sta
         return tr("Show in folder");
     case Action::Remove:
         return tr("Remove from list");
+    case Action::Details:
+        return tr("Details: the items, Play all and the playlist file");
     }
     return {};
 }
 
-QList<DownloadCardDelegate::Action> DownloadCardDelegate::actionsFor(core::DownloadState state, bool hasFile)
+QList<DownloadCardDelegate::Action> DownloadCardDelegate::actionsFor(core::DownloadState state, bool hasFile,
+                                                                     bool isPlaylist)
+{
+    QList<Action> actions = actionsForState(state, hasFile);
+    if (isPlaylist) {
+        actions.prepend(Action::Details); // the items, their files, Play all: always there
+    }
+    return actions;
+}
+
+QList<DownloadCardDelegate::Action> DownloadCardDelegate::actionsForState(core::DownloadState state, bool hasFile)
 {
     switch (state) {
     case core::DownloadState::Queued:
@@ -135,11 +147,11 @@ QList<DownloadCardDelegate::Action> DownloadCardDelegate::actionsFor(core::Downl
 }
 
 QList<DownloadCardDelegate::HitButton> DownloadCardDelegate::buttonsFor(const QRect& card,
-                                                                        core::DownloadState state,
-                                                                        bool hasFile) const
+                                                                        core::DownloadState state, bool hasFile,
+                                                                        bool isPlaylist) const
 {
     QList<HitButton> buttons;
-    for (const Action action : actionsFor(state, hasFile)) {
+    for (const Action action : actionsFor(state, hasFile, isPlaylist)) {
         QString icon;
         switch (action) {
         case Action::PauseResume:
@@ -160,6 +172,9 @@ QList<DownloadCardDelegate::HitButton> DownloadCardDelegate::buttonsFor(const QR
         case Action::Remove:
             icon = u"trash"_s;
             break;
+        case Action::Details:
+            icon = u"info"_s;
+            break;
         }
         buttons.append({QRect(), action, icon, actionLabel(action, state)});
     }
@@ -175,7 +190,7 @@ QList<DownloadCardDelegate::HitButton> DownloadCardDelegate::buttonsFor(const QR
 std::optional<DownloadCardDelegate::Action> DownloadCardDelegate::actionAt(const QPoint& pos, const QRect& rect,
                                                                            const core::DownloadJob& job) const
 {
-    for (const HitButton& b : buttonsFor(cardRect(rect), job.state, !job.primaryFile().isEmpty())) {
+    for (const HitButton& b : buttonsFor(cardRect(rect), job.state, !job.primaryFile().isEmpty(), job.isPlaylist())) {
         if (b.rect.contains(pos)) {
             return b.action;
         }
@@ -276,7 +291,8 @@ void DownloadCardDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
 
     // Text block: the buttons take the right end while hovered.
     const QString file = index.data(core::DownloadQueue::FilePathRole).toString();
-    const QList<HitButton> buttons = buttonsFor(card, state, !file.isEmpty());
+    const QList<HitButton> buttons =
+        buttonsFor(card, state, !file.isEmpty(), index.data(core::DownloadQueue::IsPlaylistRole).toBool());
     const int buttonsWidth =
         hovered && !buttons.isEmpty() ? static_cast<int>(buttons.size()) * (kButtonSize + kButtonGap) + 8 : 0;
     const int textLeft = thumbRect.right() + 1 + kMargin;
@@ -378,7 +394,8 @@ bool DownloadCardDelegate::editorEvent(QEvent* event, QAbstractItemModel* /*mode
     }
     const core::DownloadState state = stateOf(index);
     const bool hasFile = !index.data(core::DownloadQueue::FilePathRole).toString().isEmpty();
-    for (const HitButton& b : buttonsFor(cardRect(option.rect), state, hasFile)) {
+    for (const HitButton& b :
+         buttonsFor(cardRect(option.rect), state, hasFile, index.data(core::DownloadQueue::IsPlaylistRole).toBool())) {
         if (b.rect.contains(mouse->pos())) {
             const quint64 id = index.data(core::DownloadQueue::IdRole).toULongLong();
             const Action action = b.action;
@@ -399,7 +416,8 @@ bool DownloadCardDelegate::helpEvent(QHelpEvent* event, QAbstractItemView* view,
     }
     const core::DownloadState state = stateOf(index);
     const bool hasFile = !index.data(core::DownloadQueue::FilePathRole).toString().isEmpty();
-    for (const HitButton& b : buttonsFor(cardRect(option.rect), state, hasFile)) {
+    for (const HitButton& b :
+         buttonsFor(cardRect(option.rect), state, hasFile, index.data(core::DownloadQueue::IsPlaylistRole).toBool())) {
         if (b.rect.contains(event->pos())) {
             QToolTip::showText(event->globalPos(), b.tooltip, view);
             return true;

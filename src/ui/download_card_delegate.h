@@ -41,6 +41,7 @@ public:
         Open,
         ShowInFolder,
         Remove,
+        Details, ///< a playlist's items sheet (owner: an info button on playlist cards)
     };
     Q_ENUM(Action)
 
@@ -62,7 +63,8 @@ public:
     [[nodiscard]] std::optional<Action> actionAt(const QPoint& pos, const QRect& rect,
                                                  const core::DownloadJob& job) const;
     /// The actions a card in `state` offers, in their painted order.
-    [[nodiscard]] static QList<Action> actionsFor(core::DownloadState state, bool hasFile);
+    [[nodiscard]] static QList<Action> actionsFor(core::DownloadState state, bool hasFile, bool isPlaylist = false);
+    [[nodiscard]] static QList<Action> actionsForState(core::DownloadState state, bool hasFile);
     /// The tooltip and accessible name of an action (Pause and Resume share one).
     [[nodiscard]] static QString actionLabel(Action action, core::DownloadState state);
     /// The colour of a state's bar (DESIGN.md: queued muted, active accent,
@@ -84,7 +86,8 @@ public:
         QString icon;
         QString tooltip;
     };
-    [[nodiscard]] QList<HitButton> buttonsFor(const QRect& card, core::DownloadState state, bool hasFile) const;
+    [[nodiscard]] QList<HitButton> buttonsFor(const QRect& card, core::DownloadState state, bool hasFile,
+                                              bool isPlaylist = false) const;
 
 private:
     [[nodiscard]] static QRect cardRect(const QRect& rect);

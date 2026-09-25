@@ -190,13 +190,13 @@ private Q_SLOTS:
     {
         QCOMPARE(m_settings->searchResultsPerPage(), 20);
         QVERIFY(m_settings->keepSearchHistory());
-        QVERIFY(m_settings->searchGridView());
+        QVERIFY(!m_settings->searchGridView()); // rows by default
         QVERIFY(m_settings->recentQueries().isEmpty());
 
         QSignalSpy changed(m_settings.get(), &Settings::searchChanged);
-        m_settings->setSearchGridView(false);
-        QVERIFY(!m_settings->searchGridView());
-        m_settings->setSearchGridView(false);
+        m_settings->setSearchGridView(true);
+        QVERIFY(m_settings->searchGridView());
+        m_settings->setSearchGridView(true);
         QCOMPARE(changed.count(), 1);
         QVERIFY(m_settings->searchSuggestions()); // on by default
         m_settings->setSearchSuggestions(false);

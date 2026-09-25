@@ -376,7 +376,7 @@ void SearchPage::setState(State state)
         QTimer::singleShot(0, this, [this] { layoutGrid(); });
         break;
     case State::Loading:
-        m_status->setText(tr("Searching"));
+        m_status->setText(tr("Searching…"));
         m_retry->hide();
         m_stage->setCurrentWidget(m_statusPane);
         break;
@@ -390,7 +390,7 @@ void SearchPage::setState(State state)
         m_stage->setCurrentWidget(m_statusPane);
         break;
     case State::SettingUp:
-        m_status->setText(tr("Setting up the download engine, a one-time step"));
+        m_status->setText(tr("Setting up the download engine, a one-time step…"));
         m_retry->hide();
         m_stage->setCurrentWidget(m_statusPane);
         break;
@@ -517,9 +517,9 @@ void SearchPage::startSearch(const QString& query, int page)
         m_model->clear();
         m_hasMore = false;
         setState(State::Loading);
-        busy::set(m_button, true, tr("Searching"), true);
+        busy::set(m_button, true, tr("Searching…"), true);
     } else {
-        busy::set(m_loadMore, true, tr("Loading"));
+        busy::set(m_loadMore, true, tr("Loading…"));
     }
     m_page = page;
     m_searchId = m_search->search(query, page);
@@ -711,7 +711,7 @@ void SearchPage::setEngineStatus(const services::EngineManager::Status& status)
     if (m_state != State::SettingUp) {
         return;
     }
-    QString text = tr("Setting up the download engine, a one-time step");
+    QString text = tr("Setting up the download engine, a one-time step…");
     if (!status.stepLabel.isEmpty()) {
         text += u"\n"_s + status.stepLabel;
         if (status.progress >= 0) {

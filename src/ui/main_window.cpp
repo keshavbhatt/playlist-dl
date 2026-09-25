@@ -443,6 +443,18 @@ void MainWindow::openPlaylist(const QUrl& url)
 void MainWindow::downloadUrl(const QString& url)
 {
     if (url.trimmed().isEmpty()) {
+        // The launcher's "Download from a link" and a bare --download: ask for
+        // the link, with the clipboard's one offered (owner, 2026-09-25).
+        showAndRaise();
+        const QUrl clip = linkIn(QApplication::clipboard()->mimeData());
+        bool ok = false;
+        const QString text = MessageSheet::askText(this, tr("Download from a link"),
+                                                   tr("A playlist, video or track link from any site."),
+                                                   tr("https://…"), clip.isValid() ? clip.toString() : QString(),
+                                                   tr("Download"), &ok);
+        if (ok && !text.trimmed().isEmpty()) {
+            downloadUrl(text);
+        }
         return;
     }
     qCInfo(lcUi) << "download requested:" << url;

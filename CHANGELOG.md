@@ -5,9 +5,9 @@ Keep a Changelog; the newest version is first.
 
 ## [3.0.0] - unreleased
 
-A new app, rebuilt from the ground up: the same flow as before (search or paste, browse
-the playlist, play, choose the download options, watch the queue) on a new foundation, with
-a left rail for the Search, Playlist, Browser and Downloads pages.
+The same flow as before (search or paste, browse the playlist, play, choose the download
+options, watch the queue) on a new foundation, with a left rail for the Search, Playlist,
+Browser and Downloads pages.
 
 ### Added
 - Search: playlist search with suggestions as you type, recent queries, a card grid with
@@ -37,6 +37,3 @@ a left rail for the Search, Playlist, Browser and Downloads pages.
   identity setting.
 - Download quality is chosen from a list (Best, 2160p to 360p; MP3, M4A, Opus, FLAC, WAV)
   instead of three sliders.
-
-### Removed
-- Rate this app, Claim offer and the blocked-request log window.

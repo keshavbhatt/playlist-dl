@@ -507,7 +507,7 @@ void PlaylistPage::setState(State state)
 {
     m_state = state;
     const bool loading = state == State::Loading;
-    busy::set(m_download, loading, tr("Reading"));
+    busy::set(m_download, loading, tr("Reading…"));
     if (!loading) {
         m_download->setEnabled(state == State::Ready && selectedCount() > 0);
     }
@@ -518,7 +518,7 @@ void PlaylistPage::setState(State state)
         m_status->setText(tr("Open a playlist from Search or paste a link"));
         break;
     case State::Loading:
-        m_status->setText(tr("Reading the playlist"));
+        m_status->setText(tr("Reading the playlist…"));
         break;
     case State::Empty:
         m_status->setText(tr("This playlist is empty"));
@@ -812,7 +812,7 @@ void PlaylistPage::setEngineStatus(const services::EngineManager::Status& status
     if (m_state != State::Loading || (status.state != EngineState::Installing && status.state != EngineState::Updating)) {
         return;
     }
-    QString text = tr("Setting up the download engine, a one-time step");
+    QString text = tr("Setting up the download engine, a one-time step…");
     if (!status.stepLabel.isEmpty()) {
         text += u"\n"_s + status.stepLabel;
         if (status.progress >= 0) {

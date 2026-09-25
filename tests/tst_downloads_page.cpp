@@ -182,7 +182,7 @@ private Q_SLOTS:
         status.state = State::Installing;
         status.progress = 0.5;
         m_page->setEngineStatus(status);
-        QCOMPARE(chip->text(), u"Setting up 50%"_s);
+        QCOMPARE(chip->text(), u"Setting up… 50%"_s);
         status.state = State::Ready;
         status.progress = -1;
         status.ytdlpVersion = u"2026.09.01"_s;

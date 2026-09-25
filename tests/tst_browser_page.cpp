@@ -255,7 +255,7 @@ private Q_SLOTS:
         page.setDownloadBusy(true);
         QVERIFY(page.isDownloadBusy());
         QVERIFY(button->isEnabled()); // a busy button is the cancel
-        QCOMPARE(button->text(), u"Checking"_s);
+        QCOMPARE(button->text(), u"Checking…"_s);
         page.setDownloadBusy(false);
         QVERIFY(!page.isDownloadBusy());
     }
@@ -351,7 +351,7 @@ private Q_SLOTS:
         page.detectedButton()->click();
         QCOMPARE(spy.count(), 1);
         QVERIFY(page.isDownloadBusy());
-        QCOMPARE(page.detectedButton()->text(), u"Checking"_s);
+        QCOMPARE(page.detectedButton()->text(), u"Checking…"_s);
         auto* downloadThis = page.findChild<QPushButton*>(u"downloadThisButton"_s);
         QVERIFY(!downloadThis->isEnabled());
         QCOMPARE(downloadThis->text(), u"Download this"_s);
@@ -371,7 +371,7 @@ private Q_SLOTS:
         // And the other way round.
         downloadThis->click();
         QCOMPARE(spy.count(), 2);
-        QCOMPARE(downloadThis->text(), u"Checking"_s);
+        QCOMPARE(downloadThis->text(), u"Checking…"_s);
         QVERIFY(!page.detectedButton()->isEnabled());
         page.setDownloadBusy(false);
     }

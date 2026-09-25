@@ -74,17 +74,17 @@ private Q_SLOTS:
 
     void viewToggleSwitchesBetweenCardsAndRows()
     {
-        QVERIFY(m_page->gridViewButton()->isChecked());
-        QCOMPARE(m_page->resultsView()->viewMode(), QListView::IconMode);
-        QTest::mouseClick(m_page->listViewButton(), Qt::LeftButton);
-        QVERIFY(m_page->listViewButton()->isChecked());
-        QVERIFY(!m_settings->searchGridView());
+        QVERIFY(m_page->listViewButton()->isChecked()); // rows by default
         QCOMPARE(m_page->resultsView()->viewMode(), QListView::ListMode);
         QCOMPARE(m_page->resultsView()->flow(), QListView::TopToBottom);
-        // The choice is a setting: changing it elsewhere moves the toggle.
-        m_settings->setSearchGridView(true);
+        QTest::mouseClick(m_page->gridViewButton(), Qt::LeftButton);
         QVERIFY(m_page->gridViewButton()->isChecked());
+        QVERIFY(m_settings->searchGridView());
         QCOMPARE(m_page->resultsView()->viewMode(), QListView::IconMode);
+        // The choice is a setting: changing it elsewhere moves the toggle.
+        m_settings->setSearchGridView(false);
+        QVERIFY(m_page->listViewButton()->isChecked());
+        QCOMPARE(m_page->resultsView()->viewMode(), QListView::ListMode);
     }
 
     void init()

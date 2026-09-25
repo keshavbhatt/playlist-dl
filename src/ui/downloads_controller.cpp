@@ -432,6 +432,11 @@ void DownloadsController::handleCardAction(quint64 id, Action action)
     case Action::Retry:
         m_queue->retry(id);
         break;
+    case Action::Details:
+        if (job->isPlaylist()) {
+            Q_EMIT playlistItemsRequested(id);
+        }
+        break;
     case Action::Open:
         if (job->isPlaylist()) {
             Q_EMIT playlistItemsRequested(id); // the items, Play all and the playlist file
@@ -607,7 +612,7 @@ void DownloadsController::handleJobFinished(quint64 id, core::DownloadState stat
 void DownloadsController::syncActivity()
 {
     const bool running = m_queue->runningCount() > 0;
-    m_inhibitor->setInhibited(running, tr("Downloading"));
+    m_inhibitor->setInhibited(running, tr("Downloading…"));
     syncTaskbar();
 }
 

@@ -235,7 +235,7 @@ private Q_SLOTS:
         QCOMPARE(SettingsDialog::engineStatusText(s), u"Not installed"_s);
         s.state = State::Installing;
         s.stepLabel = u"Downloading…"_s;
-        QCOMPARE(SettingsDialog::engineStatusText(s), u"Setting up"_s);
+        QCOMPARE(SettingsDialog::engineStatusText(s), u"Setting up…"_s);
         QCOMPARE(SettingsDialog::engineStatusDetail(s), u"Downloading…"_s);
         s.state = State::NotInstalled;
         s.ytdlpPath = u"/x/yt-dlp"_s;

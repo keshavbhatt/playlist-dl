@@ -237,7 +237,8 @@ void DownloadsPage::setupList()
         const auto state = static_cast<core::DownloadState>(index.data(core::DownloadQueue::StateRole).toInt());
         const bool hasFile = !index.data(core::DownloadQueue::FilePathRole).toString().isEmpty();
         QMenu menu(this);
-        for (const auto& button : m_delegate->buttonsFor(m_list->visualRect(index), state, hasFile)) {
+        const bool playlist = index.data(core::DownloadQueue::IsPlaylistRole).toBool();
+        for (const auto& button : m_delegate->buttonsFor(m_list->visualRect(index), state, hasFile, playlist)) {
             const auto action = button.action;
             menu.addAction(icons::themed(button.icon, palette().color(QPalette::Text)), button.tooltip, this,
                            [this, id, action] { m_controller.handleCardAction(id, action); });
@@ -248,9 +249,12 @@ void DownloadsPage::setupList()
     });
     connect(m_delegate, &DownloadCardDelegate::repaintNeeded, m_list->viewport(), qOverload<>(&QWidget::update));
     connect(m_list, &QListView::doubleClicked, this, [this](const QModelIndex& index) {
-        if (!index.data(core::DownloadQueue::FilePathRole).toString().isEmpty()) {
-            m_controller.handleCardAction(index.data(core::DownloadQueue::IdRole).toULongLong(),
-                                          DownloadCardDelegate::Action::Open);
+        // A playlist's details in any state; a single item's file once it has one.
+        const quint64 id = index.data(core::DownloadQueue::IdRole).toULongLong();
+        if (index.data(core::DownloadQueue::IsPlaylistRole).toBool()) {
+            m_controller.handleCardAction(id, DownloadCardDelegate::Action::Details);
+        } else if (!index.data(core::DownloadQueue::FilePathRole).toString().isEmpty()) {
+            m_controller.handleCardAction(id, DownloadCardDelegate::Action::Open);
         }
     });
     m_stack->addWidget(m_list);
@@ -324,7 +328,7 @@ void DownloadsPage::setEngineStatus(const services::EngineManager::Status& statu
         break;
     case State::Installing:
     case State::Updating:
-        text = tr("Setting up");
+        text = tr("Setting up…");
         if (status.progress >= 0) {
             text += u" %1%"_s.arg(static_cast<int>(status.progress * 100));
         }

@@ -983,7 +983,7 @@ void BrowserPage::setDownloadBusy(bool busy)
     QPushButton* source = m_busySource != nullptr ? m_busySource : m_download;
     QPushButton* other = source == m_download ? m_detected : m_download;
     if (busy) {
-        busy::set(source, true, tr("Checking"), true);
+        busy::set(source, true, tr("Checking…"), true);
         other->setEnabled(false);
         m_escape->setEnabled(true);
         return;

@@ -15,7 +15,7 @@ CliParseResult parseCliOptions(const QStringList& arguments)
 {
     QCommandLineParser parser;
     parser.setApplicationDescription(
-        u"Search, browse, play and download YouTube playlists"_s);
+        u"Search, browse, play and download playlists from any site"_s);
     parser.setSingleDashWordOptionMode(QCommandLineParser::ParseAsLongOptions);
 
     const QCommandLineOption help = parser.addHelpOption();
@@ -26,11 +26,11 @@ CliParseResult parseCliOptions(const QStringList& arguments)
         u"log-file"_s, u"Write the log to <path> instead of the default location."_s, u"path"_s);
     const QCommandLineOption noLogFile(u"no-log-file"_s, u"Do not write a log file."_s);
     const QCommandLineOption download({u"d"_s, u"download"_s},
-                                      u"Download a YouTube video or playlist link."_s, u"url"_s);
+                                      u"Download a playlist, video or track link; an empty link asks for one."_s, u"url"_s);
     const QCommandLineOption settings({u"s"_s, u"settings"_s}, u"Open the settings dialog."_s);
     const QCommandLineOption quit({u"q"_s, u"quit"_s}, u"Quit the running instance."_s);
     parser.addOptions({profile, logFile, noLogFile, download, settings, quit});
-    parser.addPositionalArgument(u"url"_s, u"YouTube video, playlist or channel link to open."_s, u"[url]"_s);
+    parser.addPositionalArgument(u"url"_s, u"A playlist, video or channel link to open."_s, u"[url]"_s);
 
     CliParseResult result;
     if (!parser.parse(arguments)) {
