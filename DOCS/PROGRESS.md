@@ -45,6 +45,13 @@
      playlist; toasts take an action (Added to queue offers View); the rail badge and the
      range slider announce themselves; links by drag and drop; a clipboard link offered
      once as a toast when the window comes to the front.
+- Owner: a playlist read failed with "The download engine exited with code 255" and nothing
+  else (three probes, each dead within 12 ms; the same binary and playlist work from a shell
+  and from the scratch profile, so the cause is still open). `core::friendlyError` now puts
+  the engine's last useful stderr line on screen when there is no ERROR: line (a traceback's
+  last line, the binary loader's message), names the temporary folder when that is full, and
+  the probe logs the stderr tail and exit status, so the next occurrence explains itself.
+  Leftover kit wording ("in Red") replaced.
 - Owner: "it still labels videos instead of items": items everywhere now (Playlist page counts
   and Download button, the options sheet's playlist button, search cards, the row action),
   no site or kind exception; guide, README and metainfo say item count. Found on the way:

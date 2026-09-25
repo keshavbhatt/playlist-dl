@@ -64,7 +64,14 @@ private Q_SLOTS:
         QVERIFY(friendlyError(u"ERROR: Requested format is not available"_s, 1).contains(u"quality"_s));
         QVERIFY(friendlyError(u"WARNING: x\nERROR: [youtube] abc: Video unavailable"_s, 1)
                     .contains(u"unavailable"_s));
-        QCOMPARE(friendlyError(QString(), 7), u"The download engine exited with code 7."_s);
+        QVERIFY(friendlyError(QString(), 7).startsWith(u"The download engine exited with code 7"_s));
+        // No ERROR: line: the last useful stderr line goes on screen with the code.
+        QCOMPARE(friendlyError(u"Traceback (most recent call last):\n  File \"x.py\", line 1\nKeyError: 'formats'\n"_s, 1),
+                 u"The download engine exited with code 1: KeyError: 'formats'"_s);
+        QCOMPARE(friendlyError(u"[PYI-12345:ERROR] Failed to load Python shared library\n"_s, 255),
+                 u"The download engine exited with code 255: Failed to load Python shared library"_s);
+        QVERIFY(friendlyError(u"[PYI-1:ERROR] No space left on device"_s, 255).contains(u"/tmp"_s));
+        QVERIFY(friendlyError(u"ERROR: [youtube] x: Sign in to confirm you’re not a bot."_s, 1).contains(u"built-in browser"_s));
         QVERIFY(friendlyError(u"ERROR: something odd happened"_s, 1).startsWith(u"something odd"_s));
     }
 };

@@ -106,7 +106,10 @@ void MediaProbe::handleFinished(quint64 id)
     const QString err = QString::fromUtf8(p->readAllStandardError());
     if (p->exitStatus() != QProcess::NormalExit || p->exitCode() != 0 || out.trimmed().isEmpty()) {
         const QString message = core::friendlyError(err, p->exitCode());
-        qCWarning(lcServices) << "probe" << id << "failed:" << message;
+        const QStringList tail = err.trimmed().split(u'\n', Qt::SkipEmptyParts);
+        qCWarning(lcServices) << "probe" << id << "failed:" << message << "exit" << p->exitCode()
+                              << (p->exitStatus() == QProcess::NormalExit ? "normal" : "crash") << "stderr tail:"
+                              << tail.mid(std::max<qsizetype>(0, tail.size() - 5));
         Q_EMIT failed(id, message);
         return;
     }

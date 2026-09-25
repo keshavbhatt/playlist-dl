@@ -141,13 +141,13 @@ QString friendlyError(const QString& stderrTail, int exitCode)
     const QString probe = lastError.isEmpty() ? text : lastError;
     if (probe.contains(u"Sign in to confirm"_s, Qt::CaseInsensitive) ||
         probe.contains(u"not a bot"_s, Qt::CaseInsensitive)) {
-        return u"YouTube asked for a sign-in. Sign in to YouTube in Red and try again."_s;
+        return u"YouTube asked for a sign-in. Sign in to YouTube in the built-in browser and try again."_s;
     }
     if (probe.contains(u"Private video"_s, Qt::CaseInsensitive)) {
         return u"This video is private."_s;
     }
     if (probe.contains(u"age"_s, Qt::CaseInsensitive) && probe.contains(u"confirm"_s, Qt::CaseInsensitive)) {
-        return u"Age-restricted video: sign in to YouTube in Red and try again."_s;
+        return u"Age-restricted item: sign in to YouTube in the built-in browser and try again."_s;
     }
     if (probe.contains(u"members-only"_s, Qt::CaseInsensitive) || probe.contains(u"Join this channel"_s)) {
         return u"Members-only content: sign in with a membership and try again."_s;
@@ -167,13 +167,15 @@ QString friendlyError(const QString& stderrTail, int exitCode)
     }
     if (probe.contains(u"ffmpeg"_s, Qt::CaseInsensitive) &&
         probe.contains(u"not found"_s, Qt::CaseInsensitive)) {
-        return u"The media converter (ffmpeg) is missing. Install it, then check the download engine in Settings → Downloads."_s;
+        return u"The media converter is missing. Install the ffmpeg package, then check the download engine in Settings, Downloads."_s;
     }
     if (probe.contains(u"Requested format is not available"_s)) {
         return u"The chosen quality is not available for this video."_s;
     }
     if (probe.contains(u"No space left"_s)) {
-        return u"No space left on the download drive."_s;
+        return probe.contains(u"PYI-"_s) || probe.contains(u"/tmp"_s)
+                   ? u"No space left in the temporary folder (/tmp). Free some space and try again."_s
+                   : u"No space left on the download drive."_s;
     }
     if (probe.contains(u"Unable to download webpage"_s) || probe.contains(u"Network is unreachable"_s) ||
         probe.contains(u"Temporary failure in name resolution"_s)) {
@@ -189,10 +191,28 @@ QString friendlyError(const QString& stderrTail, int exitCode)
         }
         return cleaned.left(200);
     }
-    if (exitCode != 0) {
-        return u"The download engine exited with code %1."_s.arg(exitCode);
+    // No "ERROR:" line: the engine died before it could say so (a Python
+    // traceback, the binary's own loader, a missing library). Its last line
+    // is still the best clue, so it goes on screen with the code.
+    QString last;
+    for (auto it = lines.crbegin(); it != lines.crend(); ++it) {
+        const QString line = it->trimmed();
+        if (line.isEmpty() || line.startsWith(u"WARNING:"_s) || line.startsWith(u"Traceback"_s) ||
+            line.startsWith(u"File \""_s) || line.startsWith(u"^"_s)) {
+            continue;
+        }
+        last = line;
+        break;
     }
-    return u"Download failed."_s;
+    static const QRegularExpression kLoaderPrefix(u"^\\[PYI-\\d+:[A-Z]+\\]\\s*"_s);
+    last.remove(kLoaderPrefix);
+    if (exitCode != 0) {
+        return last.isEmpty()
+                   ? u"The download engine exited with code %1 and said nothing. Check the engine in Settings, Downloads."_s
+                         .arg(exitCode)
+                   : u"The download engine exited with code %1: %2"_s.arg(exitCode).arg(last.left(200));
+    }
+    return last.isEmpty() ? u"Download failed."_s : u"Download failed: %1"_s.arg(last.left(200));
 }
 
 } // namespace pldl::core
