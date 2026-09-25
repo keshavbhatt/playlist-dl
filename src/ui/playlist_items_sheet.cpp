@@ -165,20 +165,19 @@ void PlaylistItemsSheet::setupUi()
     m_shuffle->setObjectName(u"shuffleButton"_s);
     m_shuffle->setToolTip(tr("Put the items in a random order"));
     connect(m_shuffle, &QPushButton::clicked, this, &PlaylistItemsSheet::shuffle);
-    // Play and Folder stay as buttons; the five arranging actions go under one
-    // menu (review 2026-09-24: nine controls in the footer was too many).
+    // Play, Folder, Up and Down stay as buttons (owner, 2026-09-25: moving one
+    // item is the everyday action); the three orderings go under one menu.
     m_arrange = flat(tr("Arrange"), u"sliders"_s);
     m_arrange->setObjectName(u"arrangeButton"_s);
-    m_arrange->setToolTip(tr("Move, sort or shuffle the items"));
+    m_arrange->setToolTip(tr("Sort or shuffle the items"));
     auto* arrangeMenu = new QMenu(m_arrange);
-    for (QPushButton* button : {m_up, m_down, m_sortPlaylist, m_sortName, m_shuffle}) {
-        button->hide(); // kept for the tests and the shortcuts; the menu drives them
+    for (QPushButton* button : {m_sortPlaylist, m_sortName, m_shuffle}) {
+        button->hide(); // kept for the tests; the menu drives them
         QAction* action = arrangeMenu->addAction(button->icon(), button->text(), button, &QPushButton::click);
         action->setToolTip(button->toolTip());
-        connect(button, &QPushButton::clicked, action, [action, button] { action->setEnabled(button->isEnabled()); });
     }
     m_arrange->setMenu(arrangeMenu);
-    for (QPushButton* button : {m_play, m_reveal, m_arrange}) {
+    for (QPushButton* button : {m_play, m_reveal, m_up, m_down, m_arrange}) {
         tools->addWidget(button);
     }
     tools->addStretch(1);
