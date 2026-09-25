@@ -19,7 +19,7 @@ name (ADR-002), the repository licence (ADR-005).
 
 | # | Feature | 2.x | Decision | Status / class |
 |---|---|---|---|---|
-| S1 | One window: rail with Search, Playlist, Browser, Downloads; Settings and Account at the bottom (DESIGN.md) | toolbar + sliding pages | KEEP | done (`ui::MainWindow`, `ui::SideRail`, `ui::Actions`) |
+| S1 | One window: rail with Search, Playlist, Browser, Downloads; Settings, Account and a Help menu at the bottom (DESIGN.md) | toolbar + sliding pages | KEEP | done (`ui::MainWindow`, `ui::SideRail`, `ui::Actions`) |
 | S2 | Persist window geometry and state; restore last page (setting) | geometry only | KEEP | done (`MainWindow`, `window/lastPage`) |
 | S3 | Single instance; second launch forwards a URL and commands | RunGuard, no forwarding | KEEP | done (`app::SingleInstance`) |
 | S4 | System tray: show/hide, downloads, quit; close-to-tray optional (default quit) | none | KEEP | done (`ui::TrayController`, close action setting) |

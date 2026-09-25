@@ -52,6 +52,9 @@
   `EngineManager::downloadFile` now retries a transient failure once after 1.5 s. The
   engine's requests identified themselves as Red/10; they now say Playlist-Downloader/3.
   Temporary cookie files, notification ids and the test profile dropped the Red prefix.
+- Owner: shortcuts are invisible unless one knows F1. The rail's last button is a Help menu
+  now (Keyboard shortcuts with its key shown, Online guide, Report a bug, About);
+  `PLDL_DEBUG_OPEN=help` pops it for a grab.
 - Owner: no way back to the clean Search view after a search. `SearchPage::resetToEmpty`:
   the field's clear button, Esc on results and an empty search all clear the query and the
   results and show the invitation again (tst_search_page).

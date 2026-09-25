@@ -9,6 +9,7 @@
 #include <QAction>
 #include <QActionGroup>
 #include <QLabel>
+#include <QMenu>
 #include <QToolButton>
 #include <QVBoxLayout>
 
@@ -96,7 +97,20 @@ void SideRail::setupUi()
     layout->addStretch(1);
     layout->addWidget(makeButton(m_actions.settings, u"settings"_s), 0, Qt::AlignHCenter);
     layout->addWidget(makeButton(m_actions.account, u"account"_s), 0, Qt::AlignHCenter);
-    layout->addWidget(makeButton(m_actions.about, u"info"_s), 0, Qt::AlignHCenter);
+    // Help is a menu, so the shortcuts sheet is one click away without knowing
+    // F1 (owner, 2026-09-25): the menu lists the keys next to each entry.
+    QToolButton* help = makeButton(m_actions.help, u"info"_s);
+    auto* helpMenu = new QMenu(help);
+    helpMenu->setObjectName(u"helpMenu"_s);
+    helpMenu->addAction(m_actions.shortcuts);
+    helpMenu->addAction(m_actions.onlineGuide);
+    helpMenu->addAction(m_actions.reportBug);
+    helpMenu->addSeparator();
+    helpMenu->addAction(m_actions.about);
+    help->setMenu(helpMenu);
+    help->setPopupMode(QToolButton::InstantPopup);
+    help->setObjectName(u"helpButton"_s);
+    layout->addWidget(help, 0, Qt::AlignHCenter);
 }
 
 void SideRail::applyIcons()

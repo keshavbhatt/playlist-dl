@@ -70,7 +70,7 @@ download options, watch the queue.
 Rail (56 px, `rail` surface), top to bottom: brand mark, **Search** (Ctrl+1), **Playlist**
 (Ctrl+2, the playlist last opened; disabled until one is), **Browser** (Ctrl+3),
 **Downloads** (Ctrl+4, with the active-count badge in `badge`); at the bottom Settings
-(Ctrl+,), Account and About (owner request, 2026-09-24). The rail hides while a video is full screen. Every action is also in
+(Ctrl+,), Account and Help (a menu: Keyboard shortcuts, Online guide, Report a bug, About; owner requests 2026-09-24 and 2026-09-25). The rail hides while a video is full screen. Every action is also in
 the shortcuts sheet (Ctrl+/).
 
 The window remembers its geometry and the page it was on. Minimum size 960 by 600.

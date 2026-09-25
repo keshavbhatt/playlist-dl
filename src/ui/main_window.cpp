@@ -58,7 +58,9 @@
 #include <QTemporaryDir>
 #include <QTextStream>
 #include <QPushButton>
+#include <QMenu>
 #include <QTimer>
+#include <QToolButton>
 #include <QtEnvironmentVariables>
 
 #include <algorithm>
@@ -260,6 +262,7 @@ void MainWindow::connectActions()
     connect(a.openLogFolder, &QAction::triggered, this,
             [] { platform::openDirectory(QFileInfo(core::LogSink::logFilePath()).absolutePath()); });
     connect(a.about, &QAction::triggered, this, &MainWindow::showAbout);
+    connect(a.reportBug, &QAction::triggered, this, &MainWindow::showBugReport);
     connect(a.account, &QAction::triggered, this, &MainWindow::showAccount);
     connect(a.quit, &QAction::triggered, this, &MainWindow::quit);
 
@@ -843,6 +846,13 @@ void MainWindow::showShortcuts()
     dialog->show();
 }
 
+void MainWindow::showBugReport()
+{
+    auto* dialog = new BugReportDialog(m_settings, m_theme, m_browser->userAgent(), QString(), this);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->show();
+}
+
 void MainWindow::showAbout()
 {
     auto* dialog = new AboutDialog(m_settings, m_theme, m_browser->userAgent(), QString(), this);
@@ -880,9 +890,12 @@ void MainWindow::debugOpen(const QString& what)
         showAccount();
         m_accountDialog->showPlans();
     } else if (what == u"bug"_s) {
-        auto* dialog = new BugReportDialog(m_settings, m_theme, m_browser->userAgent(), QString(), this);
-        dialog->setAttribute(Qt::WA_DeleteOnClose);
-        dialog->show();
+        showBugReport();
+    } else if (what == u"help"_s) {
+        // The rail's help menu, popped without blocking, for a grab.
+        if (auto* button = m_rail->findChild<QToolButton*>(u"helpButton"_s); button != nullptr && button->menu()) {
+            button->menu()->popup(button->mapToGlobal(QPoint(button->width(), 0)));
+        }
     } else if (what == u"whatsnew"_s || what.startsWith(u"whatsnew:"_s)) {
         maybeShowWhatsNew(true);
         if (auto* dialog = findChild<WhatsNewDialog*>(); dialog != nullptr && what.contains(u':')) {

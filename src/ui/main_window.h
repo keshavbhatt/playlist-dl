@@ -121,6 +121,7 @@ public Q_SLOTS:
     void showSettings();
     void showShortcuts();
     void showAbout();
+    void showBugReport();
     void showAccount();
     /// Headless verification aid: opens a screen by name: "about",
     /// "shortcuts", "account", "plans", "bug", "whatsnew", "settings",

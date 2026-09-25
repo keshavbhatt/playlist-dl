@@ -41,6 +41,9 @@ Actions::Actions(QWidget* owner)
     onlineGuide = make(owner, tr("Online guide"));
     openLogFolder = make(owner, tr("Open log folder"));
     about = make(owner, tr("About Playlist Downloader"));
+    help = make(owner, tr("Help"));
+    help->setToolTip(tr("Help: keyboard shortcuts, the guide, report a bug, about"));
+    reportBug = make(owner, tr("Report a bug…"));
     account = make(owner, tr("Account…"), {QKeySequence(Qt::CTRL | Qt::Key_5)});
     quit = make(owner, tr("Quit"), {QKeySequence::Quit});
     browserNewTab = make(owner, tr("New tab"), {QKeySequence(Qt::CTRL | Qt::Key_T)});
@@ -66,7 +69,8 @@ QList<QAction*> Actions::all() const
 {
     return {home,           playlist,       browser,        downloads,     showHide,
             settings,       shortcuts,      onlineGuide,    openLogFolder, account,
-            about,          quit,           browserNewTab,  browserCloseTab, browserAddress,
+            about,          help,           reportBug,      quit,            browserNewTab,
+            browserCloseTab, browserAddress,
             browserReload,  browserBack,    browserForward, browserNextTab, browserPreviousTab,
             browserDownload, browserFind};
 }
