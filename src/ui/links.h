@@ -10,6 +10,7 @@ inline const QString kGuide = QStringLiteral("https://github.com/keshavbhatt/pla
 inline const QString kMoreApps = QStringLiteral("https://ktechpit.com/USS/public/products.php");
 inline const QString kContact = QStringLiteral("mailto:connect@ktechpit.com");
 inline const QString kIssues = QStringLiteral("https://github.com/keshavbhatt/playlist-dl/issues");
+inline const QString kLicences = QStringLiteral("https://github.com/keshavbhatt/playlist-dl/blob/main/LICENSING.md");
 inline const QString kChangelog =
     QStringLiteral("https://github.com/keshavbhatt/playlist-dl/blob/main/CHANGELOG.md");
 
