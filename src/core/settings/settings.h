@@ -174,6 +174,9 @@ public:
     /// The YouTube choice of the Start page setting.
     static constexpr QLatin1StringView kYouTubeStartPage{"https://www.youtube.com/"};
     [[nodiscard]] static bool isEmptyStartPage(const QString& url);
+    /// Whether the rail shows labels beside its glyphs (Ctrl+B), default off.
+    [[nodiscard]] bool railExpanded() const;
+    void setRailExpanded(bool expanded);
     /// Whether the Browser page reopens last time's tabs (off: one tab on the start page).
     [[nodiscard]] bool restoreBrowserTabs() const;
     void setRestoreBrowserTabs(bool enabled);

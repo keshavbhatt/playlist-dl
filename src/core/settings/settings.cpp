@@ -333,6 +333,18 @@ void Settings::setBrowserStartPage(const QString& url)
     }
 }
 
+bool Settings::railExpanded() const
+{
+    return boolValue(keys::kRailExpanded, false);
+}
+
+void Settings::setRailExpanded(bool expanded)
+{
+    if (storeBool(keys::kRailExpanded, false, expanded)) {
+        Q_EMIT generalChanged();
+    }
+}
+
 bool Settings::restoreBrowserTabs() const
 {
     return boolValue(keys::kRestoreBrowserTabs, kDefaultRestoreBrowserTabs);

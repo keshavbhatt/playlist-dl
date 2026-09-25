@@ -261,6 +261,11 @@ void MainWindow::connectActions()
     connect(a.browser, &QAction::triggered, this, [this] { showPage(PageId::Browser); });
     connect(a.downloads, &QAction::triggered, this, [this] { showPage(PageId::Downloads); });
     connect(a.showHide, &QAction::triggered, this, &MainWindow::toggleVisibility);
+    connect(a.railLabels, &QAction::triggered, this, [this](bool checked) {
+        m_rail->setExpanded(checked);
+        m_settings.setRailExpanded(checked);
+    });
+    m_rail->setExpanded(m_settings.railExpanded(), false);
     connect(a.settings, &QAction::triggered, this, &MainWindow::showSettings);
     connect(a.shortcuts, &QAction::triggered, this, &MainWindow::showShortcuts);
     connect(a.onlineGuide, &QAction::triggered, this, [] { platform::openUrl(links::kGuide); });
@@ -928,6 +933,8 @@ void MainWindow::debugOpen(const QString& what)
         showBugReport();
     } else if (what == u"sites"_s || what.startsWith(u"sites:"_s)) {
         showSupportedSites(what.section(u':', 1)); // PLDL_DEBUG_SITES=<file> feeds the list without an engine
+    } else if (what == u"rail"_s) {
+        m_rail->setExpanded(true); // animated, for a grab of the labels
     } else if (what == u"help"_s) {
         // The rail's help menu, popped without blocking, for a grab.
         if (auto* button = m_rail->findChild<QToolButton*>(u"helpButton"_s); button != nullptr && button->menu()) {

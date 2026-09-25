@@ -10,7 +10,9 @@ four pages of the window and the settings that matter.
 ![The window: the rail on the left](screenshots/guide/window.png)
 
 1. Search, 2. Playlist, 3. Browser, 4. Downloads, 5. Settings, 6. Account, 7. Help: the
-keyboard shortcuts, the online guide, the supported sites, Report a bug and About.
+keyboard shortcuts, the online guide, the supported sites, Report a bug and About. The
+button under the logo (or Ctrl+B) widens the rail to show the labels beside the icons; the
+choice is remembered.
 
 A rail on the left holds the pages: **Search** (Ctrl+1), **Playlist** (Ctrl+2), **Browser**
 (Ctrl+3) and **Downloads** (Ctrl+4), with **Settings** (Ctrl+,), your account and **About**

@@ -35,6 +35,7 @@ inline constexpr QLatin1StringView kBlockAds{"browser/blockAds"};
 inline constexpr QLatin1StringView kDoNotTrack{"browser/doNotTrack"};
 inline constexpr QLatin1StringView kBrowserStartPage{"browser/startPage"};
 inline constexpr QLatin1StringView kRestoreBrowserTabs{"browser/restoreTabs"}; ///< reopen last time's tabs
+inline constexpr QLatin1StringView kRailExpanded{"general/railExpanded"};       ///< labels beside the rail's glyphs
 inline constexpr QLatin1StringView kBrowserUserAgentPreset{"browser/userAgentPreset"}; ///< "default", a preset id, "custom"
 inline constexpr QLatin1StringView kBrowserUserAgent{"browser/userAgent"};             ///< the custom text
 

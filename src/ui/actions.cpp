@@ -41,6 +41,9 @@ Actions::Actions(QWidget* owner)
     onlineGuide = make(owner, tr("Online guide"));
     openLogFolder = make(owner, tr("Open log folder"));
     about = make(owner, tr("About Playlist Downloader"));
+    railLabels = make(owner, tr("Show labels"), {QKeySequence(Qt::CTRL | Qt::Key_B)});
+    railLabels->setCheckable(true);
+    railLabels->setToolTip(tr("Show or hide the labels on the rail"));
     help = make(owner, tr("Help"));
     help->setToolTip(tr("Help: keyboard shortcuts, the guide, report a bug, about"));
     reportBug = make(owner, tr("Report a bug…"));
@@ -70,7 +73,8 @@ QList<QAction*> Actions::all() const
 {
     return {home,           playlist,       browser,        downloads,     showHide,
             settings,       shortcuts,      onlineGuide,    openLogFolder, account,
-            about,          help,           reportBug,      supportedSites,  quit,            browserNewTab,
+            about,          help,           reportBug,      supportedSites,  railLabels,      quit,
+            browserNewTab,
             browserCloseTab, browserAddress,
             browserReload,  browserBack,    browserForward, browserNextTab, browserPreviousTab,
             browserDownload, browserFind};

@@ -255,7 +255,7 @@ QProgressBar[pldlThin="true"]::chunk { border-radius: 0; }
 /* Rail buttons: square, rounded, the active one carries the accent bar. */
 QToolButton[pldlRailButton="true"] {
     background: transparent; border: none; border-radius: 10px; padding: 0; margin: 0;
-    min-width: 40px; max-width: 40px; min-height: 40px; max-height: 40px;
+    min-width: 40px; min-height: 40px; max-height: 40px;
 }
 QToolButton[pldlRailButton="true"]:hover { background: {{hover}}; }
 QToolButton[pldlRailButton="true"]:pressed { background: {{accentSoft}}; }

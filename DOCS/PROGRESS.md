@@ -52,6 +52,10 @@
   `EngineManager::downloadFile` now retries a transient failure once after 1.5 s. The
   engine's requests carried an old user agent; they now say Playlist-Downloader/3.
   Temporary cookie files, notification ids and the test profile dropped an old prefix.
+- Owner: the rail expands to show labels beside the glyphs (toggle under the logo, Ctrl+B),
+  animated over 200 ms with the labels fading in over the last two thirds of the way, the
+  glyphs staying put; the choice is a setting (`general/railExpanded`); `rail` hook;
+  tst_side_rail.
 - Owner's list of seven (2026-09-25): Search shows rows by default; playlist cards carry a
   Details button and a double click opens the items sheet (a single item's file otherwise);
   a divider above the Settings footer; an ellipsis on every in-progress label; the launcher's

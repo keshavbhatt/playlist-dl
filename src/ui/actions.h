@@ -30,6 +30,7 @@ public:
     QAction* onlineGuide = nullptr;
     QAction* openLogFolder = nullptr;
     QAction* about = nullptr;
+    QAction* railLabels = nullptr; ///< checkable: labels beside the rail's glyphs (Ctrl+B)
     QAction* help = nullptr;      ///< the rail's help menu: shortcuts, guide, report a bug, about
     QAction* reportBug = nullptr;
     QAction* supportedSites = nullptr; ///< the sheet listing what the engine reads
