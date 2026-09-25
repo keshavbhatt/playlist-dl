@@ -47,7 +47,7 @@
             (el.richSectionRenderer.content.adSlotRenderer || el.richSectionRenderer.content.statementBannerRenderer)) {
             return true;
         }
-        // Shelves that are pure premium upsell on TV (hideLogo metadata, VacuumTube).
+        // Shelves that are pure premium upsell on TV (hideLogo metadata).
         if (el.shelfRenderer && el.shelfRenderer.tvhtml5Metadata && el.shelfRenderer.tvhtml5Metadata.hideLogo) {
             return true;
         }

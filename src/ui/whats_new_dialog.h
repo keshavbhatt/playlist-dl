@@ -17,7 +17,7 @@ namespace pldl::ui {
 /// first start that has not seen them (FEATURES S9) and on demand from About.
 /// Opens on the running version; a Version picker (shown when the changelog
 /// carries more than one release) swaps in an older release's notes
-/// (UMD mocks/whats-new.html, approved 2026-09-24).
+///.
 class WhatsNewDialog : public QDialog
 {
     Q_OBJECT

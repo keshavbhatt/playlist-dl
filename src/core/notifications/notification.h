@@ -8,7 +8,7 @@
 // Backend-agnostic notification model and the interface every backend
 // implements (FEATURES S6). Ids are assigned by NotificationService and must
 // be tracked by backends so that a click on an *unrelated* notification never
-// reaches us (whatsie W#5, 42, 271, 278).
+// reaches us.
 namespace pldl::core {
 
 struct NotificationAction

@@ -93,10 +93,10 @@ struct EnginePaths
 [[nodiscard]] QStringList baseArguments(const EnginePaths& paths);
 
 /// The line prefixes the runner parses (see ytdlp_output.h).
-inline constexpr QLatin1StringView kProgressPrefix{"RED:"};
-inline constexpr QLatin1StringView kPostprocessPrefix{"REDPP:"};
-inline constexpr QLatin1StringView kItemPrefix{"REDITEM:"};
-inline constexpr QLatin1StringView kFilePrefix{"REDFILE:"};
+inline constexpr QLatin1StringView kProgressPrefix{"PLDL:"};
+inline constexpr QLatin1StringView kPostprocessPrefix{"PLDLPP:"};
+inline constexpr QLatin1StringView kItemPrefix{"PLDLITEM:"};
+inline constexpr QLatin1StringView kFilePrefix{"PLDLFILE:"};
 
 /// A playlist title as a folder name: `/`, `\`, `:` and the characters no
 /// file system takes become `_`, control characters go, the result is trimmed

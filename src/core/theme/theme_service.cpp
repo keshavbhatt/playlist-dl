@@ -73,7 +73,7 @@ void ThemeService::reevaluate()
 
 QPalette ThemeService::lightPalette()
 {
-    // Red's brand tokens (DESIGN.md §1), light: YouTube's white surfaces.
+    // The light palette behind the brand tokens (DESIGN.md section 1).
     QPalette p;
     p.setColor(QPalette::Window, QColor(0xFF, 0xFF, 0xFF));
     p.setColor(QPalette::WindowText, QColor(0x0F, 0x0F, 0x0F));
@@ -97,7 +97,7 @@ QPalette ThemeService::lightPalette()
 
 QPalette ThemeService::darkPalette()
 {
-    // Red's brand tokens (DESIGN.md §1), dark: YouTube's #0F0F0F surfaces.
+    // The dark palette behind the brand tokens (DESIGN.md section 1).
     QPalette p;
     p.setColor(QPalette::Window, QColor(0x0F, 0x0F, 0x0F));
     p.setColor(QPalette::WindowText, QColor(0xF1, 0xF1, 0xF1));

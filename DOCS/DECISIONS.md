@@ -1,14 +1,14 @@
 # Architecture Decision Records
 
 Short, numbered, append-only. Format: Context, Decision, Consequences. Headings use a colon,
-not a dash. ADRs inherited from Red 10 (the rewrite kit) are listed once in ADR-000.
+not a dash. ADRs inherited from the owner's earlier apps are listed once in ADR-000.
 
 ---
 
-## ADR-000: inherited from Red 10 and UMD 7 (2026-09-24)
+## ADR-000: inherited from the owner's earlier apps (2026-09-24)
 
-The rewrite adopts, verbatim in spirit and mostly in code, these Red decisions (numbers refer
-to `rewrite-kit/reference/red-docs/DECISIONS.md`) and the UMD 7 refinements of them:
+The rewrite adopts, verbatim in spirit and mostly in code, these decisions from the owner's earlier apps (their R-ADR numbering kept) and the
+refinements of them:
 
 - Qt 6.11 minimum built against the KDE snap SDK, run against the `kf6-core24` runtime; C++20
   and CMake only; warnings as errors in CI; layered static libraries `core -> services /
@@ -16,7 +16,7 @@ to `rewrite-kit/reference/red-docs/DECISIONS.md`) and the UMD 7 refinements of t
 - One typed `core::Settings` facade; every key once in `settings_keys.h`.
 - Injected JavaScript as resources on the profile-level script collection, concatenated into
   one DocumentCreation bundle behind `bootstrap.js` and `hooks.js`, one `QWebChannel` bridge
-  per tab (R-ADR-006, UMD's tabbed form).
+  per tab (R-ADR-006, the tabbed form).
 - User agent derived from the engine default with the QtWebEngine token stripped; the Firefox
   identity only on Google sign-in hosts (R-ADR-008).
 - Chromium sandbox on outside the snap; GPU on by default with the storm detector fallback,
@@ -34,25 +34,25 @@ to `rewrite-kit/reference/red-docs/DECISIONS.md`) and the UMD 7 refinements of t
 - Accounts through the shared AccountAndLicense module with a per-app config; gate decided by
   the owner; nothing about it in user-facing release text (R-ADR-011).
 - What's new once per version from the bundled changelog; a Version picker shows earlier
-  releases and About links to it (R-ADR-012, kit update of 2026-09-24).
+  releases and About links to it (R-ADR-012, update of 2026-09-24).
 - Every dialog is the app's own sheet, including the ones raised by pop-up windows.
-- UMD's interaction and accessibility standard for every control (DESIGN.md section 1).
+- The interaction and accessibility standard for every control (DESIGN.md section 1).
 
 ## ADR-001: product shape, one window with four pages (2026-09-24)
 
 **Context.** Playlist-Dl 2.x is a single window whose sliding stacked widget holds the
 search, the playlist, the player (a Qt WebEngine view of YouTube with ad-skipping scripts),
 the download widget, settings and the account screens, all reached from a toolbar. The
-owner's brief for 3.0: rebuild it with a browser shell like Ultimate Media Downloader, add
+owner's brief for 3.0: rebuild it with a general browser shell, add
 the engine's search as a fallback when the ktechpit search service fails, an own theme
 built from the new icon, and keep the flow users know while fixing what is broken.
 
 **Decision.** One window: a rail and a stacked page area with **Search**, **Playlist**,
-**Browser** and **Downloads** (DESIGN.md section 2). The Browser page is UMD's browser
+**Browser** and **Downloads** (DESIGN.md section 2). The Browser page is the earlier apps' browser
 shell (tabs on one persistent profile, toolbar, badges, the page-detected Download button)
 and replaces the 2.x WebEnginePlayer as the place where videos are played and YouTube is
 browsed. The Playlist page is the app's core: the videos of one playlist, selectable, with a
-Download options sheet. Downloads run through the kit's yt-dlp queue. Settings is a dialog.
+Download options sheet. Downloads run through the yt-dlp queue. Settings is a dialog.
 The 2.x extras that were not about playlists (Rate this app, Claim offer, the blocked
 request log window) are dropped.
 
@@ -76,7 +76,7 @@ Everything else starts fresh.
 and a light/dark toggle that reloaded the page. The owner asked for an own theme matching
 the new icon.
 
-**Decision.** The kit's token sheet (`ui::Tokens` and the `{{token}}` style sheet, applied by
+**Decision.** The token sheet (`ui::Tokens` and the `{{token}}` style sheet, applied by
 `ThemeApplier` on Fusion) with the palette in DESIGN.md section 1: the icon's purple as the
 accent, its yellow as the download badge colour, a purple-tinted neutral scale
 for both schemes. Theme setting System, Light, Dark; System follows the platform live. The
@@ -85,29 +85,27 @@ page background of the browser follows the scheme. `tst_style_contrast` guards t
 **Consequences.** One place to change a colour; both schemes are first-class; the old
 per-widget sheets and the theme reload are gone.
 
-## ADR-005: rewrite in this repository on `v3-rewrite`, sources from the kit and UMD (2026-09-24)
+## ADR-005: rewrite in this repository on `v3-rewrite`, sources from the owner's earlier apps (2026-09-24)
 
-**Context.** The playbook starts a new private repository per rewrite. The owner asked for
-the rewrite in this project after the Qt 6 port, without a word on the repository.
+**Context.** The owner asked for the rewrite in this project after the Qt 6 port, without a
+word on the repository.
 
 **Decision.** Branch `v3-rewrite` in this repository; `main` and `qt6-cmake-migration` stay
-as the frozen 2.x reference. The tree is assembled from the rewrite kit (`scripts/adopt.sh`
-for core, services, platform, app, the yt-dlp download queue, the process documents) and
-from Ultimate Media Downloader 7 for the browser shell (`web/`, `BrowserPage`,
-`BrowserTabButton`), the page-based window pieces (`Page`, `SideRail`, `Actions`), the
-generic sheets and widgets, and `SearchService` (the engine-based search). The download
-queue is the kit's yt-dlp-only one, not UMD's aria2 composite.
+as the frozen 2.x reference. The tree is assembled from the owner's earlier apps: core,
+services, platform, app, the yt-dlp download queue and the process documents from one, the
+browser shell (`web/`, `BrowserPage`, `BrowserTabButton`), the page-based window pieces
+(`Page`, `SideRail`, `Actions`), the generic sheets and widgets and `SearchService` (the
+engine-based search) from another. The download queue is the yt-dlp-only one.
 
-**Consequences.** The repository holds code that Red and UMD ship as proprietary while its
+**Consequences.** The repository holds code the earlier apps ship as proprietary while its
 `LICENSE` is GPL-3 from 2.x and the repository is public on GitHub. Nothing is pushed until
-the owner decides between a private repository with a metadata-only public one (the kit's
-model) and keeping the GPL, in which case the copied code has to be relicensed by its
+the owner decides between a private repository with a metadata-only public one and keeping the GPL, in which case the copied code has to be relicensed by its
 owner. Recorded as the first open question in PROGRESS.md.
 
 ## ADR-008: open source, two licences by path (2026-09-25)
 
 **Context.** ADR-005 left the repository question open: the tree holds code copied from
-Red 10 and UMD 7, both shipped proprietary, and the owner owns all of it. Playlist-Dl 2.x
+the owner's earlier apps, both shipped proprietary, and the owner owns all of it. Playlist-Dl 2.x
 had been GPL-3 all along (its `LICENSE`), which the owner had forgotten.
 
 **Decision.** The code goes public at github.com/keshavbhatt/playlist-dl: `main` holds
@@ -125,8 +123,8 @@ GPL-3.0-or-later. The private repository (p-pldl) keeps its history as a mirror.
 
 **Consequences.** Contributions to the GPL part are welcome; forks must replace the gate.
 A build switch that compiles the app without the module would make forking practical
-and is a follow-up. The copied Red and UMD code is relicensed by its owner through this
-decision; Red and UMD themselves stay proprietary.
+and is a follow-up. The copied code is relicensed by its owner through this decision; the
+earlier apps themselves stay proprietary.
 
 ## ADR-007: the display name (2026-09-25)
 
@@ -157,10 +155,10 @@ the browser is tied to no site. Consequences:
 ## ADR-003: search through the ktechpit service, the engine as the fallback (2026-09-24)
 
 **Context.** 2.x searched playlists through one PHP proxy on the author's shared host
-(`https://ktechpit.com/USS/Olivia/youtube/api.php?query=<term>`, an Invidious-shaped JSON
+(the ktechpit search service, an Invidious-shaped JSON
 array of playlists with a video preview), with no timeout, no retry and no fallback, and an
 outage rendered as "No result found". The owner asked for the engine's search as a fallback.
-UMD 7's `services::SearchService` already searches playlists through the engine (the site's
+An earlier app's `services::SearchService` already searches playlists through the engine (the site's
 filtered search page read flat, `countPlaylist` for the sizes).
 
 **Decision.** `services::PlaylistSearch` runs a query in two stages: (1) the ktechpit service

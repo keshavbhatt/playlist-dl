@@ -438,7 +438,7 @@ void BrowserPage::buildStage()
     content()->setContentsMargins(0, 0, 0, 0);
     content()->setSpacing(0);
     // The load progress lives inside the address field (AddressField): a bar
-    // in this layout moved the page by its height at every load (UMD owner).
+    // in this layout moved the page by its height at every load.
 
     auto* stage = new QWidget(this);
     stage->setObjectName(u"browserStage"_s);

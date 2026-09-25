@@ -6,8 +6,7 @@ site the engine reads (owner, 2026-09-24), with YouTube as the search source. Ve
 a from-scratch rewrite on `main`; the 2.x code on `old-qt5` (and its Qt 6 port on
 `qt6-cmake-migration`) is the frozen reference. Read `DOCS/` for the feature contract
 (FEATURES), design (DESIGN), decisions (DECISIONS, ADRs), lessons (LESSONS) and the progress
-log (PROGRESS). The rewrite followed the owner's private rewrite kit (its PLAYBOOK); the
-kit itself is not part of this repository. The public repository is
+log (PROGRESS). The public repository is
 github.com/keshavbhatt/playlist-dl is the only remote (`main`: 3.x, `old-qt5`: 2.x); the
 licence split is
 in LICENSING.md and REUSE.toml: GPL-3.0-or-later, licensing module under its own licence.

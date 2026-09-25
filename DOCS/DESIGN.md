@@ -17,7 +17,7 @@ download options, watch the queue.
   128 px grid, GNOME style, no baked shadow. The symbolic variant is the list plus the
   download arrow in one colour.
 - Tagline (store, About): *Save whole playlists offline.*
-- Tokens: the kit's `{{token}}` sheet with a palette taken from the icon. The accent is the
+- Tokens: a `{{token}}` sheet with a palette taken from the icon. The accent is the
   card's purple; the yellow of the badge is a second accent reserved for the download badge,
   progress and the "new" chips, so the two colours of the icon are the two colours of the
   app. `ui::Tokens` is the source; `tst_style_contrast` asserts every pair below at 4.5:1
@@ -50,7 +50,7 @@ download options, watch the queue.
   weight 500 for titles. Shape: 8 px controls, 12 px cards, 14 px sheets, pill buttons and
   chips (the icon's rounded cards set the radius language). Motion: none that blocks; the
   page switch is instant, the toast slides 160 ms.
-- Interaction states and accessibility: the UMD standard applies unchanged (four visible
+- Interaction states and accessibility: the standard of section 1 applies unchanged (four visible
   states on every control, an immediate busy verb on press, a toast for results the user is
   not looking at, full keyboard order with a visible focus ring, accessible names, colour
   never the only signal, 34 px hit targets).
@@ -107,7 +107,7 @@ The 2.x playlist view (videos with checkboxes, select all, download button) rebu
   12 videos" as the selection changes) and a "Play all" flat button (opens the playlist in
   the Browser page).
 - Toolbar row: "Select all" checkbox, range "from [ ] to [ ]" spin boxes with the range
-  slider (from UMD), a filter field, a sort menu (playlist order, title, duration, newest),
+  slider, a filter field, a sort menu (playlist order, title, duration, newest),
   "Skip videos already downloaded" toggle (on).
 - List: rows of 72 px: checkbox, index, thumbnail 96 by 54, title (2 lines), channel and
   duration, a play glyph on hover (opens the video in the Browser page) and a download glyph
@@ -134,7 +134,7 @@ The 2.x playlistdownloadoptions page, as a sheet:
 
 ### Browser
 
-UMD's browser page, unchanged in shape: tab strip, toolbar (back, forward, reload,
+The browser page: tab strip, toolbar (back, forward, reload,
 address, "Ads blocked" badge, **Download this** button), find bar, the
 web view, the floating "Download detected" button. A new tab opens empty by default
 (owner, 2026-09-24); Settings, Browser offers Empty tab, YouTube or a custom address.

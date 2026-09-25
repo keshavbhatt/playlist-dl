@@ -7,7 +7,7 @@ Everything about the rewrite lives here. If it is not in `DOCS/`, it did not hap
 | `FEATURES.md` | Feature list with the decision per row. The scope contract. |
 | `ROADMAP.md` | Milestones with exit criteria. |
 | `PROGRESS.md` | Session log and milestone status table, newest first. |
-| `CODING_STANDARDS.md` | Binding Qt 6 / C++20 rules (from the rewrite kit, adapted). |
+| `CODING_STANDARDS.md` | Binding Qt 6 / C++20 rules. |
 | `DECISIONS.md` | Architecture Decision Records, append-only. |
 | `LESSONS.md` | Mistakes in the old app and the rule each became. |
 | `DESIGN.md` | The UI design: brand, tokens, layout, every screen. |

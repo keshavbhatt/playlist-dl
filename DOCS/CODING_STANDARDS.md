@@ -4,7 +4,7 @@ These are the rules the rewrite follows. They are binding for every commit. When
 violated for a good reason, the reason goes in a code comment and (if architectural) in
 `DOCS/DECISIONS.md`.
 
-The document is deliberately opinionated. Playlist-Dl 2.x (like the original Red and whatsie) grew into a few
+The document is deliberately opinionated. Playlist-Dl 2.x grew into a few
 giant classes with UI, business logic, JavaScript strings and settings access all mixed
 together; whatly fixed much of that but at the cost of size. The goal here is **small,
 boring, testable code**.
@@ -236,7 +236,7 @@ YouTube changes without notice. The rewrite treats every injected script as a
 
 ---
 
-## 11. Things explicitly banned (lessons from Playlist-Dl 2.x, Red v9, whatsie)
+## 11. Things explicitly banned (lessons from Playlist-Dl 2.x and earlier projects)
 
 | Banned | Why | Do instead |
 |---|---|---|

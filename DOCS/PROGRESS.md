@@ -8,7 +8,7 @@
 | M1 Skeleton | done |
 | M2 Engine and search | done |
 | M3 Downloads | done |
-| M4 Player and browser shell | done (UMD's browser page; W rows) |
+| M4 Player and browser shell | done (the browser page; W rows) |
 | M5 Desktop integration | done (tray, notifications, taskbar, screen inhibit, crash handler, GPU fallback) |
 | M6 Polish and text | done (see 2026-09-24, M6) |
 | M7 Packaging and release | wip (snap recipe, CI workflow, metainfo, public README, guide and screenshots ready; the snap is unbuilt, the public repository and the Flathub manifest wait for the licence decision) |
@@ -18,7 +18,7 @@
 1. **Repository licence**: decided 2026-09-25 (ADR-008): open source at
    github.com/keshavbhatt/playlist-dl, GPL-3.0-or-later with the licensing module under
    the Ktechpit Licensing Module License.
-2. **The gate** (FEATURES L3): assumed Red's daily allowance (5 free downloads a day); 2.x
+2. **The gate** (FEATURES L3): a daily allowance (5 free downloads a day); 2.x
    gated quality above "Poor" instead.
 3. **Display name**: decided 2026-09-25: "Playlist Downloader" stays everywhere; About shows
    "Playlist Downloader (playlist-dl)" so the package name is visible; the snap keeps its name.
@@ -50,8 +50,8 @@
   and the JS runtime fetched and verified, the missing converter reported with the pacman
   hint, ready once the host ffmpeg is visible, and a real probe returned "Me at the zoo".
   `EngineManager::downloadFile` now retries a transient failure once after 1.5 s. The
-  engine's requests identified themselves as Red/10; they now say Playlist-Downloader/3.
-  Temporary cookie files, notification ids and the test profile dropped the Red prefix.
+  engine's requests carried an old user agent; they now say Playlist-Downloader/3.
+  Temporary cookie files, notification ids and the test profile dropped an old prefix.
 - About carries the GPL's Appropriate Legal Notices (v3, 5d): copyright, GPL v3 or later,
   no warranty, the module's own terms, and one Licences link to LICENSING.md (owner: "one link").
 - Owner: shortcuts are invisible unless one knows F1. The rail's last button is a Help menu
@@ -69,7 +69,7 @@
   the engine's last useful stderr line on screen when there is no ERROR: line (a traceback's
   last line, the binary loader's message), names the temporary folder when that is full, and
   the probe logs the stderr tail and exit status, so the next occurrence explains itself.
-  Leftover kit wording ("in Red") replaced.
+  Leftover wording replaced.
 - Owner: "it still labels videos instead of items": items everywhere now (Playlist page counts
   and Download button, the options sheet's playlist button, search cards, the row action),
   no site or kind exception; guide, README and metainfo say item count. Found on the way:
@@ -105,14 +105,14 @@
   YouTube for the browser (Use my sign-ins).
 - Owner report: signing in to SoundCloud in the built-in browser sent every link off the
   sign-in page to the system browser. `core::shouldOpenExternally` now keeps all http and
-  https in the app (UMD's rule); only mailto, tel and magnet leave, file: never.
-- UMD change ported (owner request): the page-load progress is a hairline inside the
+  https in the app (the general-browser rule); only mailto, tel and magnet leave, file: never.
+- Ported from an earlier app (owner request): the page-load progress is a hairline inside the
   address field (`ui::AddressField`), no bar in the layout, so the page never moves; the
-  tab's loader glyph turns while the page loads. Both back-ported to the rewrite kit.
+  tab's loader glyph turns while the page loads. 
 - Owner request: Settings, Search, Suggest as I type (on by default) gates the suggestions;
   the Playlist items sheet shows a banner when the folder already has a playlist file, with
   Play as is and Folder (`playlist-items-demo-file` hook).
-- Kit update ported (owner request): the What's new sheet takes the whole changelog, opens
+- Update ported (owner request): the What's new sheet takes the whole changelog, opens
   on the running version and carries a Version picker once there are two releases; About
   shows a flat What's new link beside the version; `whatsnew:<version>` and
   `PLDL_DEBUG_CHANGELOG=<path>` hooks; `core::changelogReleases`.
@@ -123,7 +123,7 @@
   the one shown); Original restores the playlist's order; unticked items stay unticked.
 
 - No `QMessageBox` anywhere; every question is a sheet. The About, Plans and Account text is
-  this app's; the engine's ffmpeg hint no longer names Red.
+  this app's; the engine's ffmpeg hint no longer names an earlier app.
 - The engine setup sheet the app opens on its own closes itself once the engine is ready;
   one the user opened stays.
 - `PLDL_DEBUG_AUTODOWNLOAD=video|audio` (ADR-000's hook family): with `PLDL_DEBUG_OPEN=
@@ -151,8 +151,8 @@
   endpoint), FEATURES with every 2.x feature decided, LESSONS P1 to P16, ADR-000 to ADR-005,
   DESIGN with the brand palette from the new icon (contrast-checked) and every screen,
   ROADMAP, CODING_STANDARDS, CLAUDE.md.
-- M1 started: the skeleton assembled from the kit (core, services, platform, app, the yt-dlp
-  queue) and UMD 7 (web layer, BrowserPage, Page, SideRail, Actions, sheets, SearchService),
+- M1 started: the skeleton assembled from the owner's earlier apps (core, services, platform, app, the yt-dlp
+  queue, web layer, BrowserPage, Page, SideRail, Actions, sheets, SearchService),
   identity `pldl` / `com.ktechpit.playlist-dl`, the new icon set under
   `src/resources/icons`.
 - M1 done: 32 tests pass, the build is warning-free with `-Werror` against the KDE Qt 6.11
@@ -182,7 +182,7 @@
 - Owner request: the Downloads page shows the free tier's remaining downloads for today as
   a chip next to the title (hidden on Pro and during the evaluation), refreshed when a
   download is admitted and when the page is shown again.
-- Owner request: the Account and Plans sheets now state the real model (UMD's files,
+- Owner request: the Account and Plans sheets now state the real model (the earlier apps' files,
   torrents and 8K presets were still in the text): Free is 5 downloads a day with every
   quality, a playlist counts each picked video, Pro has no daily limit; the evaluation shows
   "Checking" instead of "0 days left" until the server has answered.
@@ -191,7 +191,7 @@
   took the mouse. It now starts hidden and lives over the page area; tst_smoke checks that
   every rail button is what lies under its centre.
 - Owner request: About reachable from the rail's bottom (info glyph under Account); the
-  About sheet itself already matched Red's shape.
+  About sheet itself already matched the earlier shape.
 - Owner request: a new browser tab opens empty by default; Settings, Browser offers Empty
   tab, YouTube or a custom address (the address row shows for the custom choice only).
   Grabbed: the empty New tab and the settings page.

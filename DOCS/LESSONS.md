@@ -1,7 +1,6 @@
-# Lessons: Playlist-Dl 2.x and the rewrite kit
+# Lessons: Playlist-Dl 2.x
 
-Red 10's lessons (`rewrite-kit/reference/red-docs/LESSONS.md`, R1 to R13 and V1 to V8) and
-UMD 7's (U1 to U15, R1 to R8) apply to any Qt WebEngine wrapper with a download engine and
+The lessons of the owner's earlier Qt WebEngine apps apply to any such app with a download engine and
 are not repeated. Below: what 2.x adds, from `reference/analysis-playlist-dl-v2.md` section 7.
 
 ## A. Playlist-Dl 2.x
@@ -10,7 +9,7 @@ are not repeated. Below: what 2.x adds, from `reference/analysis-playlist-dl-v2.
 |---|---|---|---|
 | P1 | One search backend on a shared host, no timeout, errors shown as "no results" | an outage killed the app's first screen | two backends, a timeout, a visible source chip, error states with Retry (ADR-003) |
 | P2 | Formats and progress parsed from the engine's human output (`-F`, `[download]` lines) | `-f 0+0` on empty lists, wrong progress on every engine change | typed protocol only (ADR-000) |
-| P3 | Engine run through `python3`, version compared as a mis-parsed date, binary truncated before the download, Cancel loops the modal | no updates ever, broken engine after a failed download | the kit's EngineManager: standalone binary, checksum, `QDate` compare, async |
+| P3 | Engine run through `python3`, version compared as a mis-parsed date, binary truncated before the download, Cancel loops the modal | no updates ever, broken engine after a failed download | the shared EngineManager: standalone binary, checksum, `QDate` compare, async |
 | P4 | ffmpeg neither bundled nor detected in the snap | every merge and audio extraction failed under confinement | ffmpeg from the runtime, detected, with an install hint (ADR-000) |
 | P5 | Ad list rebuilt quadratically and re-deduplicated on every request; QSettings read per request; a QSettings write per blocked request | measurable lag on every page | immutable block list snapshot, atomic counter, no settings in the IO path |
 | P6 | Ad blocker toggle half wired, a reload the user may decline, duplicate scripts | page and script collection out of sync | one profile-level bundle, config pushed over the bridge |
@@ -25,7 +24,7 @@ are not repeated. Below: what 2.x adds, from `reference/analysis-playlist-dl-v2.
 | P15 | Typos baked into object names and strings ("Unclock", "adBocker", "rungaurd") | embarrassing UI, unsearchable code | strings reviewed, names spelt |
 | P16 | Dead settings and dead classes shipped (`ClaimOffer`, `Request`, `lastVisited`, `showSearchSuggestion`) | maintenance tax | delete on the spot |
 
-## B. Rules the rewrite kit already encodes
+## B. Rules the codebase already encodes
 
 - Ask the owner the product questions early; make the routine calls yourself.
 - Probe the live page over CDP before writing a selector.
@@ -38,7 +37,7 @@ are not repeated. Below: what 2.x adds, from `reference/analysis-playlist-dl-v2.
 - The browser is general purpose (owner): no site-specific gate in the web layer. The
   navigation policy, the cookie mirror and the toolbar badges must not assume YouTube; the
   YouTube extras (playlist detection, start page preset) are additions, not conditions.
-- The kit's navigation policy is a YouTube wrapper's (everything else goes to the system
+- The inherited navigation policy was a YouTube wrapper's (everything else goes to the system
   browser). A general browser keeps every http and https page in the app and lets only
   mailto, tel and magnet out; a sign-in page's links otherwise leave for the desktop.
 - A bar shown and hidden in the layout above a page moves the page by its height at every

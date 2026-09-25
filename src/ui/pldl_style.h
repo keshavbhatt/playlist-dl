@@ -5,7 +5,7 @@
 
 namespace pldl::ui {
 
-/// UMD's brand tokens (DESIGN.md section 1), per scheme. The single source of truth
+/// The brand tokens (DESIGN.md section 1), per scheme. The single source of truth
 /// for every colour the native chrome paints, the style sheet, the rail, the
 /// download cards and the dialogs all read from here.
 struct Tokens

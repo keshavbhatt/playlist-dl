@@ -29,7 +29,7 @@ QStringList chromiumFlags(HardwareAcceleration acceleration, bool gpuAutoDisable
         u"--disable-component-update"_s,
         u"--disable-default-apps"_s,
         // YouTube's player registers a media session; keep Chromium's own
-        // handling out of the way so Red's MPRIS service (ADR-007) is the one
+        // handling out of the way so the app's MPRIS service is the one
         // the desktop sees.
         u"--disable-features=HardwareMediaKeyHandling,MediaSessionService"_s,
         // Let audio keep flowing while the window is hidden (FEATURES D6/D7).
@@ -41,7 +41,7 @@ QStringList chromiumFlags(HardwareAcceleration acceleration, bool gpuAutoDisable
         // Opt-in VA-API decode. Off by default: hardware decode hands the
         // compositor dmabuf-backed NV12 frames that some Mesa/Wayland stacks
         // (notably under snap confinement) cannot import, which blanks the
-        // video (observed in whatsie, W-ADR-032 revision).
+        // video (observed in an earlier app).
         features << u"VaapiVideoDecodeLinuxGL"_s << u"VaapiVideoDecoder"_s
                  << u"AcceleratedVideoDecodeLinuxGL"_s;
         flags << u"--enable-accelerated-video-decode"_s;

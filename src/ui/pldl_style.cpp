@@ -92,7 +92,7 @@ QColor Tokens::textOn(const QColor& background)
 namespace {
 
 // The sheet, with {{token}} placeholders. Backgrounds are set only on the
-// containers and controls that need the UMD look; the palette handles the
+// containers and controls that need the app's look; the palette handles the
 // rest, so nothing paints an opaque block over the browser page.
 const char* kSheet = R"qss(
 QDialog, QMainWindow { background: {{bg}}; }

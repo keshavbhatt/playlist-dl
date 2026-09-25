@@ -12,7 +12,7 @@ class QVBoxLayout;
 
 namespace pldl::ui {
 
-/// Red's replacement for QMessageBox / QInputDialog: accent badge, title,
+/// The app's replacement for QMessageBox / QInputDialog: accent badge, title,
 /// body, optional muted note and text field, pill buttons. Works modally
 /// (`run()`) and asynchronously (`open()` + `finished` → `clickedIndex()`).
 class MessageSheet : public QDialog

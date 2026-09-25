@@ -20,7 +20,7 @@ public:
     static void setLogFile(const QString& path, qint64 maxBytes = qint64{2} * 1024 * 1024);
     [[nodiscard]] static QString logFilePath();
 
-    /// Conventional location: <AppDataLocation>/logs/red.log. Requires the
+    /// Conventional location: <AppDataLocation>/logs/pldl.log. Requires the
     /// application identity to be set.
     [[nodiscard]] static QString defaultLogFilePath();
 

@@ -45,7 +45,7 @@ inline constexpr QLatin1StringView kUserAgentPresetCustom{"custom"};
 /// platform token says. A Firefox or Safari override is used as it is.
 [[nodiscard]] QString signInUserAgent(core::SignInUserAgent choice, const QString& userOverride);
 
-/// TV mode (ADR-001, VacuumTube V1): what `navigator.userAgent` reports inside
+/// TV mode: what `navigator.userAgent` reports inside
 /// Leanback, an old Cobalt so YouTube does not assume Widevine.
 [[nodiscard]] QString tvNavigatorUserAgent(const QString& appVersion);
 /// TV mode: what www.youtube.com sees on the wire, a newer Cobalt for the

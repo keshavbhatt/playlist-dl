@@ -43,7 +43,7 @@ QStringList BlockList::trackerHosts()
     return {
         u"google-analytics.com"_s, u"googletagmanager.com"_s, u"googletagservices.com"_s,
         u"analytics.google.com"_s, u"crashlytics.com"_s,
-        u"csp.withgoogle.com"_s, // CSP violation reports (VacuumTube blocks it too)
+        u"csp.withgoogle.com"_s, // CSP violation reports
     };
 }
 

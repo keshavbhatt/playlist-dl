@@ -1,7 +1,7 @@
 #!/bin/bash
 # Drives a running (or freshly started) Red through a short tour for a screen
 # recording: home page, a video, a download, TV mode, settings, quit.
-# Every step is a command Red's single instance accepts, so nothing has to be
+# Every step is a command the app's single instance accepts, so nothing has to be
 # clicked. Start the recorder first, then:
 #
 #   scripts/demo-tour.sh                    # the dev build (scripts/dev-run.sh)

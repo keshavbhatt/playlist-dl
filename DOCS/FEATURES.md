@@ -3,12 +3,12 @@
 Decision legend: KEEP (in 3.0), LATER (after it), DROP (never).
 Status legend: `todo`, `wip`, `done (class)`, `verified` (exercised live on the owner's desktop).
 
-Sources: `reference/analysis-playlist-dl-v2.md` (the 2.x app), the rewrite kit's Red FEATURES
-and UMD 7's FEATURES for the desktop-shell and browser features that proved themselves.
+Sources: `reference/analysis-playlist-dl-v2.md` (the 2.x app) and the owner's earlier desktop
+apps for the shell and browser features that proved themselves.
 
 The owner's brief (2026-09-24): "we want to re-write the application: implement a browser
 shell like ultimate-media-downloader, give engine based search as fallback if the ktechpit
-based search is not working, follow the rewrite kit where needed, make our own theming with
+based search is not working, reuse proven pieces where needed, make our own theming with
 the brand theme according to the new icon, keep the application flow mostly like it is but
 improve what is broken."
 
@@ -93,7 +93,7 @@ name (ADR-002), the repository licence (ADR-005).
 
 | # | Feature | 2.x | Decision | Status / class |
 |---|---|---|---|---|
-| W1 | UMD's browser page, general purpose, tied to no site, an empty tab shows a themed invitation (every http and https page stays in it, only mailto, tel and magnet go to the desktop): tabs on one persistent named profile, toolbar, address bar, find in page, badges, pop-ups as windows, script dialogs as sheets, permission prompts | one view, default (off-the-record in Qt 6) profile | KEEP | done (`web::*`, `ui::BrowserPage`, `ui::BrowserTabButton`; tst_browser_page) |
+| W1 | The browser page, general purpose, tied to no site, an empty tab shows a themed invitation (every http and https page stays in it, only mailto, tel and magnet go to the desktop): tabs on one persistent named profile, toolbar, address bar, find in page, badges, pop-ups as windows, script dialogs as sheets, permission prompts | one view, default (off-the-record in Qt 6) profile | KEEP | done (`web::*`, `ui::BrowserPage`, `ui::BrowserTabButton`; tst_browser_page) |
 | W2 | Ad blocking in three layers (interceptor host list, InnerTube response hooks, cosmetic CSS) with the "Ads blocked" badge; trackers blocked | 589-line substring list rebuilt per request, skip clicker, core.css | KEEP | done (`core::BlockList`, `web::RequestInterceptor`, `adblock.js`; badge on the page) |
 | W3 | Download this: a YouTube playlist page opens the Playlist page, a YouTube video page opens the Download options sheet, a page on any other site is probed and the answer decides (ADR-006); page-detected media button | none | KEEP | done (`BrowserPage` reads "Open playlist" on a playlist page; a video probes and opens the sheet; page-media button) |
 | W4 | Sign-in works (sanitised Chrome UA, Firefox identity on Google sign-in hosts) and is shared with the engine | Firefox 72 UA everywhere | KEEP | done (`web::user_agent`, `web::CookieExporter`; the engine hand-off lands with E5) |
@@ -120,5 +120,5 @@ Target 30 options at most. Restart required: interface scale, hardware accelerat
 |---|---|---|---|---|
 | L1 | Shared AccountAndLicense module, app code PLDL, 10-day evaluation | own module, 30 days, http | KEEP | done (`services::LicenseService`, app code PLDL, 10 days) |
 | L2 | 2.x account id migrated on first start | n/a | KEEP | done (`core::legacyAccountId`, tst_legacy_account; the 2.x download folder too, ADR-002) |
-| L3 | Gate: assumed Red's model, a daily allowance of free downloads (5 a day), everything visible; the owner may prefer 2.x's quality gate | quality above "Poor" | KEEP (assumption) | done as assumed (`DownloadsController::admit`, `LicenseService::canDownload`, 5 a day; the gate sheet offers View plans; the Downloads page shows "N of 5 downloads left today" on Free) |
+| L3 | Gate: a daily allowance of free downloads (5 a day), everything visible; the owner may prefer 2.x's quality gate | quality above "Poor" | KEEP (assumption) | done as assumed (`DownloadsController::admit`, `LicenseService::canDownload`, 5 a day; the gate sheet offers View plans; the Downloads page shows "N of 5 downloads left today" on Free) |
 | L4 | Plans sheet listing what is free and what Pro adds | none | KEEP | done (`ui::PlansDialog`, `ui::AccountDialog`: Free is 5 downloads a day with every quality, Pro has no daily limit; reworded 2026-09-24) |

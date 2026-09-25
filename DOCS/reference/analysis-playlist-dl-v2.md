@@ -1,6 +1,6 @@
 # Analysis: Playlist-Dl v2.x (frozen, 2026-09-24)
 
-Source: `/home/commander/DCode/p-pldl` (git history: 14 commits, 2022-03-07 to 2026-09-23; last
+Source: the 2.x tree, now branch `old-qt5` (git history: 14 commits, 2022-03-07 to 2026-09-23; last
 user-facing release "2.1"/"2.2" in 2024, project version now 3.0.0 after the Qt 6 port). About
 10,000 lines of C++ (`.cpp` + `.h`), 4,171 lines of `.ui`, 1,164 lines of JS/CSS/ad-list.
 Everything below is from reading the full source, not from memory. Runtime behaviour is that of
@@ -67,7 +67,7 @@ Line counts are `wc -l`. "Talks to" lists the classes or endpoints a file depend
 |---|---|---|---|
 | `main.cpp` | 48 | Entry point | Argv patch `--disable-web-security`, app/org name, `RunGuard`, shows `MainWindow` |
 | `mainwindow.cpp/.h/.ui` | 511/84/43 | Shell window | Toolbar actions, `SlidingStackedWidget` with 5 pages, back-stack `stackVector`, dark/light palette, shared `QNetworkAccessManager` + `QNetworkDiskCache`, wires all pages, Settings/About/Account dialogs, RateApp, `Esc` filter |
-| `playlistsearch.cpp/.h/.ui` | 282/62/71 | Home page: search | Calls `ktechpit.com/USS/Olivia/youtube/api.php`, parses JSON array into `PlayListItem`s, URL detection regex, Force Reload (drops cache entry), `Esc` cancels |
+| `playlistsearch.cpp/.h/.ui` | 282/62/71 | Home page: search | Calls the ktechpit search service, parses JSON array into `PlayListItem`s, URL detection regex, Force Reload (drops cache entry), `Esc` cancels |
 | `onlinesearchsuggestion.cpp/.h` | 210/50 | Suggest popup on the search line edit | `http://suggestqueries.google.com` every 500 ms after typing, own `QNetworkAccessManager` |
 | `playlistitem.cpp/.h/.ui` | 88/38/215 | Search result row | Thumbnail, title, author, count, first videos list, menu (View / Bookmark) |
 | `playlistview.cpp/.h/.ui` | 352/73/259 | Playlist page | Runs `python3 core --dump-single-json --flat-playlist`, caches JSON in `playlist_cache/<id>`, `VideoItem` list, filter, select all, play buttons, copy URL |
@@ -155,7 +155,7 @@ QNetworkDiskCache and searches again), results `QListWidget`. Suggestions popup
 (`onlineSearchSuggestion`) fires 500 ms after typing unless the text contains `http`/`www.`.
 
 Flow: Enter or Search -> `doSearch()` -> if the button says "Process Playlist" extract the id and
-emit `loadPlaylist(id)`; otherwise `GET https://ktechpit.com/USS/Olivia/youtube/api.php?query=<term>`
+emit `loadPlaylist(id)`; otherwise the ktechpit search service
 on the shared manager (disk cache, default cache policy). `processResult()` parses the body as a
 JSON array; each object yields `title`, `playlistId`, `author`, `authorId`, `videoCount`,
 `playlistThumbnail` (with `hqdefault` rewritten to `mqdefault`) and `videos[]` of
@@ -426,7 +426,7 @@ Total: 25 + 15 + 3 + 1 = 44 distinct keys. Other files under `<AppLocalData>`: `
 
 | # | URL | Scheme | Purpose, where |
 |---|---|---|---|
-| 1 | `https://ktechpit.com/USS/Olivia/youtube/api.php?query=<term>` | https | Playlist search ("ktechpit based search", shared with the author's Olivia app; response is Invidious `search?type=playlist` shaped JSON). `playlistsearch.cpp:89` |
+| 1 | the ktechpit search service | https | Playlist search ("ktechpit based search", shared with the author's Olivia app; response is Invidious `search?type=playlist` shaped JSON). `playlistsearch.cpp:89` |
 | 2 | `http://suggestqueries.google.com/complete/search?ds=yt&client=youtube&hjson=t&cp=1&format=5&alt=json&q=<text>` | http | Search suggestions, parsed as nested JSON arrays. `onlinesearchsuggestion.cpp:5` |
 | 3 | `https://i.ytimg.com/vi/<videoId>/mqdefault.jpg` | https | Thumbnails everywhere (`playlistitem`, `videoitem`, `playlistview`, `playlistdownloadoptions`, `downloadwidget`, `playlistentryitem`) |
 | 4 | `https://m.youtube.com/playlist?list=<id>` | https | Fed to yt-dlp for flattening. `playlistview.cpp:68` |

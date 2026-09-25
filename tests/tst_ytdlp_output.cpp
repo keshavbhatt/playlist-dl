@@ -13,7 +13,7 @@ private Q_SLOTS:
     void progressLine()
     {
         const auto e = parseOutputLine(
-            u"RED:{\"status\":\"downloading\",\"downloaded\":3072,\"total\":117526,\"estimate\":0,\"speed\":45434.4,\"eta\":2,\"filename\":\"out/x.m4a\",\"index\":3,\"id\":\"jNQXAC9IVRw\",\"count\":10}"_s);
+            u"PLDL:{\"status\":\"downloading\",\"downloaded\":3072,\"total\":117526,\"estimate\":0,\"speed\":45434.4,\"eta\":2,\"filename\":\"out/x.m4a\",\"index\":3,\"id\":\"jNQXAC9IVRw\",\"count\":10}"_s);
         QVERIFY(e.has_value());
         const auto* p = std::get_if<ProgressEvent>(&*e);
         QVERIFY(p != nullptr);
@@ -29,17 +29,17 @@ private Q_SLOTS:
     void otherLines()
     {
         const auto pp =
-            parseOutputLine(u"REDPP:{\"status\":\"started\",\"postprocessor\":\"Merger\",\"id\":\"x\"}"_s);
+            parseOutputLine(u"PLDLPP:{\"status\":\"started\",\"postprocessor\":\"Merger\",\"id\":\"x\"}"_s);
         QVERIFY(std::holds_alternative<PostprocessEvent>(*pp));
         QCOMPARE(std::get<PostprocessEvent>(*pp).label(), u"Merging streams"_s);
 
         const auto item = parseOutputLine(
-            u"REDITEM:{\"id\":\"v\",\"title\":\"T\",\"index\":2,\"count\":5,\"thumbnail\":\"t\",\"duration\":19,\"uploader\":\"U\",\"url\":\"w\"}"_s);
+            u"PLDLITEM:{\"id\":\"v\",\"title\":\"T\",\"index\":2,\"count\":5,\"thumbnail\":\"t\",\"duration\":19,\"uploader\":\"U\",\"url\":\"w\"}"_s);
         QVERIFY(std::holds_alternative<ItemEvent>(*item));
         QCOMPARE(std::get<ItemEvent>(*item).count, 5);
 
-        const auto file = parseOutputLine(u"REDFILE:/home/u/Videos/Red/Me at the zoo.mp4"_s);
-        QCOMPARE(std::get<FileEvent>(*file).path, u"/home/u/Videos/Red/Me at the zoo.mp4"_s);
+        const auto file = parseOutputLine(u"PLDLFILE:/home/u/Videos/Playlists/Me at the zoo.mp4"_s);
+        QCOMPARE(std::get<FileEvent>(*file).path, u"/home/u/Videos/Playlists/Me at the zoo.mp4"_s);
 
         const auto err = parseOutputLine(u"ERROR: [youtube] abc: Video unavailable"_s);
         QCOMPARE(std::get<MessageEvent>(*err).level, MessageEvent::Level::Error);
@@ -48,7 +48,7 @@ private Q_SLOTS:
         const auto info = parseOutputLine(u"[youtube] Extracting URL"_s);
         QCOMPARE(std::get<MessageEvent>(*info).level, MessageEvent::Level::Info);
         QVERIFY(!parseOutputLine(u"   "_s).has_value());
-        QVERIFY(!parseOutputLine(u"RED:not json"_s).has_value());
+        QVERIFY(!parseOutputLine(u"PLDL:not json"_s).has_value());
     }
 
     void friendlyErrors()

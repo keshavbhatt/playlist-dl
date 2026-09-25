@@ -1,4 +1,4 @@
-// Drives the queue with a fake yt-dlp (a shell script that speaks the RED:
+// Drives the queue with a fake yt-dlp (a shell script that speaks the PLDL:
 // protocol) so scheduling, progress, pause/resume, persistence and failure
 // handling are tested without the network.
 
@@ -31,21 +31,21 @@ private Q_SLOTS:
             QByteArray() + "#!/bin/sh\n" + "url=$(eval echo \\${$#})\n" +
             "out=\"$(dirname \"$0\")/result.mp4\"\n" +
             "case \"$url\" in *fail*) echo \"ERROR: [youtube] x: Video unavailable\" 1>&2; exit 1;; esac\n" +
-            "echo 'REDITEM:{\"id\":\"vid\",\"title\":\"Fake "
+            "echo 'PLDLITEM:{\"id\":\"vid\",\"title\":\"Fake "
             "video\",\"index\":0,\"count\":0,\"thumbnail\":\"\",\"duration\":19,\"uploader\":\"U\",\"url\":"
             "\"u\"}'\n" +
             "for n in 100 200 300; do\n" +
             "  echo "
-            "\"RED:{\\\"status\\\":\\\"downloading\\\",\\\"downloaded\\\":$n,\\\"total\\\":300,"
+            "\"PLDL:{\\\"status\\\":\\\"downloading\\\",\\\"downloaded\\\":$n,\\\"total\\\":300,"
             "\\\"estimate\\\":0,\\\"speed\\\":50,\\\"eta\\\":1,\\\"filename\\\":\\\"$out\\\",\\\"index\\\":0,"
             "\\\"id\\\":\\\"vid\\\",\\\"count\\\":0}\"\n" +
             "  sleep 0.15\n" + "done\n" +
             "echo "
-            "'RED:{\"status\":\"finished\",\"downloaded\":300,\"total\":300,\"estimate\":0,\"speed\":0,"
+            "'PLDL:{\"status\":\"finished\",\"downloaded\":300,\"total\":300,\"estimate\":0,\"speed\":0,"
             "\"eta\":0,\"filename\":\"x\",\"index\":0,\"id\":\"vid\",\"count\":0}'\n" +
-            "echo 'REDPP:{\"status\":\"started\",\"postprocessor\":\"Merger\",\"id\":\"vid\"}'\n" +
-            "echo 'REDPP:{\"status\":\"finished\",\"postprocessor\":\"Merger\",\"id\":\"vid\"}'\n" +
-            "printf 'abc' > \"$out\"\n" + "echo \"REDFILE:$out\"\n" + "\n");
+            "echo 'PLDLPP:{\"status\":\"started\",\"postprocessor\":\"Merger\",\"id\":\"vid\"}'\n" +
+            "echo 'PLDLPP:{\"status\":\"finished\",\"postprocessor\":\"Merger\",\"id\":\"vid\"}'\n" +
+            "printf 'abc' > \"$out\"\n" + "echo \"PLDLFILE:$out\"\n" + "\n");
         script.close();
         QVERIFY(QFile::setPermissions(m_fake, QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner));
     }

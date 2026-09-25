@@ -47,9 +47,9 @@ private Q_SLOTS:
         QVERIFY(kept.contains(u"thumbnail:/data/thumbs/7-full.%(ext)s"_s));
         QCOMPARE(args.at(args.size() - 2), u"--"_s);
         const QString joined = args.join(u'\n');
-        QVERIFY(joined.contains(u"download:RED:{"_s));
-        QVERIFY(joined.contains(u"postprocess:REDPP:{"_s));
-        QVERIFY(joined.contains(u"after_move:REDFILE:%(filepath)s"_s));
+        QVERIFY(joined.contains(u"download:PLDL:{"_s));
+        QVERIFY(joined.contains(u"postprocess:PLDLPP:{"_s));
+        QVERIFY(joined.contains(u"after_move:PLDLFILE:%(filepath)s"_s));
     }
 
     void audioAndCustom()
