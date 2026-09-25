@@ -21,8 +21,8 @@
    Nothing is pushed until this is answered.
 2. **The gate** (FEATURES L3): assumed Red's daily allowance (5 free downloads a day); 2.x
    gated quality above "Poor" instead.
-3. **Display name**: "Playlist Downloader" (the icon set's wording) instead of "Playlist-Dl";
-   the snap keeps its name.
+3. **Display name**: decided 2026-09-25: "Playlist Downloader" stays everywhere; About shows
+   "Playlist Downloader (playlist-dl)" so the package name is visible; the snap keeps its name.
 
 ## Sessions (newest first)
 

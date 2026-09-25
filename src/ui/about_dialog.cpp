@@ -60,7 +60,9 @@ void AboutDialog::setupUi()
     hero->addWidget(icon, 0, Qt::AlignTop);
     auto* identity = new QVBoxLayout;
     identity->setSpacing(3);
-    auto* name = new QLabel(u"Playlist Downloader"_s, this);
+    // The display name, with the package name users type and search for (owner, 2026-09-25).
+    auto* name = new QLabel(u"Playlist Downloader (playlist-dl)"_s, this);
+    name->setObjectName(u"appName"_s);
     name->setProperty("pldlHeading", true);
     identity->addWidget(name);
     auto* tagline = new QLabel(tr("Save whole playlists offline, from YouTube and any site."), this);

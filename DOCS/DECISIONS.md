@@ -104,6 +104,13 @@ the owner decides between a private repository with a metadata-only public one (
 model) and keeping the GPL, in which case the copied code has to be relicensed by its
 owner. Recorded as the first open question in PROGRESS.md.
 
+## ADR-007: the display name (2026-09-25)
+
+The app is "Playlist Downloader" in the window, the store copy and the docs; the binary,
+the snap and the desktop id stay `playlist-dl`. About shows "Playlist Downloader
+(playlist-dl)" so the name people type and search for is visible in one place. Closes the
+third open question of ADR-005.
+
 ## ADR-006: playlists from any site (2026-09-24)
 
 The owner: "playlist-dl is not anymore just for YouTube, it's playlists from anywhere", and
