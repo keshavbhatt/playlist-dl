@@ -52,6 +52,9 @@
   `EngineManager::downloadFile` now retries a transient failure once after 1.5 s. The
   engine's requests identified themselves as Red/10; they now say Playlist-Downloader/3.
   Temporary cookie files, notification ids and the test profile dropped the Red prefix.
+- Owner: no way back to the clean Search view after a search. `SearchPage::resetToEmpty`:
+  the field's clear button, Esc on results and an empty search all clear the query and the
+  results and show the invitation again (tst_search_page).
 - Owner: the fixed example chips looked odd. They now come from the suggestion service:
   three seeds a day (rotating through twelve), one completion each, deduplicated, the fixed
   three until an answer arrives or when Suggest as I type is off (tst_search_page).

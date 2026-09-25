@@ -17,6 +17,8 @@ Type what you are looking for and press Enter. Suggestions appear as you type (S
 Suggest as I type); the results
 are playlist cards with the number of items on each. Click a card to open the playlist.
 The two buttons at the right end of the header switch between cards and a list of rows.
+To start over, clear the field with its clear button, press Esc, or search with the field
+empty: the results go and the start view comes back.
 Recent searches come back as chips under the field (Settings, General, Keep search history).
 A playlist link from any other site (a SoundCloud set, for example) opens on the Playlist page
 too; a link to a single track or video opens the download options.

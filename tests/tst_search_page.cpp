@@ -25,6 +25,7 @@
 #include <QTemporaryDir>
 #include <QTcpServer>
 #include <QTcpSocket>
+#include <QAction>
 #include <QTest>
 #include <QToolButton>
 
@@ -265,6 +266,37 @@ private Q_SLOTS:
         QCOMPARE(other.size(), 1);
         QCOMPARE(m_page->state(), SearchPage::State::Error);
         QVERIFY(!m_page->retryButton()->isVisible());
+    }
+
+    void theCleanPageComesBack()
+    {
+        m_page->showResults(canned(5), true);
+        m_page->queryField()->setText(u"lofi"_s);
+        QCOMPARE(m_page->state(), SearchPage::State::Results);
+        // An empty search: back to the invitation, results gone.
+        m_page->search(QString());
+        QCOMPARE(m_page->state(), SearchPage::State::Empty);
+        QCOMPARE(m_page->results().size(), 0);
+        QVERIFY(m_page->queryField()->text().isEmpty());
+        // Esc on results does the same.
+        m_page->showResults(canned(3), false);
+        m_page->queryField()->setText(u"lofi"_s);
+        m_page->queryField()->setFocus();
+        QTest::keyClick(m_page->queryField(), Qt::Key_Escape);
+        QCOMPARE(m_page->state(), SearchPage::State::Empty);
+        QVERIFY(m_page->queryField()->text().isEmpty());
+        // The field's clear button too.
+        m_page->showResults(canned(2), false);
+        m_page->queryField()->setText(u"lofi"_s);
+        QAction* clear = nullptr;
+        for (QAction* action : m_page->queryField()->findChildren<QAction*>()) {
+            if (action->objectName() == u"_q_qlineeditclearaction"_s) {
+                clear = action;
+            }
+        }
+        QVERIFY(clear != nullptr);
+        clear->trigger();
+        QCOMPARE(m_page->state(), SearchPage::State::Empty);
     }
 
     void cannedResultsShowCardsAndTheChip()

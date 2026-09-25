@@ -16,6 +16,7 @@
 #include <QAbstractButton>
 #include <QHBoxLayout>
 #include <QKeyEvent>
+#include <QAction>
 #include <QDate>
 #include <QLabel>
 #include <QLineEdit>
@@ -127,6 +128,16 @@ void SearchPage::buildHeader()
     m_field->setPlaceholderText(tr("Search YouTube playlists, or paste a playlist link from any site"));
     m_field->setAccessibleName(tr("Search query"));
     m_field->setClearButtonEnabled(true);
+    // The field's own clear button resets the page, not just the text.
+    for (QAction* action : m_field->findChildren<QAction*>()) {
+        if (action->objectName() == u"_q_qlineeditclearaction"_s) {
+            connect(action, &QAction::triggered, this, [this] {
+                if (m_state != State::Empty) {
+                    resetToEmpty();
+                }
+            });
+        }
+    }
     m_field->installEventFilter(this);
     connect(m_field, &QLineEdit::textEdited, this, [this](const QString& text) {
         if (!m_settings.searchSuggestions() || text.trimmed().isEmpty() || looksLikeLink(text)) {
@@ -462,7 +473,7 @@ void SearchPage::search(const QString& text)
     hideSuggestions();
     m_suggestions->cancel();
     if (trimmed.isEmpty()) {
-        m_field->setFocus();
+        resetToEmpty(); // Enter or Search on an empty field: the clean page
         return;
     }
     QUrl url;
@@ -512,6 +523,22 @@ void SearchPage::startSearch(const QString& query, int page)
     }
     m_page = page;
     m_searchId = m_search->search(query, page);
+}
+
+void SearchPage::resetToEmpty()
+{
+    cancelSearch();
+    hideSuggestions();
+    m_suggestions->cancel();
+    m_query.clear();
+    m_results.clear();
+    m_model->clear();
+    m_hasMore = false;
+    if (!m_field->text().isEmpty()) {
+        m_field->clear();
+    }
+    setState(State::Empty);
+    m_field->setFocus();
 }
 
 void SearchPage::cancelSearch()
@@ -835,6 +862,8 @@ bool SearchPage::eventFilter(QObject* watched, QEvent* event)
                     m_suggestions->cancel();
                 } else if (m_searchId != 0) {
                     cancelSearch();
+                } else if (m_state != State::Empty) {
+                    resetToEmpty(); // results on show: Esc clears them and the query
                 } else {
                     return false;
                 }

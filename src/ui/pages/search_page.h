@@ -80,6 +80,9 @@ public:
     /// searching (the debug hook, the tests).
     void typeQuery(const QString& text);
     void cancelSearch();
+    /// Back to the clean page: no query, no results, the invitation and today's examples
+    /// (owner, 2026-09-25). The field's clear button, an empty search and Esc all do it.
+    void resetToEmpty();
     /// The window's answer to engineNeeded once the engine is provisioned.
     void setEnginePaths(const core::EnginePaths& paths);
     /// The engine's progress while the page waits for it (State::SettingUp).
